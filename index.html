@@ -1,0 +1,716 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NextLayer - Portal</title>
+    <style>
+        /* Estilos CSS Atualizados e Revisados */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem 0;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            width: 90%;
+            max-width: 600px;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .screen {
+            display: none;
+        }
+
+            .screen.active {
+                display: block;
+            }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        h3 {
+            margin-top: 1.5rem;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 0.5rem;
+                color: #555;
+                font-weight: 500;
+            }
+
+            .form-group input, .form-group textarea, .form-group select {
+                width: 100%;
+                padding: 0.75rem;
+                box-sizing: border-box;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 1rem;
+            }
+
+                .form-group input[type="file"] {
+                    padding: 0.3rem;
+                    border: none;
+                }
+
+        .btn {
+            width: 100%;
+            padding: 0.85rem;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 1rem;
+        }
+
+            .btn:hover {
+                background-color: #0056b3;
+            }
+
+            .btn:disabled {
+                background-color: #a0cfff;
+                cursor: not-allowed;
+            }
+
+        .nav-links {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .nav-link {
+            color: #007bff;
+            cursor: pointer;
+            margin: 0 0.5rem;
+            text-decoration: none;
+        }
+
+            .nav-link:hover {
+                text-decoration: underline;
+            }
+
+        #message-area {
+            text-align: center;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-radius: 4px;
+            display: none;
+            word-wrap: break-word;
+        }
+
+            #message-area.success {
+                background-color: #d4edda;
+                color: #155724;
+                display: block;
+            }
+
+            #message-area.error {
+                background-color: #f8d7da;
+                color: #721c24;
+                display: block;
+            }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+            .header h2 {
+                margin: 0;
+                padding: 0;
+                text-align: left;
+                flex-grow: 1;
+            }
+
+        .btn-action {
+            background: none;
+            border: 1px solid #007bff;
+            color: #007bff;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-left: 0.5rem;
+            flex-shrink: 0;
+        }
+
+            .btn-action:hover {
+                background-color: #e7f3ff;
+            }
+
+        .btn-logout {
+            background: none;
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-left: 0.5rem;
+            flex-shrink: 0;
+        }
+
+            .btn-logout:hover {
+                background-color: #f8d7da;
+            }
+
+        .btn-back {
+            background: none;
+            border: 1px solid #6c757d;
+            color: #6c757d;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+            .btn-back:hover {
+                background-color: #e9ecef;
+            }
+
+        /* Grid de Chamados */
+        .ticket-grid-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .ticket-grid {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .ticket-grid th, .ticket-grid td {
+                border-bottom: 1px solid #ddd;
+                padding: 0.75rem;
+                text-align: left;
+                vertical-align: top;
+            }
+
+            .ticket-grid th {
+                background-color: #f9f9f9;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+            }
+
+            .ticket-grid tbody tr {
+                cursor: pointer;
+            }
+
+                .ticket-grid tbody tr:hover {
+                    background-color: #f0f8ff;
+                }
+
+            .ticket-grid td:last-child, .ticket-grid th:last-child {
+                padding-right: 1rem;
+            }
+
+            .ticket-grid td:first-child, .ticket-grid th:first-child {
+                padding-left: 1rem;
+            }
+
+        /* Chat */
+        .chat-container {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 1.5rem;
+        }
+
+        .chat-header {
+            background-color: #f9f9f9;
+            padding: 1rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+            .chat-header h4 {
+                margin: 0;
+                color: #333;
+            }
+
+            .chat-header span {
+                font-size: 0.9rem;
+                color: #666;
+                display: block;
+                margin-top: 0.2rem;
+            }
+
+        .anexos-list {
+            padding: 0.5rem 1rem 1rem 1rem;
+            border-bottom: 1px solid #eee;
+            background-color: #fdfdfd;
+        }
+
+            .anexos-list strong {
+                font-size: 0.9rem;
+                color: #555;
+            }
+
+            .anexos-list ul {
+                list-style: none;
+                padding-left: 0;
+                margin: 0.5rem 0 0 0;
+            }
+
+            .anexos-list li {
+                margin-bottom: 0.3rem;
+            }
+
+                .anexos-list li a {
+                    text-decoration: none;
+                    color: #007bff;
+                    font-size: 0.9rem;
+                    word-break: break-all;
+                }
+
+                    .anexos-list li a:hover {
+                        text-decoration: underline;
+                    }
+
+        .chat-messages {
+            height: 350px;
+            overflow-y: auto;
+            padding: 1rem;
+            background-color: #f5f5f5;
+        }
+
+        .chat-message {
+            margin-bottom: 1rem;
+            max-width: 80%;
+            display: flex;
+            flex-direction: column;
+        }
+
+            .chat-message .sender {
+                font-weight: bold;
+                font-size: 0.85rem;
+                color: #333;
+                margin-bottom: 0.2rem;
+                display: block;
+            }
+
+            .chat-message .timestamp {
+                font-size: 0.75rem;
+                color: #999;
+                margin-left: 0.5rem;
+            }
+
+            .chat-message .content {
+                padding: 0.75rem;
+                border-radius: 8px;
+                margin-top: 0.25rem;
+                word-wrap: break-word;
+                line-height: 1.4;
+            }
+
+            /* Alinhamento e Cores */
+            .chat-message.other {
+                align-items: flex-start;
+                margin-right: auto;
+            }
+
+                .chat-message.other .sender {
+                    text-align: left;
+                }
+
+            .chat-message.viewer {
+                align-items: flex-end;
+                margin-left: auto;
+            }
+
+                .chat-message.viewer .sender {
+                    text-align: right;
+                }
+
+                .chat-message.viewer .content {
+                    background-color: #007bff;
+                    color: white;
+                }
+
+            .chat-message.other.client .content {
+                background-color: #e9ecef;
+                color: #333;
+            }
+
+            .chat-message.other.ia .content {
+                background-color: #f8f9fa;
+                border: 1px solid #e9ecef;
+                color: #444;
+            }
+
+            .chat-message.other.analyst .content {
+                background-color: #d1ecf1;
+                color: #0c5460;
+            }
+
+        .chat-input-form {
+            display: flex;
+            border-top: 1px solid #ddd;
+        }
+
+            .chat-input-form input {
+                flex-grow: 1;
+                border: none;
+                padding: 1rem;
+                border-radius: 0 0 0 4px;
+                outline: none;
+                font-size: 1rem;
+            }
+
+            .chat-input-form button {
+                border: none;
+                background-color: #007bff;
+                color: white;
+                padding: 0 1.5rem;
+                cursor: pointer;
+                border-radius: 0 0 4px 0;
+                font-size: 1rem;
+                flex-shrink: 0;
+            }
+
+                .chat-input-form button:hover {
+                    background-color: #0056b3;
+                }
+
+                .chat-input-form button:disabled {
+                    background-color: #a0cfff;
+                    cursor: not-allowed;
+                }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="message-area"></div>
+        <div id="login-screen" class="screen active">
+            <h2>NextLayer Login</h2>
+            <form id="login-form">
+                <div class="form-group"> <label for="login-email">E-mail</label> <input type="email" id="login-email" required autocomplete="email"> </div>
+                <div class="form-group"> <label for="login-password">Senha</label> <input type="password" id="login-password" required autocomplete="current-password"> </div>
+                <button type="submit" class="btn">Entrar</button>
+            </form>
+            <div class="nav-links"> <span class="nav-link" onclick="showScreen('client-register-screen')">Cadastrar Cliente</span> <span class="nav-link" onclick="showScreen('employee-register-screen')">Cadastrar Funcionário</span> </div>
+        </div>
+        <div id="client-register-screen" class="screen">
+            <h2>Cadastro de Cliente</h2>
+            <form id="client-register-form">
+                <div class="form-group"> <label for="client-name">Nome Completo</label> <input type="text" id="client-name" required autocomplete="name"> </div>
+                <div class="form-group"> <label for="client-email">E-mail</label> <input type="email" id="client-email" required autocomplete="email"> </div>
+                <div class="form-group"> <label for="client-cpf">CPF</label> <input type="text" id="client-cpf" required> </div>
+                <div class="form-group"> <label for="client-password">Senha (mín. 6 caracteres)</label> <input type="password" id="client-password" minlength="6" required autocomplete="new-password"> </div>
+                <div class="form-group"> <label for="client-confirm-password">Confirmar Senha</label> <input type="password" id="client-confirm-password" required autocomplete="new-password"> </div>
+                <button type="submit" class="btn">Cadastrar</button>
+            </form>
+            <div class="nav-links"> <span class="nav-link" onclick="showScreen('login-screen')">Voltar para Login</span> </div>
+        </div>
+        <div id="employee-register-screen" class="screen">
+            <h2>Cadastro de Funcionário</h2>
+            <form id="employee-register-form">
+                <div class="form-group"> <label for="employee-name">Nome Completo</label> <input type="text" id="employee-name" required autocomplete="name"> </div>
+                <div class="form-group"> <label for="employee-email">E-mail Institucional</label> <input type="email" id="employee-email" required autocomplete="email"> </div>
+                <div class="form-group"> <label for="employee-role">Cargo (Ex: Analista N1)</label> <input type="text" id="employee-role" required> </div>
+                <div class="form-group"> <label for="employee-password">Senha (mín. 6 caracteres)</label> <input type="password" id="employee-password" minlength="6" required autocomplete="new-password"> </div>
+                <div class="form-group"> <label for="employee-confirm-password">Confirmar Senha</label> <input type="password" id="employee-confirm-password" required autocomplete="new-password"> </div>
+                <button type="submit" class="btn">Cadastrar</button>
+            </form>
+            <div class="nav-links"> <span class="nav-link" onclick="showScreen('login-screen')">Voltar para Login</span> </div>
+        </div>
+        <div id="client-dashboard-screen" class="screen">
+            <div class="header"> <h2>Portal do Cliente</h2> <button class="btn-logout" onclick="logout()">Sair</button> </div>
+            <h3>Abrir Novo Chamado</h3>
+            <form id="client-ticket-form">
+                <div class="form-group"> <label for="ticket-titulo">Título</label> <input type="text" id="ticket-titulo" required> </div>
+                <div class="form-group"> <label for="ticket-descricao">Descrição do Problema</label> <textarea id="ticket-descricao" rows="5" required></textarea> </div>
+                <div class="form-group"> <label for="ticket-imagens">Anexar Imagens (Opcional, máx. ${MAX_FILE_SIZE_MB}MB por arquivo)</label> <input type="file" id="ticket-imagens" accept="image/*" multiple> </div>
+                <button type="submit" class="btn" id="btn-criar-chamado">Enviar Chamado e Abrir Chat</button>
+            </form>
+            <h3 style="margin-top: 2.5rem; border-top: 1px solid #eee; padding-top: 2rem;">Meus Chamados</h3>
+            <div class="ticket-grid-container">
+                <table class="ticket-grid">
+                    <thead> <tr> <th>Nº Chamado</th> <th>Título</th> <th>Abertura</th> <th>Status</th> </tr> </thead>
+                    <tbody id="client-ticket-grid-body"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="employee-dashboard-screen" class="screen">
+            <div class="header"> <h2>Painel do Analista</h2> <button class="btn-logout" onclick="logout()">Sair</button> </div>
+            <h3>Chamados Atribuídos / Em Aberto</h3>
+            <div class="ticket-grid-container">
+                <table class="ticket-grid">
+                    <thead> <tr> <th>Nº Chamado</th> <th>Título</th> <th>Cliente</th> <th>Abertura</th> <th>Status</th> </tr> </thead>
+                    <tbody id="analyst-ticket-grid-body"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="chat-screen" class="screen">
+            <div class="header">
+                <button class="btn-back" id="chat-btn-back" title="Voltar para o painel">← Voltar</button>
+                <h2 id="chat-header-title" style="text-align: left;">Chat do Chamado</h2>
+                <button class="btn-action" id="chat-btn-refresh" title="Atualizar mensagens">↻ Atualizar</button>
+                <button class="btn-logout" onclick="logout()">Sair</button>
+            </div>
+            <div class="chat-container">
+                <div class="chat-header"> <h4 id="chat-titulo">Carregando...</h4> <span id="chat-numero">...</span> </div>
+                <div class="anexos-list" id="chat-anexos-container" style="display: none;">
+                    <strong>Anexos:</strong>
+                    <ul id="chat-anexos-list"></ul>
+                </div>
+                <div class="chat-messages" id="chat-messages-area"><p style="text-align:center; color:#999;">Carregando mensagens...</p></div>
+                <form class="chat-input-form" id="chat-message-form">
+                    <input type="text" id="chat-message-input" placeholder="Digite sua mensagem..." required autocomplete="off">
+                    <button type="submit" id="btn-enviar-msg">Enviar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURAÇÃO E VARIÁVEIS GLOBAIS ---
+        const API_URL = "https://localhost:7121"; // CONFIRME A PORTA!
+        const MAX_FILE_SIZE_MB = 5;
+        const MAX_TOTAL_FILES = 5;
+        const messageArea = document.getElementById('message-area');
+        let currentUserType = null; // 'Client' ou 'Employee'
+        let currentChamadoId = null;
+
+        // --- FUNÇÕES AUXILIARES ---
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+            const screenToShow = document.getElementById(screenId);
+            if (screenToShow) { screenToShow.classList.add('active'); }
+            else { console.error("Tela inexistente:", screenId); showScreen('login-screen'); }
+            showMessage('', false); window.scrollTo(0, 0);
+        }
+        function showMessage(message, isError = false) {
+            if (!messageArea) return;
+            if (messageArea.timerId) clearTimeout(messageArea.timerId);
+            messageArea.textContent = message; messageArea.className = message ? (isError ? 'error' : 'success') : '';
+            const timeout = isError ? 8000 : 5000;
+            if (message) { messageArea.timerId = setTimeout(() => { showMessage(''); }, timeout); }
+        }
+        function formatISODate(isoDateString) {
+            if (!isoDateString) return '-';
+            try { return new Date(isoDateString).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+            catch (e) { console.error("Erro formatar data:", isoDateString, e); return isoDateString; }
+        }
+        function disableForm(formId, disable = true) {
+            const form = document.getElementById(formId); if (!form) return;
+            const elements = form.elements; let firstInput = null;
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].disabled = disable;
+                if (!firstInput && !['hidden', 'submit', 'button', 'reset'].includes(elements[i].type)) { firstInput = elements[i]; }
+            }
+            const button = form.querySelector('button[type="submit"]');
+            if (button) {
+                const originalText = button.dataset.originalText || button.textContent;
+                if (disable && !button.dataset.originalText) { button.dataset.originalText = originalText; }
+                button.textContent = disable ? 'Aguarde...' : originalText; button.disabled = disable;
+                if (!disable) delete button.dataset.originalText;
+            }
+            if (!disable && firstInput && formId !== 'login-form' && formId !== 'chat-message-form') { setTimeout(() => { try { firstInput.focus(); } catch (e) { } }, 100); }
+            else if (!disable && formId === 'chat-message-form') { setTimeout(() => { try { document.getElementById('chat-message-input').focus(); } catch (e) { } }, 100); }
+        }
+        function logout() {
+            currentUserType = null; currentChamadoId = null;
+            document.getElementById('analyst-ticket-grid-body').innerHTML = ''; document.getElementById('client-ticket-grid-body').innerHTML = '';
+            ['login-form', 'client-register-form', 'employee-register-form', 'client-ticket-form', 'chat-message-form'].forEach(id => { const form = document.getElementById(id); if (form) form.reset(); });
+            showScreen('login-screen');
+        }
+
+        // --- LÓGICA DE CARREGAMENTO DOS PAINÉIS ---
+        async function loadEmployeeDashboard() { /* ... (código mantido da versão anterior) ... */
+            const gridBody = document.getElementById('analyst-ticket-grid-body'); if (!gridBody) return;
+            gridBody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Carregando...</td></tr>`;
+            try {
+                const response = await fetch(`${API_URL}/api/Chamado/abertos`); if (!response.ok) throw new Error(`Erro ${response.status}.`);
+                const chamados = await response.json(); gridBody.innerHTML = '';
+                if (!chamados || chamados.length === 0) { gridBody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Nenhum chamado.</td></tr>`; return; }
+                chamados.forEach(chamado => {
+                    gridBody.innerHTML += `<tr onclick="abrirChat(${chamado.id})" title="Abrir ${chamado.numeroChamado}"><td>${chamado.numeroChamado || '-'}</td><td>${chamado.titulo || '-'}</td><td>${chamado.nomeCliente || '-'}</td><td>${formatISODate(chamado.dataAbertura)}</td><td>${chamado.status || '-'}</td></tr>`;
+                });
+            } catch (error) { console.error('Erro load analista:', error); gridBody.innerHTML = `<tr><td colspan="5" style="color:red; text-align: center;">${error.message || 'Erro ao conectar.'}</td></tr>`; }
+        }
+        async function loadClientDashboard() { /* ... (código mantido da versão anterior) ... */
+            const gridBody = document.getElementById('client-ticket-grid-body'); if (!gridBody) return;
+            gridBody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Carregando...</td></tr>`;
+            try {
+                const response = await fetch(`${API_URL}/api/Chamado/meuschamados`); if (!response.ok) throw new Error(`Erro ${response.status}.`);
+                const chamados = await response.json(); gridBody.innerHTML = '';
+                if (!chamados || chamados.length === 0) { gridBody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Nenhum chamado.</td></tr>`; return; }
+                chamados.forEach(chamado => {
+                    gridBody.innerHTML += `<tr onclick="abrirChat(${chamado.id})" title="Abrir ${chamado.numeroChamado}"><td>${chamado.numeroChamado || '-'}</td><td>${chamado.titulo || '-'}</td><td>${formatISODate(chamado.dataAbertura)}</td><td>${chamado.status || '-'}</td></tr>`;
+                });
+            } catch (error) { console.error('Erro load cliente:', error); gridBody.innerHTML = `<tr><td colspan="4" style="color:red; text-align: center;">${error.message || 'Erro ao conectar.'}</td></tr>`; }
+        }
+
+        // --- LÓGICA DO CHAT (Revisada com console.log) ---
+        async function abrirChat(chamadoId) {
+            if (!chamadoId) return; currentChamadoId = chamadoId; showScreen('chat-screen');
+            const chatTitulo = document.getElementById('chat-titulo'); const chatNumero = document.getElementById('chat-numero');
+            const chatAnexosContainer = document.getElementById('chat-anexos-container'); const chatAnexosList = document.getElementById('chat-anexos-list');
+            const chatMessagesArea = document.getElementById('chat-messages-area');
+
+            chatTitulo.textContent = 'Carregando...'; chatNumero.textContent = '...'; chatAnexosList.innerHTML = '';
+            chatAnexosContainer.style.display = 'none'; chatMessagesArea.innerHTML = '<p style="text-align:center; color:#999;">Carregando...</p>';
+            disableForm('chat-message-form', true);
+
+            try {
+                // TODO: JWT
+                const response = await fetch(`${API_URL}/api/Chamado/${chamadoId}`);
+                if (!response.ok) throw new Error(`Erro ${response.status}.`);
+                const chamado = await response.json();
+
+                // --- DEBUG CONSOLE.LOG ---
+                console.log("Dados recebidos do back-end para o chat:", chamado);
+                console.log("Mensagens recebidas:", chamado.mensagens);
+                // --- FIM DEBUG ---
+
+                chatTitulo.textContent = chamado.titulo || 'Chamado s/ título'; chatNumero.textContent = `${chamado.numeroChamado || 'N/A'} (${chamado.status || 'N/A'})`;
+
+                if (chamado.anexos && chamado.anexos.length > 0) {
+                    let anexosHtml = '';
+                    chamado.anexos.forEach(anexo => { if (anexo.urlArquivo && anexo.nomeArquivo) { const safeName = anexo.nomeArquivo.replace(/</g, "&lt;").replace(/>/g, "&gt;"); anexosHtml += `<li><a href="${anexo.urlArquivo}" target="_blank" rel="noopener noreferrer">${safeName}</a></li>`; } });
+                    if (anexosHtml) { chatAnexosList.innerHTML = anexosHtml; chatAnexosContainer.style.display = 'block'; }
+                }
+                renderizarMensagens(chamado.mensagens || []);
+            } catch (error) {
+                console.error('Erro abrir chat:', error); showMessage(`Erro chat: ${error.message}`, true); chatMessagesArea.innerHTML = `<p style="color:red; text-align:center;">Falha ao carregar.</p>`;
+            } finally { disableForm('chat-message-form', false); }
+        }
+
+        // Função renderizarMensagens (CORRIGIDA E FINAL)
+        function renderizarMensagens(mensagens) {
+            const chatMessagesArea = document.getElementById('chat-messages-area'); if (!chatMessagesArea) return;
+            chatMessagesArea.innerHTML = '';
+            if (!mensagens || mensagens.length === 0) { chatMessagesArea.innerHTML = `<p style="text-align:center; color:#999;">Sem mensagens.</p>`; return; }
+
+            mensagens.forEach(msg => {
+                const dataEnvio = formatISODate(msg.dataEnvio); let remetenteClasse = ''; let alinhamentoClasse = '';
+                if (msg.tipoRemetente === 'Client') remetenteClasse = 'client';
+                else if (msg.tipoRemetente === 'Employee') remetenteClasse = 'analyst';
+                else if (msg.tipoRemetente === 'IA') remetenteClasse = 'ia';
+
+                if ((msg.tipoRemetente === 'Client' && currentUserType === 'Client') || (msg.tipoRemetente === 'Employee' && currentUserType === 'Employee')) { alinhamentoClasse = 'viewer'; }
+                else { alinhamentoClasse = 'other'; }
+
+                const sanitizedContent = (msg.conteudo || '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                const sanitizedSender = (msg.remetenteNome || 'Desconhecido').replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+                chatMessagesArea.innerHTML += `<div class="chat-message ${alinhamentoClasse} ${remetenteClasse}"><span class="sender">${sanitizedSender}<span class="timestamp">${dataEnvio}</span></span><div class="content">${sanitizedContent}</div></div>`;
+            });
+            setTimeout(() => { chatMessagesArea.scrollTop = chatMessagesArea.scrollHeight; }, 50); // Delay p/ render
+        }
+
+        // Evento de "Voltar" do chat
+        document.getElementById('chat-btn-back').addEventListener('click', () => {
+            currentChamadoId = null; const targetScreen = currentUserType === "Client" ? 'client-dashboard-screen' : 'employee-dashboard-screen'; showScreen(targetScreen);
+            if (currentUserType === "Client") loadClientDashboard(); else loadEmployeeDashboard();
+        });
+
+        // Evento de "Atualizar" do chat
+        document.getElementById('chat-btn-refresh').addEventListener('click', () => {
+            if (currentChamadoId) { showMessage('Atualizando...', false); abrirChat(currentChamadoId); }
+        });
+
+        // Evento de enviar nova mensagem
+        document.getElementById('chat-message-form').addEventListener('submit', async function (event) {
+            event.preventDefault(); const input = document.getElementById('chat-message-input'); const conteudo = input.value.trim();
+            if (!conteudo || !currentChamadoId || !currentUserType) return;
+            disableForm('chat-message-form', true); const originalInputValue = conteudo; input.value = '';
+            try {
+                // TODO: JWT
+                const response = await fetch(`${API_URL}/api/Chamado/${currentChamadoId}/mensagem`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ Conteudo: conteudo, TipoRemetente: currentUserType }) });
+                if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.message || `Erro ${response.status}.`); }
+                const mensagensAtualizadas = await response.json(); renderizarMensagens(mensagensAtualizadas);
+            } catch (error) { console.error('Erro enviar msg:', error); showMessage(`Falha: ${error.message}`, true); input.value = originalInputValue; }
+            finally { disableForm('chat-message-form', false); setTimeout(() => { try { input.focus(); } catch (e) { } }, 100); }
+        });
+
+        // --- LÓGICA DO FORMULÁRIO DE CRIAR CHAMADO ---
+        document.getElementById('client-ticket-form').addEventListener('submit', async function (event) {
+            event.preventDefault(); showMessage('', false); const imagensInput = document.getElementById('ticket-imagens'); const imagens = imagensInput.files;
+            if (imagens.length > MAX_TOTAL_FILES) { showMessage(`Máx ${MAX_TOTAL_FILES} arquivos.`, true); imagensInput.value = ''; return; }
+            for (let i = 0; i < imagens.length; i++) { if (imagens[i].size > MAX_FILE_SIZE_MB * 1024 * 1024) { showMessage(`"${imagens[i].name}" > ${MAX_FILE_SIZE_MB}MB.`, true); imagensInput.value = ''; return; } }
+            disableForm('client-ticket-form', true); const formData = new FormData();
+            formData.append('Titulo', document.getElementById('ticket-titulo').value); formData.append('Descricao', document.getElementById('ticket-descricao').value);
+            for (let i = 0; i < imagens.length; i++) { formData.append('Imagens', imagens[i]); }
+            try {
+                // TODO: JWT
+                const response = await fetch(`${API_URL}/api/Chamado/criar`, { method: 'POST', body: formData });
+                if (response.status === 201) { const novoChamado = await response.json(); document.getElementById('client-ticket-form').reset(); abrirChat(novoChamado.id); }
+                else { const error = await response.json(); throw new Error(error.message || `Erro ${response.status}.`); }
+            } catch (error) { console.error('Erro criar chamado:', error); showMessage(`Falha: ${error.message}`, true); }
+            finally { disableForm('client-ticket-form', false); }
+        });
+
+        // --- LÓGICA DO LOGIN ---
+        document.getElementById('login-form').addEventListener('submit', async function (event) {
+            event.preventDefault(); showMessage('', false); disableForm('login-form', true);
+            const data = { email: document.getElementById('login-email').value, password: document.getElementById('login-password').value };
+            try {
+                const response = await fetch(`${API_URL}/api/Auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                const result = await response.json(); if (!response.ok) throw new Error(result.message || `Erro ${response.status}.`);
+                currentUserType = result.userType; document.getElementById('login-form').reset();
+                if (currentUserType === "Client") { showScreen('client-dashboard-screen'); loadClientDashboard(); }
+                else if (currentUserType === "Employee") { showScreen('employee-dashboard-screen'); loadEmployeeDashboard(); }
+                else { throw new Error('Tipo de usuário desconhecido.'); }
+            } catch (error) { console.error('Erro login:', error); showMessage(`Falha: ${error.message}`, true); }
+            finally { disableForm('login-form', false); }
+        });
+
+        // --- LÓGICA DOS CADASTROS ---
+        async function handleRegistration(formId, apiUrl) {
+            const form = document.getElementById(formId); if (!form) return; showMessage('', false); disableForm(formId, true);
+            const passwordInput = form.querySelector('input[type="password"][id$="-password"]'); const confirmPasswordInput = form.querySelector('input[type="password"][id$="-confirm-password"]');
+            if (passwordInput && confirmPasswordInput && passwordInput.value !== confirmPasswordInput.value) { showMessage('Senhas não conferem.', true); disableForm(formId, false); return; }
+            const viewModel = {};
+            try {
+                if (formId === 'client-register-form') { viewModel.name = document.getElementById('client-name').value; viewModel.email = document.getElementById('client-email').value; viewModel.cpf = document.getElementById('client-cpf').value; viewModel.password = passwordInput.value; viewModel.confirmPassword = confirmPasswordInput.value; }
+                else if (formId === 'employee-register-form') { viewModel.name = document.getElementById('employee-name').value; viewModel.email = document.getElementById('employee-email').value; viewModel.role = document.getElementById('employee-role').value; viewModel.password = passwordInput.value; viewModel.confirmPassword = confirmPasswordInput.value; }
+                else { throw new Error("ID inválido."); }
+            } catch (e) { showMessage("Erro lendo formulário.", true); console.error(e); disableForm(formId, false); return; }
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(viewModel) });
+                if (response.status === 201) { showMessage('Cadastrado! Faça login.', false); showScreen('login-screen'); form.reset(); }
+                else { const error = await response.json(); if (error.errors) { const firstKey = Object.keys(error.errors)[0]; showMessage(error.errors[firstKey][0], true); } else { showMessage(error.message || `Erro ${response.status}.`, true); } }
+            } catch (error) { console.error(`Erro (${formId}):`, error); showMessage('Não foi possível conectar.', true); }
+            finally { disableForm(formId, false); }
+        }
+        document.getElementById('client-register-form').addEventListener('submit', (e) => { e.preventDefault(); handleRegistration('client-register-form', `${API_URL}/api/Registration/client`); });
+        document.getElementById('employee-register-form').addEventListener('submit', (e) => { e.preventDefault(); handleRegistration('employee-register-form', `${API_URL}/api/Registration/employee`); });
+
+        // --- INICIALIZAÇÃO ---
+        console.log("Portal NextLayer v2 inicializado.");
+
+    </script>
+</body>
+</html>
