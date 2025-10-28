@@ -6,7 +6,7 @@
     <title>NextLayer - Portal</title>
     <style>
         /* --- INÍCIO DO CSS --- */
-        /* Estilos CSS Atualizados e Revisados */
+        /* (Estilos gerais, formulários, botões, etc.) */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #f4f7f6;
@@ -197,7 +197,6 @@
                 background-color: #e9ecef;
             }
 
-        /* Grid de Chamados */
         .ticket-grid-container {
             max-height: 400px;
             overflow-y: auto;
@@ -226,22 +225,86 @@
             }
 
             .ticket-grid tbody tr {
-                cursor: pointer;
+                cursor: default;
             }
-
+                /* Linha não é mais clicável */
                 .ticket-grid tbody tr:hover {
                     background-color: #f0f8ff;
                 }
+        /* CORREÇÃO: Célula clicável (apenas a que tiver esta classe) */
+        .grid-clickable-cell {
+            cursor: pointer;
+            text-decoration: underline;
+            color: #0056b3;
+        }
 
-            .ticket-grid td:last-child, .ticket-grid th:last-child {
-                padding-right: 1rem;
+        .ticket-grid td:last-child, .ticket-grid th:last-child {
+            padding-right: 1rem;
+        }
+
+        .ticket-grid td:first-child, .ticket-grid th:first-child {
+            padding-left: 1rem;
+        }
+
+        .status-select {
+            padding: 0.3rem 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #fff;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+
+            .status-select:disabled {
+                background-color: #e9ecef;
+                cursor: not-allowed;
+                opacity: 0.7;
             }
 
-            .ticket-grid td:first-child, .ticket-grid th:first-child {
-                padding-left: 1rem;
+        #analyst-controls {
+            display: none;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            background-color: #f9f9f9;
+        }
+
+            #analyst-controls h4 {
+                margin-top: 0;
+                margin-bottom: 1rem;
+                color: #333;
             }
 
-        /* Chat */
+        .analyst-controls-grid {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+            .analyst-controls-grid .form-group {
+                flex: 1;
+                min-width: 150px;
+                margin-bottom: 0.5rem;
+            }
+
+        #btn-save-analyst-changes {
+            width: auto;
+            padding: 0.5rem 1.5rem;
+            margin-top: 0.5rem;
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+            #btn-save-analyst-changes:hover {
+                background-color: #218838;
+            }
+
+            #btn-save-analyst-changes:disabled {
+                background-color: #94d3a2;
+                cursor: not-allowed;
+            }
+
         .chat-container {
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -334,7 +397,6 @@
                 line-height: 1.4;
             }
 
-            /* Alinhamento e Cores (Revisado) */
             .chat-message.other {
                 align-items: flex-start;
                 margin-right: auto;
@@ -413,7 +475,6 @@
 <body>
 
     <div class="container">
-
         <div id="message-area"></div>
 
         <div id="login-screen" class="screen active">
@@ -432,11 +493,11 @@
                 <div class="form-group"> <label for="client-name">Nome Completo</label> <input type="text" id="client-name" required autocomplete="name"> </div>
                 <div class="form-group"> <label for="client-email">E-mail</label> <input type="email" id="client-email" required autocomplete="email"> </div>
                 <div class="form-group"> <label for="client-cpf">CPF</label> <input type="text" id="client-cpf" required> </div>
-                <div class="form-group"> <label for="client-password">Senha (mín. 6 caracteres)</label> <input type="password" id="client-password" minlength="6" required autocomplete="new-password"> </div>
+                <div class="form-group"> <label for="client-password">Senha (mín. 6)</label> <input type="password" id="client-password" minlength="6" required autocomplete="new-password"> </div>
                 <div class="form-group"> <label for="client-confirm-password">Confirmar Senha</label> <input type="password" id="client-confirm-password" required autocomplete="new-password"> </div>
                 <button type="submit" class="btn">Cadastrar</button>
             </form>
-            <div class="nav-links"> <span class="nav-link" onclick="showScreen('login-screen')">Voltar para Login</span> </div>
+            <div class="nav-links"> <span class="nav-link" onclick="showScreen('login-screen')">Voltar</span> </div>
         </div>
 
         <div id="employee-register-screen" class="screen">
@@ -444,12 +505,12 @@
             <form id="employee-register-form">
                 <div class="form-group"> <label for="employee-name">Nome Completo</label> <input type="text" id="employee-name" required autocomplete="name"> </div>
                 <div class="form-group"> <label for="employee-email">E-mail Institucional</label> <input type="email" id="employee-email" required autocomplete="email"> </div>
-                <div class="form-group"> <label for="employee-role">Cargo (Ex: Analista N1)</label> <input type="text" id="employee-role" required> </div>
-                <div class="form-group"> <label for="employee-password">Senha (mín. 6 caracteres)</label> <input type="password" id="employee-password" minlength="6" required autocomplete="new-password"> </div>
+                <div class="form-group"> <label for="employee-role">Cargo</label> <input type="text" id="employee-role" required> </div>
+                <div class="form-group"> <label for="employee-password">Senha (mín. 6)</label> <input type="password" id="employee-password" minlength="6" required autocomplete="new-password"> </div>
                 <div class="form-group"> <label for="employee-confirm-password">Confirmar Senha</label> <input type="password" id="employee-confirm-password" required autocomplete="new-password"> </div>
                 <button type="submit" class="btn">Cadastrar</button>
             </form>
-            <div class="nav-links"> <span class="nav-link" onclick="showScreen('login-screen')">Voltar para Login</span> </div>
+            <div class="nav-links"> <span class="nav-link" onclick="showScreen('login-screen')">Voltar</span> </div>
         </div>
 
         <div id="client-dashboard-screen" class="screen">
@@ -457,53 +518,51 @@
             <h3>Abrir Novo Chamado</h3>
             <form id="client-ticket-form">
                 <div class="form-group"> <label for="ticket-titulo">Título</label> <input type="text" id="ticket-titulo" required> </div>
-                <div class="form-group"> <label for="ticket-descricao">Descrição do Problema</label> <textarea id="ticket-descricao" rows="5" required></textarea> </div>
-                <div id="faq-sugestoes-container" style="margin-top: 1rem; display: none;"> <strong>Talvez isso ajude? (FAQ)</strong> <ul id="faq-sugestoes-list" style="margin-top: 0.5rem; padding-left: 20px; list-style: disc;"></ul> </div>
-                <div class="form-group"> <label for="ticket-imagens">Anexar Imagens (Opcional, máx. 5MB por arquivo)</label> <input type="file" id="ticket-imagens" accept="image/*" multiple> </div>
-                <button type="submit" class="btn" id="btn-criar-chamado">Enviar Chamado e Abrir Chat</button>
+                <div class="form-group"> <label for="ticket-descricao">Descrição</label> <textarea id="ticket-descricao" rows="5" required></textarea> </div>
+                <div id="faq-sugestoes-container" style="display: none; margin-top: 1rem;"> <strong>Sugestões (FAQ):</strong> <ul id="faq-sugestoes-list" style="margin-top: 0.5rem; padding-left: 20px; list-style: disc;"></ul> </div>
+                <div class="form-group" style="margin-top: 1rem;"> <label for="ticket-imagens">Anexos (Opcional)</label> <input type="file" id="ticket-imagens" accept="image/*" multiple> </div>
+                <button type="submit" class="btn" id="btn-criar-chamado">Enviar e Abrir Chat</button>
             </form>
             <h3 style="margin-top: 2.5rem; border-top: 1px solid #eee; padding-top: 2rem;">Meus Chamados</h3>
-            <div class="ticket-grid-container">
-                <table class="ticket-grid">
-                    <thead> <tr> <th>Nº Chamado</th> <th>Título</th> <th>Abertura</th> <th>Status</th> </tr> </thead>
-                    <tbody id="client-ticket-grid-body"></tbody>
-                </table>
-            </div>
+            <div class="ticket-grid-container"> <table class="ticket-grid"> <thead> <tr> <th>Nº</th> <th>Título</th> <th>Abertura</th> <th>Status</th> </tr> </thead> <tbody id="client-ticket-grid-body"></tbody> </table> </div>
         </div>
 
         <div id="employee-dashboard-screen" class="screen">
             <div class="header"> <h2>Painel do Analista</h2> <button class="btn-logout" onclick="logout()">Sair</button> </div>
-            <h3>Chamados Atribuídos / Em Aberto</h3>
+            <h3>Meus Chamados Atribuídos (Não Concluídos)</h3>
             <div class="ticket-grid-container">
                 <table class="ticket-grid">
-                    <thead> <tr> <th>Nº Chamado</th> <th>Título</th> <th>Cliente</th> <th>Abertura</th> <th>Status</th> </tr> </thead>
-                    <tbody id="analyst-ticket-grid-body"></tbody>
+                    <thead> <tr> <th>Nº</th> <th>Título</th> <th>Cliente</th> <th>Abertura</th> <th>Status</th> </tr> </thead>
+                    <tbody id="my-assigned-grid-body"></tbody>
                 </table>
             </div>
+            <h3 style="margin-top: 2.5rem; border-top: 1px solid #eee; padding-top: 2rem;">Todos Chamados (Abertos/Em Andamento)</h3>
+            <div class="ticket-grid-container"> <table class="ticket-grid"> <thead> <tr> <th>Nº</th> <th>Título</th> <th>Cliente</th> <th>Abertura</th> <th>Status</th> <th>Analista</th> </tr> </thead> <tbody id="analyst-ticket-grid-body"></tbody> </table> </div>
         </div>
 
         <div id="chat-screen" class="screen">
-            <div class="header">
-                <button class="btn-back" id="chat-btn-back" title="Voltar para o painel">← Voltar</button>
-                <h2 id="chat-header-title" style="text-align: left;">Chat do Chamado</h2>
-                <button class="btn-action" id="chat-btn-refresh" title="Atualizar mensagens">↻ Atualizar</button>
-                <button class="btn-logout" onclick="logout()">Sair</button>
+            <div class="header"> <button class="btn-back" id="chat-btn-back">← Voltar</button> <h2 id="chat-header-title">Chat</h2> <button class="btn-action" id="chat-btn-refresh">↻</button> <button class="btn-logout" onclick="logout()">Sair</button> </div>
+            <div id="analyst-controls">
+                <h4>Controles</h4>
+                <div class="analyst-controls-grid">
+                    <div class="form-group"> <label for="analyst-select-status">Status</label> <select id="analyst-select-status"> <option value="Aberto (IA)">Aberto (IA)</option> <option value="Aguardando Analista">Aguardando Analista</option> <option value="Em Andamento (Analista)">Em Andamento (Analista)</option> <option value="Aguardando Cliente">Aguardando Cliente</option> <option value="Concluído">Concluído</option> <option value="Encerrado">Encerrado</option> <option value="Cancelado">Cancelado</option> </select> </div>
+                    <div class="form-group"> <label for="analyst-select-priority">Prioridade</label> <select id="analyst-select-priority"> <option value="Baixa">Baixa</option> <option value="Média">Média</option> <option value="Alta">Alta</option> </select> </div>
+                    <div class="form-group"> <label for="analyst-select-assignee">Analista</label> <select id="analyst-select-assignee"> <option value="">-- Nenhum --</option> </select> </div>
+                </div>
+                <button class="btn" id="btn-save-analyst-changes">Salvar</button>
             </div>
             <div class="chat-container">
-                <div class="chat-header"> <h4 id="chat-titulo">Carregando...</h4> <span id="chat-numero">...</span> </div>
+                <div class="chat-header"> <h4 id="chat-titulo">...</h4> <span id="chat-numero">...</span> </div>
                 <div class="anexos-list" id="chat-anexos-container" style="display: none;"> <strong>Anexos:</strong> <ul id="chat-anexos-list"></ul> </div>
-                <div class="chat-messages" id="chat-messages-area"><p style="text-align:center; color:#999;">Carregando mensagens...</p></div>
-                <form class="chat-input-form" id="chat-message-form">
-                    <input type="text" id="chat-message-input" placeholder="Digite sua mensagem..." required autocomplete="off">
-                    <button type="submit" id="btn-enviar-msg">Enviar</button>
-                </form>
+                <div class="chat-messages" id="chat-messages-area"></div>
+                <form class="chat-input-form" id="chat-message-form"> <input type="text" id="chat-message-input" placeholder="..." required autocomplete="off"> <button type="submit" id="btn-enviar-msg">Enviar</button> </form>
             </div>
         </div>
-
     </div>
 
     <script>
         /* --- INÍCIO DO JAVASCRIPT --- */
+
         // --- CONFIGURAÇÃO E VARIÁVEIS GLOBAIS ---
         const API_URL = "https://localhost:7121"; // CONFIRME A PORTA!
         const MAX_FILE_SIZE_MB = 5;
@@ -512,175 +571,366 @@
         let currentUserType = null; // 'Client' ou 'Employee'
         let currentChamadoId = null;
         let faqSuggestionTimeoutId = null;
+        let currentChamadoDetails = null; // Guarda detalhes do chamado aberto
+        let listaAnalistasCache = null; // Cache para a lista de analistas
 
         // --- FUNÇÕES AUXILIARES ---
+
+        /** Mostra a tela especificada e esconde as outras */
         function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
-            const screenToShow = document.getElementById(screenId);
-            if (screenToShow) { screenToShow.classList.add('active'); }
-            else { console.error("Tela inexistente:", screenId); showScreen('login-screen'); }
-            showMessage('', false); window.scrollTo(0, 0);
+            try {
+                document.querySelectorAll('.screen').forEach(screen => {
+                    if (screen) screen.classList.remove('active');
+                });
+                const screenToShow = document.getElementById(screenId);
+                if (screenToShow) {
+                    screenToShow.classList.add('active');
+                } else {
+                    console.error("Tela Inválida:", screenId);
+                    document.getElementById('login-screen').classList.add('active'); // Fallback
+                }
+                showMessage('', false);
+                window.scrollTo(0, 0);
+            } catch (e) { console.error("Erro em showScreen:", e); }
         }
+
+        /** Exibe uma mensagem global no topo da caixa */
         function showMessage(message, isError = false) {
-            if (!messageArea) return; if (messageArea.timerId) clearTimeout(messageArea.timerId);
-            messageArea.textContent = message; messageArea.className = message ? (isError ? 'error' : 'success') : '';
-            const timeout = isError ? 8000 : 5000; if (message) { messageArea.timerId = setTimeout(() => { showMessage(''); }, timeout); }
+            if (!messageArea) return;
+            try {
+                if (messageArea.timerId) clearTimeout(messageArea.timerId);
+                messageArea.textContent = message;
+                messageArea.className = message ? (isError ? 'error' : 'success') : '';
+                const timeout = isError ? 8000 : 5000;
+                if (message) {
+                    messageArea.timerId = setTimeout(() => { showMessage(''); }, timeout);
+                }
+            } catch (e) { console.error("Erro em showMessage:", e); }
         }
+
+        /** Formata uma data string ISO para o padrão local PT-BR */
         function formatISODate(isoDateString) {
             if (!isoDateString) return '-';
-            try { return new Date(isoDateString).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
-            catch (e) { console.error("Erro formatar data:", isoDateString, e); return isoDateString; }
+            try {
+                return new Date(isoDateString).toLocaleString('pt-BR', {
+                    day: '2-digit', month: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                });
+            } catch (e) { console.error("Erro formatar data:", isoDateString, e); return isoDateString; }
         }
+
+        /** Desabilita/habilita elementos de formulário dentro de um container (form ou div) */
         function disableForm(formId, disable = true) {
-            const form = document.getElementById(formId); if (!form) return; const elements = form.elements; let firstInput = null;
-            for (let i = 0; i < elements.length; i++) { elements[i].disabled = disable; if (!firstInput && !['hidden', 'submit', 'button', 'reset'].includes(elements[i].type)) { firstInput = elements[i]; } }
-            const button = form.querySelector('button[type="submit"]');
-            if (button) {
-                const originalText = button.dataset.originalText || button.textContent; if (disable && !button.dataset.originalText) { button.dataset.originalText = originalText; }
-                button.textContent = disable ? 'Aguarde...' : originalText; button.disabled = disable; if (!disable) delete button.dataset.originalText;
-            }
-            if (!disable && firstInput && formId !== 'login-form' && formId !== 'chat-message-form') { setTimeout(() => { try { firstInput.focus(); } catch (e) { } }, 100); }
-            else if (!disable && formId === 'chat-message-form') { setTimeout(() => { try { document.getElementById('chat-message-input').focus(); } catch (e) { } }, 100); }
+            try {
+                const formOrDiv = document.getElementById(formId);
+                if (!formOrDiv) { console.warn("Elemento não encontrado:", formId); return; }
+
+                const elements = formOrDiv.querySelectorAll('input, select, textarea, button');
+                elements.forEach(el => { if (el) el.disabled = disable; });
+
+                let button;
+                if (formId === 'analyst-controls') {
+                    button = document.getElementById('btn-save-analyst-changes');
+                } else if (formOrDiv.tagName === 'FORM') {
+                    button = formOrDiv.querySelector('button[type="submit"]');
+                } else {
+                    return; // Não mexe no texto de outros botões
+                }
+
+                if (button) {
+                    const originalText = button.dataset.originalText || button.textContent;
+                    if (disable && !button.dataset.originalText) { button.dataset.originalText = originalText; }
+                    const waitText = (formId === 'analyst-controls' ? 'Salvando...' : 'Aguarde...');
+                    button.textContent = disable ? waitText : originalText;
+                    if (!disable) delete button.dataset.originalText;
+                }
+
+                const firstInput = formOrDiv.querySelector('input:not([type=hidden]), textarea, select');
+                if (!disable && firstInput && formId !== 'login-form' && formId !== 'chat-message-form') {
+                    setTimeout(() => { try { firstInput.focus(); } catch (e) { } }, 100);
+                } else if (!disable && formId === 'chat-message-form') {
+                    setTimeout(() => { try { document.getElementById('chat-message-input').focus(); } catch (e) { } }, 100);
+                }
+            } catch (e) { console.error("Erro em disableForm:", e, formId); }
         }
+
+        /** Faz logout, limpa variáveis globais e reseta formulários */
         function logout() {
-            currentUserType = null; currentChamadoId = null;
+            currentUserType = null; currentChamadoId = null; listaAnalistasCache = null;
+            localStorage.removeItem('jwtToken'); // Limpa o token
             try { document.getElementById('analyst-ticket-grid-body').innerHTML = ''; } catch (e) { }
             try { document.getElementById('client-ticket-grid-body').innerHTML = ''; } catch (e) { }
-            ['login-form', 'client-register-form', 'employee-register-form', 'client-ticket-form', 'chat-message-form'].forEach(id => { const f = document.getElementById(id); if (f) f.reset(); });
+            ['login-form', 'client-register-form', 'employee-register-form', 'client-ticket-form', 'chat-message-form', 'analyst-controls'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (el.tagName === 'FORM') el.reset();
+                    else { try { el.querySelectorAll('select').forEach(s => s.selectedIndex = 0); el.querySelectorAll('input:not([type=hidden])').forEach(i => i.value = ''); } catch (e) { } }
+                }
+            });
             showScreen('login-screen');
         }
 
-        // --- LÓGICA DE CARREGAMENTO DOS PAINÉIS ---
-        async function loadEmployeeDashboard() {
-            const gridBody = document.getElementById('analyst-ticket-grid-body'); if (!gridBody) return; gridBody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Carregando...</td></tr>`;
-            try {
-                const response = await fetch(`${API_URL}/api/Chamado/abertos`); if (!response.ok) throw new Error(`Erro ${response.status}.`);
-                const chamados = await response.json(); gridBody.innerHTML = ''; if (!chamados || chamados.length === 0) { gridBody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Nenhum chamado.</td></tr>`; return; }
-                chamados.forEach(c => { gridBody.innerHTML += `<tr onclick="abrirChat(${c.id})" title="Abrir ${c.numeroChamado}"><td>${c.numeroChamado || '-'}</td><td>${c.titulo || '-'}</td><td>${c.nomeCliente || '-'}</td><td>${formatISODate(c.dataAbertura)}</td><td>${c.status || '-'}</td></tr>`; });
-            } catch (e) { console.error('Erro load analista:', e); gridBody.innerHTML = `<tr><td colspan="5" style="color:red; text-align: center;">${e.message || 'Erro ao conectar.'}</td></tr>`; }
+        /** (NOVO) Helper para fazer fetch com autenticação */
+        async function fetchAutenticado(url, options = {}) {
+            const token = localStorage.getItem('jwtToken');
+
+            const headers = new Headers(options.headers || {});
+            if (token) {
+                headers.append('Authorization', `Bearer ${token}`);
+            }
+            if (options.body && !(options.body instanceof FormData) && !headers.has('Content-Type')) {
+                headers.append('Content-Type', 'application/json');
+            }
+            options.headers = headers;
+
+            const response = await fetch(url, options);
+
+            if (response.status === 401) { // Não autorizado (token expirado/inválido)
+                console.warn("Token inválido (401). Forçando logout.");
+                showMessage("Sua sessão expirou. Faça login novamente.", true);
+                logout();
+                throw new Error("Sessão expirada.");
+            }
+            if (response.status === 403) { // Proibido (não tem a Role certa)
+                console.warn("Ação proibida (403).");
+                // Tenta ler a mensagem de erro do back-end
+                try {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || "Você não tem permissão para fazer isso.");
+                } catch (e) {
+                    throw new Error("Você não tem permissão para fazer isso.");
+                }
+            }
+            return response; // Retorna a resposta para a função original
         }
-        async function loadClientDashboard() {
-            const gridBody = document.getElementById('client-ticket-grid-body'); if (!gridBody) return; gridBody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Carregando...</td></tr>`;
+
+        // --- LÓGICA DE CARREGAMENTO DOS PAINÉIS (USA fetchAutenticado) ---
+
+        /** Carrega os grids do Analista (Meus Chamados e Todos) */
+        async function loadEmployeeDashboard() {
+            // 1. Carrega "Meus Chamados"
+            const myGridBody = document.getElementById('my-assigned-grid-body');
+            if (myGridBody) {
+                myGridBody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Carregando...</td></tr>`;
+                try {
+                    const response = await fetchAutenticado(`${API_URL}/api/Chamado/meus-chamados-analista`);
+                    if (!response.ok) throw new Error(`Erro ${response.status}.`);
+                    const chamados = await response.json(); myGridBody.innerHTML = '';
+                    if (!chamados || chamados.length === 0) { myGridBody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Nenhum chamado atribuído.</td></tr>`; }
+                    else {
+                        chamados.forEach(c => {
+                            myGridBody.innerHTML += `<tr data-id="${c.id}">
+                                    <td onclick="abrirChat(${c.id})" class="grid-clickable-cell" title="Abrir Chat">${c.numeroChamado || '-'}</td>
+                                    <td>${c.titulo || '-'}</td>
+                                    <td>${c.nomeCliente || '-'}</td>
+                                    <td>${formatISODate(c.dataAbertura)}</td>
+                                    <td>${c.status || '-'}</td>
+                                </tr>`;
+                        });
+                    }
+                } catch (e) { console.error('Erro load meus chamados:', e); if (e.message !== "Sessão expirada.") myGridBody.innerHTML = `<tr><td colspan="5" style="color:red;">${e.message || 'Erro.'}</td></tr>`; }
+            }
+
+            // 2. Carrega "Todos Chamados"
+            const gridBody = document.getElementById('analyst-ticket-grid-body');
+            if (!gridBody) return;
+            gridBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Carregando...</td></tr>`;
             try {
-                const response = await fetch(`${API_URL}/api/Chamado/meuschamados`); if (!response.ok) throw new Error(`Erro ${response.status}.`);
-                const chamados = await response.json(); gridBody.innerHTML = ''; if (!chamados || chamados.length === 0) { gridBody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Nenhum chamado.</td></tr>`; return; }
-                chamados.forEach(c => { gridBody.innerHTML += `<tr onclick="abrirChat(${c.id})" title="Abrir ${c.numeroChamado}"><td>${c.numeroChamado || '-'}</td><td>${c.titulo || '-'}</td><td>${formatISODate(c.dataAbertura)}</td><td>${c.status || '-'}</td></tr>`; });
-            } catch (e) { console.error('Erro load cliente:', e); gridBody.innerHTML = `<tr><td colspan="4" style="color:red; text-align: center;">${e.message || 'Erro ao conectar.'}</td></tr>`; }
+                const response = await fetchAutenticado(`${API_URL}/api/Chamado/abertos`);
+                if (!response.ok) throw new Error(`Erro ${response.status}.`);
+                const chamados = await response.json(); gridBody.innerHTML = '';
+                if (!chamados || chamados.length === 0) { gridBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Nenhum chamado.</td></tr>`; return; }
+                chamados.forEach(c => {
+                    const statusOptions = ["Aberto (IA)", "Aguardando Analista", "Em Andamento (Analista)", "Aguardando Cliente", "Concluído", "Encerrado", "Cancelado"];
+                    let selHtml = `<select class="status-select" data-id="${c.id}" onchange="handleStatusChange(this)" onclick="event.stopPropagation();">`;
+                    statusOptions.forEach(opt => { const sel = (opt === (c.status || '')) ? 'selected' : ''; selHtml += `<option value="${opt}" ${sel}>${opt}</option>`; }); selHtml += `</select>`;
+                    gridBody.innerHTML += `<tr data-id="${c.id}">
+                            <td onclick="abrirChat(${c.id})" class="grid-clickable-cell">${c.numeroChamado || '-'}</td>
+                            <td>${c.titulo || '-'}</td>
+                            <td>${c.nomeCliente || '-'}</td>
+                            <td>${formatISODate(c.dataAbertura)}</td>
+                            <td>${selHtml}</td>
+                            <td>${c.nomeAnalista || '--'}</td>
+                        </tr>`;
+                });
+            } catch (e) { console.error('Erro load todos chamados:', e); if (e.message !== "Sessão expirada.") gridBody.innerHTML = `<tr><td colspan="6" style="color:red;">${e.message || 'Erro.'}</td></tr>`; }
+        }
+
+        /** Carrega o grid de chamados para o Cliente */
+        async function loadClientDashboard() {
+            const gridBody = document.getElementById('client-ticket-grid-body'); if (!gridBody) return;
+            gridBody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Carregando...</td></tr>`;
+            try {
+                const response = await fetchAutenticado(`${API_URL}/api/Chamado/meuschamados`);
+                if (!response.ok) throw new Error(`Erro ${response.status}.`);
+                const chamados = await response.json(); gridBody.innerHTML = '';
+                if (!chamados || chamados.length === 0) { gridBody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Nenhum chamado.</td></tr>`; return; }
+                chamados.forEach(c => { gridBody.innerHTML += `<tr data-id="${c.id}"><td onclick="abrirChat(${c.id})" class="grid-clickable-cell">${c.numeroChamado || '-'}</td><td>${c.titulo || '-'}</td><td>${formatISODate(c.dataAbertura)}</td><td>${c.status || '-'}</td></tr>`; });
+            } catch (e) { console.error('Erro load cliente:', e); if (e.message !== "Sessão expirada.") gridBody.innerHTML = `<tr><td colspan="4" style="color:red;">${e.message || 'Erro.'}</td></tr>`; }
+        }
+
+        /** Carrega Analistas no Dropdown */
+        async function carregarAnalistasDropdown(selectElementId, selectedAnalistaId = null) {
+            const select = document.getElementById(selectElementId);
+            if (!select) { console.error("Dropdown analistas não encontrado:", selectElementId); return; }
+            select.options.length = 1; // Limpa (mantém "-- Nenhum --")
+            try {
+                if (!listaAnalistasCache) {
+                    console.log("Buscando analistas da API...");
+                    const response = await fetchAutenticado(`${API_URL}/api/Employee/analistas`);
+                    if (!response.ok) throw new Error(`Erro ${response.status} buscando analistas.`);
+                    listaAnalistasCache = await response.json();
+                }
+                if (listaAnalistasCache && listaAnalistasCache.length > 0) {
+                    listaAnalistasCache.forEach(analista => {
+                        const option = document.createElement('option');
+                        option.value = analista.id;
+                        option.textContent = `${analista.nome} (${analista.funcao || 'N/A'})`;
+                        if (selectedAnalistaId && analista.id === selectedAnalistaId) {
+                            option.selected = true;
+                        }
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) { console.error("Erro carregar analistas:", error); const option = document.createElement('option'); option.value = ""; option.textContent = "Erro ao carregar"; option.disabled = true; select.appendChild(option); }
+        }
+
+        /** Atualiza Status pelo Grid */
+        async function handleStatusChange(selectElement) {
+            const chamadoId = selectElement.dataset.id; const novoStatus = selectElement.value; if (!chamadoId || !novoStatus) return;
+            selectElement.disabled = true; showMessage(`Salvando...`, false); let statusOriginal = '';
+            try {
+                const rGet = await fetchAutenticado(`${API_URL}/api/Chamado/${chamadoId}`); if (!rGet.ok) throw new Error(`Erro ${rGet.status}.`);
+                const cAtual = await rGet.json(); statusOriginal = cAtual.status || '';
+                const data = { Status: novoStatus, Prioridade: cAtual.prioridade || 'Média', RoleDesignada: cAtual.roleDesignada || null, AnalistaId: cAtual.analistaId || null };
+                const rPut = await fetchAutenticado(`${API_URL}/api/Chamado/${chamadoId}/atualizar`, { method: 'PUT', body: JSON.stringify(data) });
+                if (!rPut.ok) { const ed = await rPut.json(); throw new Error(ed.message || `Erro ${rPut.status}.`); }
+                showMessage('Status atualizado!', false);
+            } catch (e) { console.error('Erro status grid:', e); if (e.message !== "Sessão expirada.") showMessage(`Erro: ${e.message}`, true); try { selectElement.value = statusOriginal; } catch (revertError) { } }
+            finally { selectElement.disabled = false; }
         }
 
         // --- LÓGICA DO CHAT ---
         async function abrirChat(chamadoId) {
             if (!chamadoId) return; currentChamadoId = chamadoId; showScreen('chat-screen');
+            const controlsDiv = document.getElementById('analyst-controls'); const chatInput = document.getElementById('chat-message-input');
             const tit = document.getElementById('chat-titulo'); const num = document.getElementById('chat-numero'); const anexC = document.getElementById('chat-anexos-container');
             const anexL = document.getElementById('chat-anexos-list'); const msgA = document.getElementById('chat-messages-area');
-            tit.textContent = 'Carregando...'; num.textContent = '...'; anexL.innerHTML = ''; anexC.style.display = 'none'; msgA.innerHTML = '<p style="text-align:center; color:#999;">Carregando...</p>'; disableForm('chat-message-form', true);
+
+            tit.textContent = 'Carregando...'; num.textContent = '...'; anexL.innerHTML = ''; anexC.style.display = 'none'; msgA.innerHTML = '<p style="text-align:center; color:#999;">Carregando...</p>';
+            disableForm('chat-message-form', true); disableForm('analyst-controls', true); controlsDiv.style.display = 'none'; currentChamadoDetails = null;
+
             try {
-                const response = await fetch(`${API_URL}/api/Chamado/${chamadoId}`); if (!response.ok) throw new Error(`Erro ${response.status}.`); const c = await response.json();
-                console.log("Dados recebidos chat:", c); console.log("Mensagens:", c.mensagens); // DEBUG
+                const response = await fetchAutenticado(`${API_URL}/api/Chamado/${chamadoId}`); if (!response.ok) throw new Error(`Erro ${response.status}.`);
+                currentChamadoDetails = await response.json(); const c = currentChamadoDetails; console.log("Dados chat:", c); if (!c) throw new Error("Resposta inválida (null).");
+
                 tit.textContent = c.titulo || 'S/ Título'; num.textContent = `${c.numeroChamado || 'N/A'} (${c.status || 'N/A'})`;
-                if (c.anexos && c.anexos.length > 0) { let html = ''; c.anexos.forEach(a => { if (a.urlArquivo && a.nomeArquivo) { const safe = a.nomeArquivo.replace(/</g, "&lt;").replace(/>/g, "&gt;"); html += `<li><a href="${a.urlArquivo}" target="_blank" rel="noopener noreferrer">${safe}</a></li>`; } }); if (html) { anexL.innerHTML = html; anexC.style.display = 'block'; } }
+                if (c.anexos && c.anexos.length > 0) { let html = ''; c.anexos.forEach(a => { if (a.urlArquivo && a.nomeArquivo) { const safe = a.nomeArquivo.replace(/</g, "&lt;").replace(/>/g, "&gt;"); html += `<li><a href="${a.urlArquivo}" target="_blank">${safe}</a></li>`; } }); if (html) { aL.innerHTML = html; anexC.style.display = 'block'; } }
                 renderizarMensagens(c.mensagens || []);
-            } catch (e) { console.error('Erro abrir chat:', e); showMessage(`Erro chat: ${e.message}`, true); msgA.innerHTML = `<p style="color:red; text-align:center;">Falha.</p>`; }
-            finally { disableForm('chat-message-form', false); }
+
+                if (currentUserType === 'Employee') {
+                    controlsDiv.style.display = 'block';
+                    try { document.getElementById('analyst-select-status').value = c.status || ''; } catch (e) { console.warn(e); }
+                    try { document.getElementById('analyst-select-priority').value = c.prioridade || 'Média'; } catch (e) { console.warn(e); }
+                    // try{document.getElementById('analyst-input-role').value = c.roleDesignada || '';}catch(e){console.warn(e);} // Campo removido
+                    await carregarAnalistasDropdown('analyst-select-assignee', c.analistaId);
+                    disableForm('analyst-controls', false);
+                }
+
+                let isBlq = false; if (c.status === 'Encerrado') { isBlq = true; } else if (c.status === 'Concluído' && c.dataConclusao) { try { const dC = new Date(c.dataConclusao); const ag = new Date(); const dH = (ag - dC) / 36e5; if (dH > 72) isBlq = true; } catch (e) { console.error(e); } }
+                if (currentUserType === 'Client' && isBlq) { chatInput.placeholder = "Chamado encerrado."; showMessage("Chamado encerrado.", true); disableForm('chat-message-form', true); }
+                else { chatInput.placeholder = "Digite sua mensagem..."; disableForm('chat-message-form', false); }
+            } catch (e) { console.error('Erro abrir chat:', e); if (e.message !== "Sessão expirada.") showMessage(`Erro chat: ${e.message}`, true); msgA.innerHTML = `<p style="color:red;">Falha ao carregar dados.</p>`; }
         }
-        function renderizarMensagens(mensagens) {
-            const chatMessagesArea = document.getElementById('chat-messages-area'); if (!chatMessagesArea) return; chatMessagesArea.innerHTML = '';
-            if (!mensagens || mensagens.length === 0) { chatMessagesArea.innerHTML = `<p style="text-align:center; color:#999;">Sem mensagens.</p>`; return; }
-            mensagens.forEach(msg => {
-                const dataEnvio = formatISODate(msg.dataEnvio); let remClasse = ''; let alignClasse = '';
-                if (msg.tipoRemetente === 'Client') remClasse = 'client'; else if (msg.tipoRemetente === 'Employee') remClasse = 'analyst'; else if (msg.tipoRemetente === 'IA') remClasse = 'ia';
-                if ((msg.tipoRemetente === 'Client' && currentUserType === 'Client') || (msg.tipoRemetente === 'Employee' && currentUserType === 'Employee')) { alignClasse = 'viewer'; } else { alignClasse = 'other'; }
-                const sCont = (msg.conteudo || '').replace(/</g, "&lt;").replace(/>/g, "&gt;"); const sSend = (msg.remetenteNome || 'Desc.').replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                chatMessagesArea.innerHTML += `<div class="chat-message ${alignClasse} ${remClasse}"><span class="sender">${sSend}<span class="timestamp">${dataEnvio}</span></span><div class="content">${sCont}</div></div>`;
-            });
-            setTimeout(() => { chatMessagesArea.scrollTop = chatMessagesArea.scrollHeight; }, 50);
-        }
-        document.getElementById('chat-btn-back').addEventListener('click', () => {
-            currentChamadoId = null; const screen = currentUserType === "Client" ? 'client-dashboard-screen' : 'employee-dashboard-screen'; showScreen(screen);
-            if (currentUserType === "Client") loadClientDashboard(); else loadEmployeeDashboard();
-        });
-        document.getElementById('chat-btn-refresh').addEventListener('click', () => { if (currentChamadoId) { showMessage('Atualizando...', false); abrirChat(currentChamadoId); } });
-        document.getElementById('chat-message-form').addEventListener('submit', async function (event) {
-            event.preventDefault(); const input = document.getElementById('chat-message-input'); const cont = input.value.trim(); if (!cont || !currentChamadoId || !currentUserType) return;
-            disableForm('chat-message-form', true); const origVal = cont; input.value = '';
+
+        // --- FUNÇÃO RENDERIZARMENSAGENS CORRIGIDA ---
+        function renderizarMensagens(mensagens) { // Parâmetro é 'mensagens'
+            const area = document.getElementById('chat-messages-area'); if (!area) return; area.innerHTML = '';
+            // Use 'mensagens' (o parâmetro) aqui
+            if (!mensagens || mensagens.length === 0) { area.innerHTML = `<p style="text-align:center; color:#999;">Sem mensagens.</p>`; return; }
             try {
-                const response = await fetch(`${API_URL}/api/Chamado/${currentChamadoId}/mensagem`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ Conteudo: cont, TipoRemetente: currentUserType }) });
-                if (!response.ok) { const err = await response.json(); throw new Error(err.message || `Erro ${response.status}.`); }
-                const msgs = await response.json(); renderizarMensagens(msgs);
-            } catch (e) { console.error('Erro enviar msg:', e); showMessage(`Falha: ${e.message}`, true); input.value = origVal; }
-            finally { disableForm('chat-message-form', false); setTimeout(() => { try { input.focus(); } catch (e) { } }, 100); }
+                // Use 'mensagens' (o parâmetro) aqui
+                mensagens.forEach(msg => {
+                    if (!msg) { console.warn("Msg inválida:", msg); return; }
+                    const d = formatISODate(msg.dataEnvio); let rc = '', ac = '';
+                    const t = msg.tipoRemetente || 'IA'; const u = currentUserType || 'Client';
+                    if (t === 'Client') rc = 'client'; else if (t === 'Employee') rc = 'analyst'; else rc = 'ia';
+                    if ((t === 'Client' && u === 'Client') || (t === 'Employee' && u === 'Employee')) { ac = 'viewer'; } else { ac = 'other'; }
+                    const sC = (msg.conteudo || '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    const sS = (msg.remetenteNome || 'Desc.').replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    area.innerHTML += `<div class="chat-message ${ac} ${rc}"><span class="sender">${sS}<span class="timestamp">${d}</span></span><div class="content">${sC}</div></div>`;
+                });
+                setTimeout(() => { area.scrollTop = area.scrollHeight; }, 50);
+            } catch (err) {
+                console.error("Erro renderizar:", err, mensagens); // Usa 'mensagens'
+                area.innerHTML = `<p style="color:red;">Erro exibir msgs.</p>`;
+            }
+        }
+        // --- FIM DA CORREÇÃO ---
+
+        // --- EVENT LISTENERS (Usam fetchAutenticado) ---
+        document.getElementById('chat-btn-back').addEventListener('click', () => { currentChamadoId = null; const s = currentUserType === "Client" ? 'client-dashboard-screen' : 'employee-dashboard-screen'; showScreen(s); if (currentUserType === "Client") loadClientDashboard(); else loadEmployeeDashboard(); });
+        document.getElementById('chat-btn-refresh').addEventListener('click', () => { if (currentChamadoId) { showMessage('Atualizando...', false); abrirChat(currentChamadoId); } });
+        document.getElementById('chat-message-form').addEventListener('submit', async function (ev) {
+            ev.preventDefault(); const i = document.getElementById('chat-message-input'); const c = i.value.trim(); if (!c || !currentChamadoId || !currentUserType) return; disableForm('chat-message-form', true); const ov = c; i.value = '';
+            try { const r = await fetchAutenticado(`${API_URL}/api/Chamado/${currentChamadoId}/mensagem`, { method: 'POST', body: JSON.stringify({ Conteudo: c, TipoRemetente: currentUserType }) }); if (!r.ok) { const ed = await r.json(); throw new Error(ed.message || `Erro ${r.status}.`); } const ms = await r.json(); renderizarMensagens(ms); } catch (e) { console.error(e); if (e.message !== "Sessão expirada.") showMessage(`Falha: ${e.message}`, true); i.value = ov; } finally { disableForm('chat-message-form', false); setTimeout(() => { try { i.focus(); } catch (e) { } }, 100); }
+        });
+        document.getElementById('btn-save-analyst-changes').addEventListener('click', async () => {
+            if (!currentChamadoId || currentUserType !== 'Employee') return;
+            disableForm('analyst-controls', true); const btn = document.getElementById('btn-save-analyst-changes'); const oTxt = btn.dataset.originalText || btn.textContent; btn.textContent = 'Salvando...';
+            const s = document.getElementById('analyst-select-status').value; const p = document.getElementById('analyst-select-priority').value; const aidV = document.getElementById('analyst-select-assignee').value; const aid = aidV ? parseInt(aidV, 10) : null;
+            const d = { Status: s, Prioridade: p, RoleDesignada: null, AnalistaId: aid }; // Role removida
+            try { const r = await fetchAutenticado(`${API_URL}/api/Chamado/${currentChamadoId}/atualizar`, { method: 'PUT', body: JSON.stringify(d) }); if (!r.ok) { const ed = await r.json(); throw new Error(ed.message || `Erro ${r.status}.`); } showMessage('Salvo!', false); abrirChat(currentChamadoId); } catch (e) { console.error(e); if (e.message !== "Sessão expirada.") showMessage(`Erro: ${e.message}`, true); } finally { disableForm('analyst-controls', false); btn.textContent = oTxt; }
         });
 
-        // --- LÓGICA DO FORMULÁRIO DE CRIAR CHAMADO ---
-        document.getElementById('client-ticket-form').addEventListener('submit', async function (event) {
-            event.preventDefault(); showMessage('', false); const inputImgs = document.getElementById('ticket-imagens'); const imgs = inputImgs.files;
-            if (imgs.length > MAX_TOTAL_FILES) { showMessage(`Máx ${MAX_TOTAL_FILES} arquivos.`, true); inputImgs.value = ''; return; }
-            for (let i = 0; i < imgs.length; i++) { if (imgs[i].size > MAX_FILE_SIZE_MB * 1024 * 1024) { showMessage(`"${imgs[i].name}" > ${MAX_FILE_SIZE_MB}MB.`, true); inputImgs.value = ''; return; } }
-            disableForm('client-ticket-form', true); const fd = new FormData(); fd.append('Titulo', document.getElementById('ticket-titulo').value); fd.append('Descricao', document.getElementById('ticket-descricao').value);
-            for (let i = 0; i < imgs.length; i++) { fd.append('Imagens', imgs[i]); }
+        document.getElementById('client-ticket-form').addEventListener('submit', async function (ev) {
+            ev.preventDefault(); showMessage('', false); const iI = document.getElementById('ticket-imagens'); const imgs = iI.files; if (imgs.length > MAX_TOTAL_FILES) { showMessage(`Máx ${MAX_TOTAL_FILES} arquivos.`, true); iI.value = ''; return; } for (let i = 0; i < imgs.length; i++) { if (imgs[i].size > MAX_FILE_SIZE_MB * 1024 * 1024) { showMessage(`"${imgs[i].name}" > ${MAX_FILE_SIZE_MB}MB.`, true); iI.value = ''; return; } } disableForm('client-ticket-form', true); const fd = new FormData(); fd.append('Titulo', document.getElementById('ticket-titulo').value); fd.append('Descricao', document.getElementById('ticket-descricao').value); for (let i = 0; i < imgs.length; i++) { fd.append('Imagens', imgs[i]); }
             try {
-                const response = await fetch(`${API_URL}/api/Chamado/criar`, { method: 'POST', body: fd });
-                if (response.status === 201) { const novo = await response.json(); document.getElementById('client-ticket-form').reset(); abrirChat(novo.id); }
-                else { const err = await response.json(); throw new Error(err.message || `Erro ${response.status}.`); }
-            } catch (e) { console.error('Erro criar chamado:', e); showMessage(`Falha: ${e.message}`, true); }
-            finally { disableForm('client-ticket-form', false); }
+                const r = await fetchAutenticado(`${API_URL}/api/Chamado/criar`, { method: 'POST', body: fd }); if (r.status === 201) { const n = await r.json(); document.getElementById('client-ticket-form').reset(); abrirChat(n.id); } else { const err = await r.json(); throw new Error(err.message || `Erro ${r.status}.`); }
+            } catch (e) { console.error(e); if (e.message !== "Sessão expirada.") showMessage(`Falha: ${e.message}`, true); } finally { disableForm('client-ticket-form', false); }
         });
-        // --- LÓGICA DO LOGIN ---
+
+        // --- LÓGICA DO LOGIN (ATUALIZADA PARA JWT) ---
         document.getElementById('login-form').addEventListener('submit', async function (event) {
-            event.preventDefault(); showMessage('', false); disableForm('login-form', true); const data = { email: document.getElementById('login-email').value, password: document.getElementById('login-password').value };
+            event.preventDefault(); // Garante que não recarrega
+            showMessage('', false); disableForm('login-form', true); const d = { email: document.getElementById('login-email').value, password: document.getElementById('login-password').value };
             try {
-                const response = await fetch(`${API_URL}/api/Auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-                const res = await response.json(); if (!response.ok) throw new Error(res.message || `Erro ${response.status}.`);
+                const r = await fetch(`${API_URL}/api/Auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) });
+                const res = await r.json(); if (!r.ok) throw new Error(res.message || `Erro ${r.status}.`);
+                if (!res.token) throw new Error("Resposta de login não contém token.");
+                localStorage.setItem('jwtToken', res.token); // Salva o token
                 currentUserType = res.userType; document.getElementById('login-form').reset();
-                if (currentUserType === "Client") { showScreen('client-dashboard-screen'); loadClientDashboard(); } else if (currentUserType === "Employee") { showScreen('employee-dashboard-screen'); loadEmployeeDashboard(); } else { throw new Error('Tipo user desconhecido.'); }
-            } catch (e) { console.error('Erro login:', e); showMessage(`Falha: ${e.message}`, true); }
-            finally { disableForm('login-form', false); }
+                if (currentUserType === "Client") { showScreen('client-dashboard-screen'); loadClientDashboard(); }
+                else if (currentUserType === "Employee") { showScreen('employee-dashboard-screen'); loadEmployeeDashboard(); }
+                else { throw new Error('Tipo user desconhecido.'); }
+            } catch (e) { console.error(e); showMessage(`Falha: ${e.message}`, true); } finally { disableForm('login-form', false); }
         });
-        // --- LÓGICA DOS CADASTROS ---
-        async function handleRegistration(formId, apiUrl) {
-            const form = document.getElementById(formId); if (!form) return; showMessage('', false); disableForm(formId, true);
-            const pInput = form.querySelector('input[type="password"][id$="-password"]'); const cpInput = form.querySelector('input[type="password"][id$="-confirm-password"]');
-            if (pInput && cpInput && pInput.value !== cpInput.value) { showMessage('Senhas não conferem.', true); disableForm(formId, false); return; }
-            const vm = {};
+
+        // --- CADASTROS (Não autenticados) ---
+        async function handleRegistration(fId, apiUrl) {
+            const f = document.getElementById(fId); if (!f) return; showMessage('', false); disableForm(fId, true); const pI = f.querySelector('input[type="password"][id$="-password"]'); const cpI = f.querySelector('input[type="password"][id$="-confirm-password"]'); if (pI && cpI && pI.value !== cpI.value) { showMessage('Senhas não conferem.', true); disableForm(fId, false); return; } const vm = {};
             try {
-                if (formId === 'client-register-form') { vm.name = document.getElementById('client-name').value; vm.email = document.getElementById('client-email').value; vm.cpf = document.getElementById('client-cpf').value; vm.password = pInput.value; vm.confirmPassword = cpInput.value; }
-                else if (formId === 'employee-register-form') { vm.name = document.getElementById('employee-name').value; vm.email = document.getElementById('employee-email').value; vm.role = document.getElementById('employee-role').value; vm.password = pInput.value; vm.confirmPassword = cpInput.value; }
+                if (fId === 'client-register-form') { vm.name = document.getElementById('client-name').value; vm.email = document.getElementById('client-email').value; vm.cpf = document.getElementById('client-cpf').value; vm.password = pI.value; vm.confirmPassword = cpI.value; }
+                else if (fId === 'employee-register-form') { vm.name = document.getElementById('employee-name').value; vm.email = document.getElementById('employee-email').value; vm.role = document.getElementById('employee-role').value; vm.password = pI.value; vm.confirmPassword = cpI.value; }
                 else { throw new Error("ID inválido."); }
-            } catch (e) { showMessage("Erro lendo form.", true); console.error(e); disableForm(formId, false); return; }
-            try {
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(vm) });
-                if (response.status === 201) { showMessage('Cadastrado! Faça login.', false); showScreen('login-screen'); form.reset(); }
-                else { const err = await response.json(); if (err.errors) { const key = Object.keys(err.errors)[0]; showMessage(err.errors[key][0], true); } else { showMessage(err.message || `Erro ${response.status}.`, true); } }
-            } catch (e) { console.error(`Erro (${formId}):`, e); showMessage('Não foi possível conectar.', true); }
-            finally { disableForm(formId, false); }
+            } catch (e) { showMessage("Erro lendo form.", true); console.error(e); disableForm(fId, false); return; }
+            try { const r = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(vm) }); if (r.status === 201) { showMessage('Cadastrado! Faça login.', false); showScreen('login-screen'); f.reset(); } else { const err = await r.json(); if (err.errors) { const k = Object.keys(err.errors)[0]; showMessage(err.errors[k][0], true); } else { showMessage(err.message || `Erro ${r.status}.`, true); } } } catch (e) { console.error(`Erro (${fId}):`, e); showMessage('Não foi possível conectar.', true); } finally { disableForm(fId, false); }
         }
         document.getElementById('client-register-form').addEventListener('submit', (e) => { e.preventDefault(); handleRegistration('client-register-form', `${API_URL}/api/Registration/client`); });
         document.getElementById('employee-register-form').addEventListener('submit', (e) => { e.preventDefault(); handleRegistration('employee-register-form', `${API_URL}/api/Registration/employee`); });
 
-        // --- LÓGICA DE SUGESTÕES DE FAQ ---
+        // --- FAQ (Não autenticado) ---
         async function buscarSugestoesFaq() {
-            const titulo = document.getElementById('ticket-titulo').value; const descricao = document.getElementById('ticket-descricao').value;
-            const sugestoesC = document.getElementById('faq-sugestoes-container'); const sugestoesL = document.getElementById('faq-sugestoes-list');
-            if (!sugestoesC || !sugestoesL) return; sugestoesL.innerHTML = ''; sugestoesC.style.display = 'none';
-            if ((titulo.trim().length + descricao.trim().length) < 5) return;
-            try {
-                const response = await fetch(`${API_URL}/api/Faq/sugerir`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ Titulo: titulo, Descricao: descricao }) });
-                if (!response.ok) { console.error('Erro sugestões FAQ:', response.status); return; } const sugestoes = await response.json();
-                if (sugestoes && sugestoes.length > 0) {
-                    sugestoes.forEach(faq => { const li = document.createElement('li'); const a = document.createElement('a'); a.href = '#'; a.textContent = faq.pergunta; a.title = faq.resposta; a.onclick = (e) => { e.preventDefault(); alert(`Resposta:\n\n${faq.resposta}`); }; li.appendChild(a); sugestoesL.appendChild(li); });
-                    sugestoesC.style.display = 'block';
-                }
-            } catch (e) { console.error('Erro rede sugestões FAQ:', e); }
+            const t = document.getElementById('ticket-titulo').value; const d = document.getElementById('ticket-descricao').value; const sC = document.getElementById('faq-sugestoes-container'); const sL = document.getElementById('faq-sugestoes-list'); if (!sC || !sL) return; sL.innerHTML = ''; sC.style.display = 'none'; if ((t.trim().length + d.trim().length) < 5) return;
+            try { const r = await fetch(`${API_URL}/api/Faq/sugerir`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ Titulo: t, Descricao: d }) }); if (!r.ok) { console.error('Erro sugestões:', r.status); return; } const s = await r.json(); if (s && s.length > 0) { s.forEach(f => { const li = document.createElement('li'); const a = document.createElement('a'); a.href = '#'; a.textContent = f.pergunta; a.title = f.resposta; a.onclick = (e) => { e.preventDefault(); alert(`Resposta:\n\n${f.resposta}`); }; li.appendChild(a); sL.appendChild(li); }); sC.style.display = 'block'; } } catch (e) { console.error('Erro rede sugestões:', e); }
         }
         function debounceBuscarSugestoes() { clearTimeout(faqSuggestionTimeoutId); faqSuggestionTimeoutId = setTimeout(buscarSugestoesFaq, 750); }
         document.getElementById('ticket-titulo').addEventListener('input', debounceBuscarSugestoes);
         document.getElementById('ticket-descricao').addEventListener('input', debounceBuscarSugestoes);
 
-        // --- INICIALIZAÇÃO ---
-        console.log("Portal NextLayer vFinal revisado inicializado.");
-        // showScreen('login-screen'); // Garante que começa no login (já é o default)
-
+        console.log("Portal NextLayer vFinal (Correção 'msgs is not defined') inicializado.");
         /* --- FIM DO JAVASCRIPT --- */
     </script>
+
 </body>
 </html>
