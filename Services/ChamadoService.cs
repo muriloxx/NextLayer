@@ -31,13 +31,66 @@ namespace NextLayer.Services
             _logger = logger;
         }
 
-        // --- Método CriarNovoChamado (Corrigido para IaResposta) ---
         public async Task<DetalheChamadoViewModel> CriarNovoChamado(CriarChamadoViewModel model, int clienteId)
         {
             var cliente = await _context.Clients.FindAsync(clienteId);
-            if (cliente == null) { _logger.LogError("ClienteId {Id} inexistente.", clienteId); throw new KeyNotFoundException("Cliente não encontrado."); }
-            var novoChamado = new Chamado { NumeroChamado = $"HD-{ShortId.Generate().ToUpper()}", Titulo = model.Titulo, Descricao = model.Descricao, DataAbertura = DateTime.UtcNow, Status = "Aberto (IA)", Prioridade = "Média", ClienteId = clienteId, AnalistaInteragiu = false };
-            if (model.Imagens != null) { /* ... (lógica upload) ... */ }
+            if (cliente == null)
+            {
+                _logger.LogError("ClienteId {Id} inexistente.", clienteId);
+                throw new KeyNotFoundException("Cliente não encontrado.");
+            }
+
+            var novoChamado = new Chamado
+            {
+                NumeroChamado = $"HD-{ShortId.Generate().ToUpper()}",
+                Titulo = model.Titulo,
+                Descricao = model.Descricao,
+                DataAbertura = DateTime.UtcNow,
+                Status = "Aberto (IA)",
+                Prioridade = "Média",
+                ClienteId = clienteId,
+                AnalistaInteragiu = false
+            };
+
+            // --- INÍCIO DA LÓGICA DE UPLOAD ---
+            if (model.Imagens != null && model.Imagens.Any())
+            {
+                _logger.LogInformation("Iniciando upload de {Count} anexos para o chamado {Num}", model.Imagens.Count, novoChamado.NumeroChamado);
+
+                // Define o diretório de destino baseado no número do chamado
+                // O LocalFileStorageService salvará isso dentro de wwwroot
+                string diretorioDestino = $"uploads/chamados/{novoChamado.NumeroChamado}";
+
+                foreach (var arquivo in model.Imagens)
+                {
+                    try
+                    {
+                        // 1. Salva o arquivo no disco (ex: wwwroot/uploads/chamados/HD-XYZ/arquivo.png)
+                        //    e obtém a URL pública (ex: https://localhost:7121/uploads/chamados/HD-XYZ/arquivo.png)
+                        string urlArquivo = await _fileStorage.SalvarArquivo(arquivo, diretorioDestino);
+
+                        // 2. Cria a entidade Anexo para salvar no banco
+                        var novoAnexo = new Anexo
+                        {
+                            NomeArquivo = arquivo.FileName,
+                            UrlArquivo = urlArquivo,
+                            TipoConteudo = arquivo.ContentType,
+                            DataUpload = DateTime.UtcNow
+                            // O EF irá ligar o ChamadoId automaticamente
+                        };
+
+                        // 3. Adiciona o anexo à coleção do chamado
+                        novoChamado.Anexos.Add(novoAnexo);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Falha ao salvar o anexo {NomeArquivo} para o chamado {Num}", arquivo.FileName, novoChamado.NumeroChamado);
+                        // Continua o processo mesmo que um anexo falhe
+                    }
+                }
+            }
+            // --- FIM DA LÓGICA DE UPLOAD ---
+
             novoChamado.Mensagens.Add(new MensagemChat { Conteudo = $"Problema inicial: {model.Descricao}", DataEnvio = DateTime.UtcNow, ClienteRemetenteId = clienteId, RemetenteNome = cliente.Name });
             novoChamado.Mensagens.Add(new MensagemChat { Conteudo = "Ola eu sou a IA da NextLayer...", DataEnvio = DateTime.UtcNow.AddSeconds(1), RemetenteNome = "IA NextLayer" });
 
@@ -46,10 +99,19 @@ namespace NextLayer.Services
             {
                 respostaIaObj = await _iaService.GerarRespostaAsync(novoChamado, model.Descricao);
             }
-            catch (Exception ex) { _logger.LogError(ex, "Erro 1ª resp IA {Num}", novoChamado.NumeroChamado); novoChamado.Status = "Aguardando Analista"; }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro 1ª resp IA {Num}", novoChamado.NumeroChamado);
+                novoChamado.Status = "Aguardando Analista";
+            }
             novoChamado.Mensagens.Add(new MensagemChat { Conteudo = respostaIaObj.TextoResposta, DataEnvio = DateTime.UtcNow.AddSeconds(2), RemetenteNome = "IA NextLayer" });
 
-            _context.Chamados.Add(novoChamado); await _context.SaveChangesAsync();
+            // 1. Adiciona o chamado (e seus Anexos e Mensagens) ao context
+            _context.Chamados.Add(novoChamado);
+
+            // 2. Salva tudo no banco de dados (Chamado, Anexos, Mensagens)
+            await _context.SaveChangesAsync();
+
             return MapearParaDetalheViewModel(novoChamado, cliente.Name);
         }
 
