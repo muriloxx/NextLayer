@@ -5,14 +5,14 @@ using NextLayer.Services;
 using NextLayer.ViewModels;
 using System;
 using System.Threading.Tasks;
-// --- USINGS ADICIONADOS PARA JWT ---
+// Usings necessários para JWT
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using NextLayer.Models; // Necessário para pegar o ID e Role
-// --- FIM USINGS ---
+using NextLayer.Models; // Necessário para Client e Employee
+using System.Collections.Generic; // Para List<Claim>
 
 namespace NextLayer.Controllers
 {
@@ -21,9 +21,10 @@ namespace NextLayer.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        private readonly IConfiguration _configuration; // Injeta IConfiguration para ler a chave JWT
+        private readonly IConfiguration _configuration;
 
-        public AuthController(IAuthService authService, IConfiguration configuration) // Construtor atualizado
+        // Construtor atualizado para injetar IConfiguration
+        public AuthController(IAuthService authService, IConfiguration configuration)
         {
             _authService = authService;
             _configuration = configuration;
@@ -34,28 +35,35 @@ namespace NextLayer.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            // O AuthService agora retorna (objeto user, string userType)
+            // O AuthService retorna o objeto (Client ou Employee) e o tipo
             var (userObject, userType) = await _authService.AuthenticateAsync(model);
 
             if (userObject != null)
             {
-                // --- GERAÇÃO DO TOKEN ---
+                // Gera o token JWT
                 string token = GerarTokenJwt(userObject, userType);
-                // --- FIM DA GERAÇÃO ---
 
-                // Retorna o token e o tipo de usuário para o front-end
+                // --- ATUALIZAÇÃO AQUI ---
+                // Pega o nome do usuário a partir do objeto retornado
+                string userName = (userType == "Client")
+                    ? ((Client)userObject).Name
+                    : ((Employee)userObject).Name;
+                // --- FIM DA ATUALIZAÇÃO ---
+
+                // Retorna o token, o tipo E o nome do usuário
                 return Ok(new
                 {
                     message = "Login bem-sucedido!",
                     userType = userType,
-                    token = token // Envia o token para o front-end
+                    token = token,
+                    userName = userName // <-- Nome adicionado à resposta
                 });
             }
 
             return Unauthorized(new { message = "E-mail ou senha inválidos." });
         }
 
-        // --- NOVO MÉTODO PRIVADO PARA GERAR O TOKEN ---
+        // Método privado para gerar o token JWT (sem alterações)
         private string GerarTokenJwt(object userObject, string userType)
         {
             var jwtKey = _configuration["Jwt:Key"] ?? throw new ArgumentNullException("Jwt:Key não encontrada");
@@ -65,30 +73,26 @@ namespace NextLayer.Controllers
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            // Claims são as "informações" dentro do token
+            // Claims (informações dentro do token)
             var claims = new List<Claim>
             {
-                // Adiciona o Email
                 new Claim(JwtRegisteredClaimNames.Email, (userType == "Client" ? ((Client)userObject).Email : ((Employee)userObject).Email)),
-                // Adiciona o ID (NameIdentifier é o padrão para ID)
+                // ClaimTypes.NameIdentifier é o padrão para ID do usuário
                 new Claim(ClaimTypes.NameIdentifier, (userType == "Client" ? ((Client)userObject).Id.ToString() : ((Employee)userObject).Id.ToString())),
-                // Adiciona a Role (Função)
-                new Claim(ClaimTypes.Role, userType) // "Client" ou "Employee"
+                // ClaimTypes.Role é usado pelo [Authorize(Roles = "...")]
+                new Claim(ClaimTypes.Role, userType),
+                // ClaimTypes.Name é o padrão para o nome
+                new Claim(ClaimTypes.Name, (userType == "Client" ? ((Client)userObject).Name : ((Employee)userObject).Name))
             };
 
-            // (Opcional) Adiciona o Nome
-            claims.Add(new Claim(ClaimTypes.Name, (userType == "Client" ? ((Client)userObject).Name : ((Employee)userObject).Name)));
-
-            // Cria o token
             var token = new JwtSecurityToken(
                 issuer: issuer,
                 audience: audience,
                 claims: claims,
-                expires: DateTime.Now.AddHours(8), // Token expira em 8 horas
+                expires: DateTime.Now.AddHours(8), // Duração do token
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-        // --- FIM DO NOVO MÉTODO ---
     }
 }

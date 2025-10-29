@@ -1,57 +1,53 @@
-// --- ARQUIVO: Program.cs (COMPLETO E COMENTADO) ---
+// --- ARQUIVO: Program.cs (COMPLETO E CORRIGIDO COM CORS) ---
 
-// Usings necessários para os serviços, Entity Framework, Configuração, etc.
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders; // Para UseStaticFiles
-using NextLayer.Data; // Onde está o AppDbContext
-using NextLayer.Services; // Onde estão TODAS as interfaces e classes de serviço
-using Microsoft.Extensions.Logging; // Para logs
-using System.Net.Http; // Para AddHttpClient
+using Microsoft.Extensions.FileProviders;
+using NextLayer.Data;
+using NextLayer.Services; // NECESSÁRIO para as interfaces e classes de serviço
+// using Mscc.GenerativeAI; // Não precisa mais aqui
+using Microsoft.Extensions.Logging;
+using System.Net.Http; // NECESSÁRIO para AddHttpClient
+using System.Text; // Para a chave JWT
+using Microsoft.AspNetCore.Authentication.JwtBearer; // Para JWT
+using Microsoft.IdentityModel.Tokens; // Para JWT
 
-// Usings para Autenticação JWT
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+var builder = WebApplication.CreateBuilder(args); // Definido UMA VEZ
 
-// --- Início das Instruções de Nível Superior ---
-var builder = WebApplication.CreateBuilder(args);
+// --- SEÇÃO 1: REGISTRO DE SERVIÇOS ---
 
-// --- SEÇÃO 1: REGISTRO DE SERVIÇOS (Injeção de Dependência) ---
-
-// 1. Configuração do CORS
-var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+// 1. --- CONFIGURAÇÃO DE CORS ---
+// Define uma política de CORS chamada "_myAllowSpecificOrigins"
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: MyAllowSpecificOrigins,
+    options.AddPolicy(name: "_myAllowSpecificOrigins",
                       policy =>
                       {
+                          // Permite requisições de QUALQUER origem (incluindo 'null')
+                          // Para produção, você pode restringir: policy.WithOrigins("http://seu-site.com")
                           policy.AllowAnyOrigin()
                                 .AllowAnyHeader()
                                 .AllowAnyMethod();
                       });
 });
+// --- FIM DA CONFIGURAÇÃO DE CORS ---
 
-// 2. Configuração do Banco de Dados (Entity Framework Core + PostgreSQL)
+// 2. Banco de Dados
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connectionString)
-);
+builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
 // 3. Nossos Serviços de Negócios
-builder.Services.AddScoped<IAuthService, AuthService>(); // Serviço de Login/Cadastro
-builder.Services.AddScoped<IChamadoService, ChamadoService>(); // Serviço de Chamados
-builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>(); // Serviço de Upload
-builder.Services.AddScoped<IFaqService, FaqService>(); // Serviço de FAQ
-builder.Services.AddScoped<IDashboardService, DashboardService>(); // (NOVO) Serviço de Relatórios
-
-// 4. Serviço de Inteligência Artificial (usando API REST da Groq)
-builder.Services.AddHttpClient(); // Registra IHttpClientFactory
-builder.Services.AddScoped<IIaService, GeminiIaService>(); // Mapeia Interface -> Implementação (com lógica Groq)
-
-// 5. Serviço de Contexto HTTP
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IChamadoService, ChamadoService>();
+builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IFaqService, FaqService>(); // Serviço de FAQ
+builder.Services.AddScoped<IDashboardService, DashboardService>(); // Serviço de Relatórios
 
-// 6. Configuração de Autenticação JWT (JSON Web Token)
+// 4. Serviço de Inteligência Artificial (Groq)
+builder.Services.AddHttpClient(); // NECESSÁRIO
+builder.Services.AddScoped<IIaService, GeminiIaService>(); // Mapeia Interface -> Implementação
+
+// 5. Autenticação JWT
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -68,26 +64,22 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]
-            ?? throw new ArgumentNullException("Jwt:Key não encontrada no appsettings.json")))
+            ?? throw new ArgumentNullException("Jwt:Key não encontrada")))
     };
 });
-
-// 7. Serviço de Autorização
 builder.Services.AddAuthorization();
 
-// 8. Serviços Padrão do ASP.NET Core
+// 6. Serviços Padrão do ASP.NET
 builder.Services.AddControllers();
-builder.Services.AddRazorPages(); // Para a tela de erro padrão
-builder.Services.AddEndpointsApiExplorer(); // Necessário para o Swagger
+builder.Services.AddRazorPages(); // Mantém as páginas padrão (Welcome, Error)
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 
 // --- FIM DO REGISTRO DE SERVIÇOS ---
 
+var app = builder.Build(); // Definido UMA VEZ
 
-var app = builder.Build(); // Constrói a aplicação
-
-// --- SEED INICIAL DO FAQ ---
+// --- Seed do FAQ ---
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -105,41 +97,32 @@ using (var scope = app.Services.CreateScope())
 }
 // --- FIM DO SEED ---
 
-
 // --- SEÇÃO 2: CONFIGURAÇÃO DO PIPELINE HTTP (A ORDEM IMPORTA!) ---
-
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.UseDeveloperExceptionPage(); // Mostra erros detalhados no navegador
+    app.UseSwagger(); app.UseSwaggerUI(); app.UseDeveloperExceptionPage();
 }
 else
 {
-    app.UseExceptionHandler("/Error"); // Página de erro genérica (Razor Page)
-    app.UseHsts(); // Força o uso de HTTPS
+    app.UseExceptionHandler("/Error"); app.UseHsts();
 }
-
 app.UseHttpsRedirection();
+app.UseStaticFiles(); // Para servir uploads da wwwroot
 
-// Habilita o serviço de arquivos estáticos (CSS, JS, Imagens na wwwroot, e nossos Uploads)
-app.UseStaticFiles();
-
-// Habilita o roteamento
+// O Roteamento deve vir antes do CORS e da Autenticação
 app.UseRouting();
 
-// Aplica a política de CORS
-app.UseCors(MyAllowSpecificOrigins);
+// --- APLICA A POLÍTICA DE CORS ---
+// Esta linha PERMITE que o 'origin null' acesse sua API
+app.UseCors("_myAllowSpecificOrigins");
+// --- FIM DA APLICAÇÃO DO CORS ---
 
-// Habilita Autenticação e Autorização (Ordem correta)
-app.UseAuthentication(); // 1. Verifica QUEM é o usuário (lê o token)
-app.UseAuthorization();  // 2. Verifica o que o usuário PODE FAZER (baseado na Role)
+// A Autenticação deve vir ANTES da Autorização
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Mapeia os endpoints
 app.MapRazorPages(); // Para a página /Error
 app.MapControllers(); // Para sua API
 
-// Inicia a aplicação
 app.Run();
-
-// --- FIM DO ARQUIVO ---
