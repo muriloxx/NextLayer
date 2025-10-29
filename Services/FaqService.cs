@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging; // Para logs
+﻿// --- ARQUIVO: Services/FaqService.cs (COMPLETO E ATUALIZADO) ---
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NextLayer.Data;
 using NextLayer.Models;
 using System;
@@ -9,24 +10,25 @@ using System.Threading.Tasks;
 
 namespace NextLayer.Services
 {
-    /// <summary>
-    /// Serviço para gerenciar os itens da Base de Conhecimento (FAQ).
-    /// </summary>
     public class FaqService : IFaqService
     {
         private readonly AppDbContext _context;
         private readonly ILogger<FaqService> _logger;
-        // Futuramente, pode injetar o IChatIaService aqui para sugestões via IA
-        // private readonly IChatIaService _iaService;
+        // --- INJETAR A INTERFACE DA IA COM O NOME CORRETO ---
+        private readonly IIaService _iaService;
 
-        public FaqService(AppDbContext context, ILogger<FaqService> logger)
+        // --- CONSTRUTOR ATUALIZADO ---
+        public FaqService(AppDbContext context,
+                          ILogger<FaqService> logger,
+                          IIaService iaService) // <-- Adicionado IIaService
         {
             _context = context;
             _logger = logger;
+            _iaService = iaService; // <-- Adicionado
         }
 
         /// <summary>
-        /// Obtém todos os itens de FAQ ordenados por ID (ou outro critério).
+        /// Obtém todos os itens de FAQ ordenados por ID.
         /// </summary>
         public async Task<List<FaqItem>> GetAllFaqsAsync()
         {
@@ -38,68 +40,65 @@ namespace NextLayer.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro ao buscar todos os itens de FAQ.");
-                return new List<FaqItem>(); // Retorna lista vazia em caso de erro
+                return new List<FaqItem>();
             }
         }
 
+        // --- MÉTODO ATUALIZADO PARA USAR A IA ---
         /// <summary>
-        /// Sugere FAQs buscando por palavras-chave no título e descrição.
-        /// Implementação simples inicial.
+        /// Sugere FAQs usando a IA para comparar o problema com a base de conhecimento.
         /// </summary>
         public async Task<List<FaqItem>> GetFaqSugestoesAsync(string titulo, string descricao)
         {
-            _logger.LogInformation("Buscando sugestões de FAQ para: Titulo='{Titulo}', Descricao='{Descricao}'", titulo, descricao);
+            _logger.LogInformation("Buscando sugestões de FAQ (via IA) para: {Titulo}", titulo);
 
             if (string.IsNullOrWhiteSpace(titulo) && string.IsNullOrWhiteSpace(descricao))
-            {
-                return new List<FaqItem>(); // Retorna vazio se não houver texto
-            }
-
-            // Combina título e descrição e divide em palavras-chave (simples)
-            var textoBusca = $"{titulo} {descricao}".ToLowerInvariant();
-            var palavrasChave = textoBusca.Split(new[] { ' ', ',', '.', ';', '?', '!' }, StringSplitOptions.RemoveEmptyEntries)
-                                          .Distinct()
-                                          .Where(p => p.Length > 2) // Ignora palavras muito curtas
-                                          .ToList();
-
-            if (!palavrasChave.Any())
             {
                 return new List<FaqItem>();
             }
 
             try
             {
-                // Busca no banco por FAQs que contenham QUALQUER uma das palavras-chave
-                // na Pergunta OU na Resposta (ToLower para busca case-insensitive)
-                // ATENÇÃO: Esta busca pode ser lenta em bancos grandes. Otimizações (Full-Text Search) seriam necessárias.
-                var sugestoes = await _context.FaqItems
-                    .Where(f => palavrasChave.Any(p => f.Pergunta.ToLower().Contains(p) || f.Resposta.ToLower().Contains(p)))
-                    .Take(5) // Limita a 5 sugestões
-                    .ToListAsync();
+                // 1. Busca todas as FAQs do banco (para a IA analisar)
+                var todasFaqs = await GetAllFaqsAsync();
+                if (!todasFaqs.Any())
+                {
+                    _logger.LogWarning("Nenhum FAQ encontrado no banco para sugestão.");
+                    return new List<FaqItem>();
+                }
 
-                _logger.LogInformation("Encontradas {Count} sugestões de FAQ.", sugestoes.Count);
+                // 2. Chama a IA (usando a interface IIaService)
+                var idsSugeridos = await _iaService.SugerirFaqsRelevantesAsync(titulo, descricao, todasFaqs);
+
+                if (!idsSugeridos.Any())
+                {
+                    _logger.LogInformation("IA não sugeriu FAQs relevantes.");
+                    return new List<FaqItem>();
+                }
+
+                // 3. Filtra a lista original para retornar apenas os itens sugeridos
+                var sugestoes = todasFaqs
+                    .Where(f => idsSugeridos.Contains(f.Id))
+                    .ToList();
+
+                _logger.LogInformation("Encontradas {Count} sugestões de FAQ via IA.", sugestoes.Count);
                 return sugestoes;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erro ao buscar sugestões de FAQ para: Titulo='{Titulo}', Descricao='{Descricao}'", titulo, descricao);
-                return new List<FaqItem>(); // Retorna lista vazia em caso de erro
+                _logger.LogError(ex, "Erro ao buscar sugestões de FAQ (IA) para: {Titulo}", titulo);
+                return new List<FaqItem>();
             }
-
-            // --- Implementação Futura com IA ---
-            // var todasFaqs = await GetAllFaqsAsync();
-            // var idsSugeridos = await _iaService.SugerirFaqIdsAsync(titulo, descricao, todasFaqs);
-            // return todasFaqs.Where(f => idsSugeridos.Contains(f.Id)).ToList();
-            // --- Fim da Implementação Futura ---
         }
+        // --- FIM DA ATUALIZAÇÃO ---
 
-        // --- Método para Popular FAQs (USAR APENAS UMA VEZ ou em SEED) ---
+
         /// <summary>
         /// Adiciona os exemplos de FAQ iniciais ao banco de dados, se ele estiver vazio.
         /// </summary>
         public async Task SeedInitialFaqsAsync()
         {
-            if (!await _context.FaqItems.AnyAsync()) // Verifica se a tabela está vazia
+            if (!await _context.FaqItems.AnyAsync())
             {
                 _logger.LogInformation("Populando tabela FaqItens com dados iniciais...");
                 var faqsIniciais = new List<FaqItem>
@@ -110,15 +109,11 @@ namespace NextLayer.Services
                     new FaqItem { Pergunta = "Meu computador está muito lento.", Resposta = "Feche todos os programas que não estiver utilizando. Reinicie o computador. Verifique se há atualizações pendentes do Windows ou de outros softwares. Execute uma verificação de vírus com o antivírus corporativo. Se a lentidão continuar, abra um chamado informando desde quando o problema ocorre e quais programas parecem ser mais afetados.", DataCriacao = DateTime.UtcNow },
                     new FaqItem { Pergunta = "Como configurar o e-mail no meu celular?", Resposta = "Siga o guia passo-a-passo disponível na Intranet em [link_do_guia_email_mobile]. Você precisará do seu e-mail corporativo, senha e, possivelmente, das configurações do servidor (IMAP/SMTP) descritas no guia. Se encontrar dificuldades, abra um chamado informando o modelo do seu celular e o passo onde ocorreu o erro.", DataCriacao = DateTime.UtcNow }
                 };
-
                 await _context.FaqItems.AddRangeAsync(faqsIniciais);
                 await _context.SaveChangesAsync();
                 _logger.LogInformation("Tabela FaqItens populada com {Count} itens.", faqsIniciais.Count);
             }
-            else
-            {
-                _logger.LogInformation("Tabela FaqItens já contém dados. Seed não executado.");
-            }
+            else { _logger.LogInformation("Tabela FaqItens já contém dados. Seed não executado."); }
         }
     }
 }

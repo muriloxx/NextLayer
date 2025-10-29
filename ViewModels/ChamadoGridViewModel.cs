@@ -10,5 +10,10 @@ namespace NextLayer.ViewModels //Para o Grid do Analista
         public string NomeCliente { get; set; }
         public DateTime DataAbertura { get; set; }
         public string Status { get; set; }
+
+        /// <summary>
+        /// Nome do analista atualmente designado ao chamado.
+        /// </summary>
+        public string? NomeAnalista { get; set; } // Pode ser nulo
     }
 }

@@ -5,31 +5,21 @@ namespace NextLayer.Validators
     public class InstitutionalEmailAttribute : ValidationAttribute
     {
         private const string InstitutionalDomain = "nextlayer.com";
+        public InstitutionalEmailAttribute() : base($"O e-mail deve pertencer ao domínio @{InstitutionalDomain}.") { }
 
-        // Mensagem de erro padrão
-        public InstitutionalEmailAttribute()
-            : base($"O e-mail deve pertencer ao domínio @{InstitutionalDomain}.")
-        {
-        }
-
-        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        // Assinatura corrigida para 'object?' e 'ValidationResult?'
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
             if (value == null || string.IsNullOrWhiteSpace(value.ToString()))
             {
-                // Deixe o [Required] cuidar da validação de nulo/vazio
-                return ValidationResult.Success;
+                return ValidationResult.Success; // [Required] cuida disso
             }
-
-            string email = value.ToString();
-
-            // Verifica se o e-mail termina com o domínio (ignorando maiúsculas/minúsculas)
+            string email = value.ToString() ?? "";
             if (email.EndsWith($"@{InstitutionalDomain}", StringComparison.OrdinalIgnoreCase))
             {
                 return ValidationResult.Success;
             }
-
-            // Retorna a mensagem de erro definida no construtor
-            return new ValidationResult(ErrorMessage);
+            return new ValidationResult(ErrorMessage ?? $"E-mail deve ser @{InstitutionalDomain}.");
         }
     }
 }
