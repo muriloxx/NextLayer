@@ -6,7 +6,6 @@
     <title>NextLayer - Portal</title>
     <style>
         /* --- INÍCIO DO CSS --- */
-        /* (Estilos gerais, formulários, botões, etc.) */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #f4f7f6;
@@ -133,6 +132,7 @@
                 display: block;
             }
 
+        /* Cabeçalho */
         .header {
             display: flex;
             justify-content: space-between;
@@ -197,6 +197,7 @@
                 background-color: #e9ecef;
             }
 
+        /* Grid de Chamados */
         .ticket-grid-container {
             max-height: 400px;
             overflow-y: auto;
@@ -227,11 +228,11 @@
             .ticket-grid tbody tr {
                 cursor: default;
             }
-                /* Linha não é mais clicável */
+
                 .ticket-grid tbody tr:hover {
                     background-color: #f0f8ff;
                 }
-        /* CORREÇÃO: Célula clicável (apenas a que tiver esta classe) */
+
         .grid-clickable-cell {
             cursor: pointer;
             text-decoration: underline;
@@ -261,6 +262,7 @@
                 opacity: 0.7;
             }
 
+        /* Controles do Analista */
         #analyst-controls {
             display: none;
             border: 1px solid #e0e0e0;
@@ -305,6 +307,7 @@
                 cursor: not-allowed;
             }
 
+        /* Estrutura do Chat */
         .chat-container {
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -368,6 +371,41 @@
             background-color: #f5f5f5;
         }
 
+        .chat-input-form {
+            display: flex;
+            border-top: 1px solid #ddd;
+        }
+
+            .chat-input-form input {
+                flex-grow: 1;
+                border: none;
+                padding: 1rem;
+                border-radius: 0 0 0 4px;
+                outline: none;
+                font-size: 1rem;
+            }
+
+            .chat-input-form button {
+                border: none;
+                background-color: #007bff;
+                color: white;
+                padding: 0 1.5rem;
+                cursor: pointer;
+                border-radius: 0 0 4px 0;
+                font-size: 1rem;
+                flex-shrink: 0;
+            }
+
+                .chat-input-form button:hover {
+                    background-color: #0056b3;
+                }
+
+                .chat-input-form button:disabled {
+                    background-color: #a0cfff;
+                    cursor: not-allowed;
+                }
+
+        /* Estilos das Mensagens do Chat (Alinhamento/Cores) */
         .chat-message {
             margin-bottom: 1rem;
             max-width: 80%;
@@ -436,38 +474,44 @@
                 color: #0c5460;
             }
 
-        .chat-input-form {
-            display: flex;
-            border-top: 1px solid #ddd;
+        /* (NOVO) CSS PARA RELATÓRIO DE STATUS */
+        #dashboard-stats-container {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1rem;
+            background-color: #fdfdfd;
         }
 
-            .chat-input-form input {
-                flex-grow: 1;
-                border: none;
+            #dashboard-stats-container ul {
+                list-style: none;
+                padding-left: 0;
+                margin: 0;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            #dashboard-stats-container li {
+                flex: 1 1 120px; /* Flexbox para caixas responsivas */
+                background-color: #f0f8ff;
+                border: 1px solid #cce5ff;
+                border-radius: 4px;
                 padding: 1rem;
-                border-radius: 0 0 0 4px;
-                outline: none;
-                font-size: 1rem;
+                text-align: center;
             }
 
-            .chat-input-form button {
-                border: none;
-                background-color: #007bff;
-                color: white;
-                padding: 0 1.5rem;
-                cursor: pointer;
-                border-radius: 0 0 4px 0;
-                font-size: 1rem;
-                flex-shrink: 0;
-            }
-
-                .chat-input-form button:hover {
-                    background-color: #0056b3;
+                #dashboard-stats-container li .stat-count {
+                    font-size: 1.75rem;
+                    font-weight: bold;
+                    color: #0056b3;
+                    display: block;
                 }
 
-                .chat-input-form button:disabled {
-                    background-color: #a0cfff;
-                    cursor: not-allowed;
+                #dashboard-stats-container li .stat-label {
+                    font-size: 0.9rem;
+                    color: #333;
+                    display: block;
+                    margin-top: 0.25rem;
                 }
         /* --- FIM DO CSS --- */
     </style>
@@ -529,6 +573,11 @@
 
         <div id="employee-dashboard-screen" class="screen">
             <div class="header"> <h2>Painel do Analista</h2> <button class="btn-logout" onclick="logout()">Sair</button> </div>
+
+            <h3 style="margin-top: 1.5rem;">Relatório de Status</h3>
+            <div id="dashboard-stats-container" style="border: 1px solid #ddd; border-radius: 4px; padding: 1rem; background-color: #fdfdfd;">
+                <p id="stats-loading-message" style="color: #666;">Carregando estatísticas...</p>
+            </div>
             <h3>Meus Chamados Atribuídos (Não Concluídos)</h3>
             <div class="ticket-grid-container">
                 <table class="ticket-grid">
@@ -659,6 +708,7 @@
             currentUserType = null; currentChamadoId = null; listaAnalistasCache = null;
             localStorage.removeItem('jwtToken'); // Limpa o token
             try { document.getElementById('analyst-ticket-grid-body').innerHTML = ''; } catch (e) { }
+            try { document.getElementById('my-assigned-grid-body').innerHTML = ''; } catch (e) { } // Limpa novo grid
             try { document.getElementById('client-ticket-grid-body').innerHTML = ''; } catch (e) { }
             ['login-form', 'client-register-form', 'employee-register-form', 'client-ticket-form', 'chat-message-form', 'analyst-controls'].forEach(id => {
                 const el = document.getElementById(id);
@@ -693,7 +743,6 @@
             }
             if (response.status === 403) { // Proibido (não tem a Role certa)
                 console.warn("Ação proibida (403).");
-                // Tenta ler a mensagem de erro do back-end
                 try {
                     const errorData = await response.json();
                     throw new Error(errorData.message || "Você não tem permissão para fazer isso.");
@@ -706,8 +755,57 @@
 
         // --- LÓGICA DE CARREGAMENTO DOS PAINÉIS (USA fetchAutenticado) ---
 
+        /** (NOVO) Carrega Estatísticas do Dashboard */
+        async function loadDashboardStats() {
+            const statsContainer = document.getElementById('dashboard-stats-container');
+            const loadingMessage = document.getElementById('stats-loading-message');
+            if (!statsContainer || !loadingMessage) return;
+
+            loadingMessage.textContent = "Carregando estatísticas...";
+            if (statsContainer.querySelector('ul')) { // Limpa <ul> antigo se existir
+                statsContainer.querySelector('ul').remove();
+            }
+            loadingMessage.style.display = 'block';
+
+            try {
+                const response = await fetchAutenticado(`${API_URL}/api/Dashboard/stats/por-status`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `Erro ${response.status}`);
+                }
+                const stats = await response.json();
+
+                loadingMessage.style.display = 'none'; // Esconde "Carregando..."
+
+                if (!stats || stats.length === 0) {
+                    statsContainer.innerHTML = '<p>Nenhuma estatística de status encontrada.</p>';
+                    return;
+                }
+
+                const ul = document.createElement('ul');
+                stats.forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                            <span class="stat-count">${item.contagem}</span>
+                            <span class="stat-label">${item.status || 'Sem Status'}</span>
+                        `;
+                    ul.appendChild(li);
+                });
+                statsContainer.appendChild(ul);
+
+            } catch (error) {
+                console.error("Erro ao carregar estatísticas:", error);
+                if (error.message !== "Sessão expirada.") {
+                    statsContainer.innerHTML = `<p style="color:red;">Erro ao carregar estatísticas: ${error.message}</p>`;
+                }
+            }
+        }
+
         /** Carrega os grids do Analista (Meus Chamados e Todos) */
         async function loadEmployeeDashboard() {
+            // --- CHAMA A NOVA FUNÇÃO DE STATS ---
+            loadDashboardStats(); // Dispara o carregamento das estatísticas
+
             // 1. Carrega "Meus Chamados"
             const myGridBody = document.getElementById('my-assigned-grid-body');
             if (myGridBody) {
@@ -721,9 +819,9 @@
                         chamados.forEach(c => {
                             myGridBody.innerHTML += `<tr data-id="${c.id}">
                                     <td onclick="abrirChat(${c.id})" class="grid-clickable-cell" title="Abrir Chat">${c.numeroChamado || '-'}</td>
-                                    <td>${c.titulo || '-'}</td>
-                                    <td>${c.nomeCliente || '-'}</td>
-                                    <td>${formatISODate(c.dataAbertura)}</td>
+                                    <td onclick="abrirChat(${c.id})" class="grid-clickable-cell">${c.titulo || '-'}</td>
+                                    <td onclick="abrirChat(${c.id})" class="grid-clickable-cell">${c.nomeCliente || '-'}</td>
+                                    <td onclick="abrirChat(${c.id})" class="grid-clickable-cell">${formatISODate(c.dataAbertura)}</td>
                                     <td>${c.status || '-'}</td>
                                 </tr>`;
                         });
@@ -746,9 +844,9 @@
                     statusOptions.forEach(opt => { const sel = (opt === (c.status || '')) ? 'selected' : ''; selHtml += `<option value="${opt}" ${sel}>${opt}</option>`; }); selHtml += `</select>`;
                     gridBody.innerHTML += `<tr data-id="${c.id}">
                             <td onclick="abrirChat(${c.id})" class="grid-clickable-cell">${c.numeroChamado || '-'}</td>
-                            <td>${c.titulo || '-'}</td>
-                            <td>${c.nomeCliente || '-'}</td>
-                            <td>${formatISODate(c.dataAbertura)}</td>
+                            <td onclick="abrirChat(${c.id})" class="grid-clickable-cell">${c.titulo || '-'}</td>
+                            <td onclick="abrirChat(${c.id})" class="grid-clickable-cell">${c.nomeCliente || '-'}</td>
+                            <td onclick="abrirChat(${c.id})" class="grid-clickable-cell">${formatISODate(c.dataAbertura)}</td>
                             <td>${selHtml}</td>
                             <td>${c.nomeAnalista || '--'}</td>
                         </tr>`;
@@ -765,15 +863,14 @@
                 if (!response.ok) throw new Error(`Erro ${response.status}.`);
                 const chamados = await response.json(); gridBody.innerHTML = '';
                 if (!chamados || chamados.length === 0) { gridBody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Nenhum chamado.</td></tr>`; return; }
-                chamados.forEach(c => { gridBody.innerHTML += `<tr data-id="${c.id}"><td onclick="abrirChat(${c.id})" class="grid-clickable-cell">${c.numeroChamado || '-'}</td><td>${c.titulo || '-'}</td><td>${formatISODate(c.dataAbertura)}</td><td>${c.status || '-'}</td></tr>`; });
+                chamados.forEach(c => { gridBody.innerHTML += `<tr data-id="${c.id}"><td onclick="abrirChat(${c.id})" class="grid-clickable-cell">${c.numeroChamado || '-'}</td><td onclick="abrirChat(${c.id})" class="grid-clickable-cell">${c.titulo || '-'}</td><td>${formatISODate(c.dataAbertura)}</td><td>${c.status || '-'}</td></tr>`; });
             } catch (e) { console.error('Erro load cliente:', e); if (e.message !== "Sessão expirada.") gridBody.innerHTML = `<tr><td colspan="4" style="color:red;">${e.message || 'Erro.'}</td></tr>`; }
         }
 
         /** Carrega Analistas no Dropdown */
         async function carregarAnalistasDropdown(selectElementId, selectedAnalistaId = null) {
-            const select = document.getElementById(selectElementId);
-            if (!select) { console.error("Dropdown analistas não encontrado:", selectElementId); return; }
-            select.options.length = 1; // Limpa (mantém "-- Nenhum --")
+            const select = document.getElementById(selectElementId); if (!select) { console.error("Dropdown não encontrado:", selectElementId); return; }
+            select.options.length = 1;
             try {
                 if (!listaAnalistasCache) {
                     console.log("Buscando analistas da API...");
@@ -783,12 +880,9 @@
                 }
                 if (listaAnalistasCache && listaAnalistasCache.length > 0) {
                     listaAnalistasCache.forEach(analista => {
-                        const option = document.createElement('option');
-                        option.value = analista.id;
+                        const option = document.createElement('option'); option.value = analista.id;
                         option.textContent = `${analista.nome} (${analista.funcao || 'N/A'})`;
-                        if (selectedAnalistaId && analista.id === selectedAnalistaId) {
-                            option.selected = true;
-                        }
+                        if (selectedAnalistaId && analista.id === selectedAnalistaId) { option.selected = true; }
                         select.appendChild(option);
                     });
                 }
@@ -843,13 +937,11 @@
             } catch (e) { console.error('Erro abrir chat:', e); if (e.message !== "Sessão expirada.") showMessage(`Erro chat: ${e.message}`, true); msgA.innerHTML = `<p style="color:red;">Falha ao carregar dados.</p>`; }
         }
 
-        // --- FUNÇÃO RENDERIZARMENSAGENS CORRIGIDA ---
-        function renderizarMensagens(mensagens) { // Parâmetro é 'mensagens'
+        /** Renderiza as mensagens na tela de chat */
+        function renderizarMensagens(mensagens) {
             const area = document.getElementById('chat-messages-area'); if (!area) return; area.innerHTML = '';
-            // Use 'mensagens' (o parâmetro) aqui
             if (!mensagens || mensagens.length === 0) { area.innerHTML = `<p style="text-align:center; color:#999;">Sem mensagens.</p>`; return; }
             try {
-                // Use 'mensagens' (o parâmetro) aqui
                 mensagens.forEach(msg => {
                     if (!msg) { console.warn("Msg inválida:", msg); return; }
                     const d = formatISODate(msg.dataEnvio); let rc = '', ac = '';
@@ -861,26 +953,26 @@
                     area.innerHTML += `<div class="chat-message ${ac} ${rc}"><span class="sender">${sS}<span class="timestamp">${d}</span></span><div class="content">${sC}</div></div>`;
                 });
                 setTimeout(() => { area.scrollTop = area.scrollHeight; }, 50);
-            } catch (err) {
-                console.error("Erro renderizar:", err, mensagens); // Usa 'mensagens'
-                area.innerHTML = `<p style="color:red;">Erro exibir msgs.</p>`;
-            }
+            } catch (err) { console.error("Erro renderizar:", err, mensagens); area.innerHTML = `<p style="color:red;">Erro exibir msgs.</p>`; }
         }
-        // --- FIM DA CORREÇÃO ---
 
-        // --- EVENT LISTENERS (Usam fetchAutenticado) ---
+        // --- EVENT LISTENERS ---
         document.getElementById('chat-btn-back').addEventListener('click', () => { currentChamadoId = null; const s = currentUserType === "Client" ? 'client-dashboard-screen' : 'employee-dashboard-screen'; showScreen(s); if (currentUserType === "Client") loadClientDashboard(); else loadEmployeeDashboard(); });
         document.getElementById('chat-btn-refresh').addEventListener('click', () => { if (currentChamadoId) { showMessage('Atualizando...', false); abrirChat(currentChamadoId); } });
         document.getElementById('chat-message-form').addEventListener('submit', async function (ev) {
             ev.preventDefault(); const i = document.getElementById('chat-message-input'); const c = i.value.trim(); if (!c || !currentChamadoId || !currentUserType) return; disableForm('chat-message-form', true); const ov = c; i.value = '';
-            try { const r = await fetchAutenticado(`${API_URL}/api/Chamado/${currentChamadoId}/mensagem`, { method: 'POST', body: JSON.stringify({ Conteudo: c, TipoRemetente: currentUserType }) }); if (!r.ok) { const ed = await r.json(); throw new Error(ed.message || `Erro ${r.status}.`); } const ms = await r.json(); renderizarMensagens(ms); } catch (e) { console.error(e); if (e.message !== "Sessão expirada.") showMessage(`Falha: ${e.message}`, true); i.value = ov; } finally { disableForm('chat-message-form', false); setTimeout(() => { try { i.focus(); } catch (e) { } }, 100); }
+            try {
+                const r = await fetchAutenticado(`${API_URL}/api/Chamado/${currentChamadoId}/mensagem`, { method: 'POST', body: JSON.stringify({ Conteudo: c, TipoRemetente: currentUserType }) }); if (!r.ok) { const ed = await r.json(); throw new Error(ed.message || `Erro ${r.status}.`); } const ms = await r.json(); renderizarMensagens(ms);
+            } catch (e) { console.error(e); if (e.message !== "Sessão expirada.") showMessage(`Falha: ${e.message}`, true); i.value = ov; } finally { disableForm('chat-message-form', false); setTimeout(() => { try { i.focus(); } catch (e) { } }, 100); }
         });
         document.getElementById('btn-save-analyst-changes').addEventListener('click', async () => {
             if (!currentChamadoId || currentUserType !== 'Employee') return;
             disableForm('analyst-controls', true); const btn = document.getElementById('btn-save-analyst-changes'); const oTxt = btn.dataset.originalText || btn.textContent; btn.textContent = 'Salvando...';
             const s = document.getElementById('analyst-select-status').value; const p = document.getElementById('analyst-select-priority').value; const aidV = document.getElementById('analyst-select-assignee').value; const aid = aidV ? parseInt(aidV, 10) : null;
             const d = { Status: s, Prioridade: p, RoleDesignada: null, AnalistaId: aid }; // Role removida
-            try { const r = await fetchAutenticado(`${API_URL}/api/Chamado/${currentChamadoId}/atualizar`, { method: 'PUT', body: JSON.stringify(d) }); if (!r.ok) { const ed = await r.json(); throw new Error(ed.message || `Erro ${r.status}.`); } showMessage('Salvo!', false); abrirChat(currentChamadoId); } catch (e) { console.error(e); if (e.message !== "Sessão expirada.") showMessage(`Erro: ${e.message}`, true); } finally { disableForm('analyst-controls', false); btn.textContent = oTxt; }
+            try {
+                const r = await fetchAutenticado(`${API_URL}/api/Chamado/${currentChamadoId}/atualizar`, { method: 'PUT', body: JSON.stringify(d) }); if (!r.ok) { const ed = await r.json(); throw new Error(ed.message || `Erro ${r.status}.`); } showMessage('Salvo!', false); abrirChat(currentChamadoId);
+            } catch (e) { console.error(e); if (e.message !== "Sessão expirada.") showMessage(`Erro: ${e.message}`, true); } finally { disableForm('analyst-controls', false); btn.textContent = oTxt; }
         });
 
         document.getElementById('client-ticket-form').addEventListener('submit', async function (ev) {
@@ -928,7 +1020,7 @@
         document.getElementById('ticket-titulo').addEventListener('input', debounceBuscarSugestoes);
         document.getElementById('ticket-descricao').addEventListener('input', debounceBuscarSugestoes);
 
-        console.log("Portal NextLayer vFinal (Correção 'msgs is not defined') inicializado.");
+        console.log("Portal NextLayer vFinal (Correção Chat + Auth) inicializado.");
         /* --- FIM DO JAVASCRIPT --- */
     </script>
 

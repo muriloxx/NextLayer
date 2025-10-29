@@ -1,5 +1,3 @@
-// --- ARQUIVO: Services/GeminiIaService.cs (USANDO LÓGICA Groq) ---
-
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NextLayer.Models;
@@ -14,11 +12,11 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using System.Text.RegularExpressions;
-using Mscc.GenerativeAI; // <--- USA O PACOTE CORRETO
+using System.Text.RegularExpressions; // Para extrair a Role e IDs
 
 namespace NextLayer.Services
 {
+    // A classe implementa a interface IIaService (que agora tem 2 métodos)
     public class GeminiIaService : IIaService
     {
         private readonly HttpClient _httpClient;
@@ -28,6 +26,7 @@ namespace NextLayer.Services
         private readonly JsonSerializerOptions _jsonOptions;
         private readonly string _modelName = "llama-3.1-8b-instant"; // Modelo Groq ativo
 
+        // Construtor (como estava antes)
         public GeminiIaService(IConfiguration configuration,
                                IHttpClientFactory clientFactory,
                                ILogger<GeminiIaService> logger)
@@ -39,11 +38,9 @@ namespace NextLayer.Services
                 _logger.LogError("ERRO CRÍTICO: Groq:ApiKey não encontrada no appsettings.json.");
                 throw new ArgumentNullException("Groq:ApiKey não encontrada.");
             }
-
             _httpClient = clientFactory.CreateClient("GroqApiClient");
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
             _apiUrl = "https://api.groq.com/openai/v1/chat/completions";
-
             _jsonOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
@@ -53,6 +50,7 @@ namespace NextLayer.Services
             _logger.LogInformation("GeminiIaService (API REST Groq) inicializado. Modelo: {ModelName}", _modelName);
         }
 
+        // --- Método GerarRespostaAsync (EXISTENTE, já retorna IaResposta) ---
         public async Task<IaResposta> GerarRespostaAsync(Chamado chamado, string novaMensagemCliente)
         {
             _logger.LogInformation("Gerando resposta da Groq para ChamadoId {ChamadoId}", chamado.Id);
@@ -70,11 +68,9 @@ REGRAS DE RESPOSTA:
     - Você NÃO precisa retornar a [CATEGORIA].
     - Exemplo: [RESPOSTA] Tente reiniciar seu computador.
 ";
-
             var messages = new List<GroqMessage>();
             messages.Add(new GroqMessage { Role = "system", Content = systemInstruction });
             messages.Add(new GroqMessage { Role = "system", Content = $"Contexto: Título: {chamado.Titulo}\nDescrição: {chamado.Descricao}" });
-
             foreach (var msg in chamado.Mensagens.OrderBy(m => m.DataEnvio))
             {
                 string role = (msg.ClienteRemetenteId.HasValue || msg.FuncionarioRemetenteId.HasValue) ? "user" : "assistant";
@@ -82,9 +78,7 @@ REGRAS DE RESPOSTA:
                 messages.Add(new GroqMessage { Role = role, Content = prefix + msg.Conteudo });
             }
             messages.Add(new GroqMessage { Role = "user", Content = novaMensagemCliente });
-
             var requestBody = new GroqRequest { Messages = messages, Model = _modelName, Temperature = 0.5f };
-
             try
             {
                 HttpResponseMessage response = await _httpClient.PostAsJsonAsync(_apiUrl, requestBody, _jsonOptions);
@@ -104,6 +98,7 @@ REGRAS DE RESPOSTA:
             catch (Exception ex) { _logger.LogError(ex, "Erro inesperado API Groq."); return new IaResposta { TextoResposta = $"Erro inesperado IA: {ex.Message}" }; }
         }
 
+        // --- Método ParseIaResposta (EXISTENTE, helper para o método acima) ---
         private IaResposta ParseIaResposta(string rawText)
         {
             var resposta = new IaResposta();
@@ -131,11 +126,88 @@ REGRAS DE RESPOSTA:
             return resposta;
         }
 
+
+        public async Task<List<int>> SugerirFaqsRelevantesAsync(string tituloProblema, string descricaoProblema, List<FaqItem> faqsExistentes)
+        {
+            _logger.LogInformation("IA (Groq) buscando sugestões de FAQ para: {Titulo}", tituloProblema);
+
+            // 1. Constrói o "Contexto" (a lista de FAQs que a IA pode escolher)
+            var contextoFaq = new StringBuilder();
+            contextoFaq.AppendLine("Aqui está a base de conhecimento (FAQ) disponível:");
+            foreach (var faq in faqsExistentes)
+            {
+                // Formato: [ID: X] Pergunta: ...
+                contextoFaq.AppendLine($"[ID: {faq.Id}] Pergunta: {faq.Pergunta}");
+            }
+
+            // 2. Constrói o "Prompt" (a pergunta para a IA)
+            var promptUsuario = $@"Um usuário está relatando o seguinte problema:
+Título: {tituloProblema}
+Descrição: {descricaoProblema}
+
+Com base na base de conhecimento acima, quais IDs de FAQ são os mais relevantes para este problema?
+Retorne APENAS os números dos IDs, separados por vírgula. Se nenhum for relevante, não retorne nada.
+Exemplo de Resposta: 1, 3";
+
+            // 3. Monta a lista de mensagens para a API Groq
+            var messages = new List<GroqMessage>
+            {
+                new GroqMessage { Role = "system", Content = "Você é um assistente de triagem de suporte. Sua tarefa é encontrar FAQs relevantes para o problema do usuário com base no contexto fornecido." },
+                new GroqMessage { Role = "system", Content = contextoFaq.ToString() },
+                new GroqMessage { Role = "user", Content = promptUsuario }
+            };
+
+            var requestBody = new GroqRequest { Messages = messages, Model = _modelName, Temperature = 0.2f };
+
+            try
+            {
+                HttpResponseMessage response = await _httpClient.PostAsJsonAsync(_apiUrl, requestBody, _jsonOptions);
+                if (!response.IsSuccessStatusCode)
+                {
+                    string err = await response.Content.ReadAsStringAsync();
+                    _logger.LogError("Erro API Groq (SugerirFaq): {Err}", err);
+                    return new List<int>(); // Retorna lista vazia se a API falhar
+                }
+
+                var groqResponse = await response.Content.ReadFromJsonAsync<GroqResponse>(_jsonOptions);
+                string? responseText = groqResponse?.Choices?.FirstOrDefault()?.Message?.Content;
+
+                if (string.IsNullOrEmpty(responseText))
+                {
+                    _logger.LogWarning("Groq (SugerirFaq) retornou resposta vazia.");
+                    return new List<int>();
+                }
+
+                _logger.LogInformation("Resposta crua da IA (Sugestão FAQ): {Text}", responseText);
+
+                // 4. Processa a resposta (ex: "1, 3") para uma lista de IDs
+                var idsSugeridos = new List<int>();
+                var idsLimpos = Regex.Replace(responseText, @"[^\d,]", ""); // Remove caracteres não numéricos
+
+                foreach (var idStr in idsLimpos.Split(','))
+                {
+                    if (int.TryParse(idStr.Trim(), out int id))
+                    {
+                        idsSugeridos.Add(id);
+                    }
+                }
+                _logger.LogInformation("IA sugeriu os IDs de FAQ: {IDs}", string.Join(", ", idsSugeridos));
+                return idsSugeridos;
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro inesperado ao sugerir FAQs via IA.");
+                return new List<int>();
+            }
+        }
+
+
         // --- Classes Auxiliares JSON (Groq/OpenAI) ---
         private class GroqRequest { [JsonPropertyName("messages")] public List<GroqMessage> Messages { get; set; } = new(); [JsonPropertyName("model")] public string Model { get; set; } = string.Empty; [JsonPropertyName("temperature")][JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] public float Temperature { get; set; } = 0.7f; }
         private class GroqMessage { [JsonPropertyName("role")] public string Role { get; set; } = string.Empty; [JsonPropertyName("content")] public string Content { get; set; } = string.Empty; }
-        private class GroqResponse { [JsonPropertyName("choices")] public List<GroqChoice>? Choices { get; set; } }
-        private class GroqChoice { [JsonPropertyName("message")] public GroqMessage? Message { get; set; } }
-        private class GroqUsage { }
+        private class GroqResponse { [JsonPropertyName("choices")] public List<GroqChoice>? Choices { get; set; } /* ... */ }
+        private class GroqChoice { [JsonPropertyName("message")] public GroqMessage? Message { get; set; } /* ... */ }
+        private class GroqUsage { /* ... */ }
     }
 }
