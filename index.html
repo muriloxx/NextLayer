@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-R">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NextLayer - Portal</title>
 
@@ -102,6 +102,14 @@
             .btn:disabled {
                 background-color: #a0cfff;
                 cursor: not-allowed;
+            }
+
+        .btn-success {
+            background-color: #28a745;
+        }
+
+            .btn-success:hover {
+                background-color: #218838;
             }
 
         .nav-links {
@@ -515,17 +523,24 @@
                 border-bottom-color: #007bff;
             }
 
-        /* --- NOVO: Estilo para a aba de Admin (escondida por padrão) --- */
         #tab-link-admin {
-            display: none; /* Escondido por padrão */
-            color: #dc3545; /* Cor de Admin */
+            display: none;
+            color: #dc3545;
             font-weight: 600;
         }
 
             #tab-link-admin.active {
                 border-bottom-color: #dc3545;
             }
-        /* --- FIM NOVO --- */
+
+        #tab-link-perfil, #tab-link-client-perfil {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+            #tab-link-perfil.active, #tab-link-client-perfil.active {
+                border-bottom-color: #28a745;
+            }
 
 
         .tab-content {
@@ -646,7 +661,6 @@
                     color: #333;
                 }
 
-        /* --- NOVO: Estilo para o checkbox de Admin --- */
         .admin-checkbox-group {
             display: flex;
             align-items: center;
@@ -669,8 +683,6 @@
                 font-weight: bold;
                 color: #dc3545;
             }
-        /* --- FIM NOVO --- */
-
 
         /* --- FIM DO CSS --- */
     </style>
@@ -709,16 +721,38 @@
 
         <div id="client-dashboard-screen" class="screen">
             <div class="header"> <h2 id="client-dashboard-title">Portal do Cliente</h2> <button class="btn-logout" id="logout-client">Sair</button> </div>
-            <h3>Abrir Novo Chamado</h3>
-            <form id="client-ticket-form">
-                <div class="form-group"> <label for="ticket-titulo">Título</label> <input type="text" id="ticket-titulo" required> </div>
-                <div class="form-group"> <label for="ticket-descricao">Descrição</label> <textarea id="ticket-descricao" rows="5" required></textarea> </div>
-                <div id="faq-sugestoes-container" style="display: none; margin-top: 1rem;"> <strong>Sugestões (FAQ):</strong> <ul id="faq-sugestoes-list" style="margin-top: 0.5rem; padding-left: 20px; list-style: disc;"></ul> </div>
-                <div class="form-group" style="margin-top: 1rem;"> <label for="ticket-imagens">Anexos (Opcional)</label> <input type="file" id="ticket-imagens" accept="image/*" multiple> </div>
-                <button type="submit" class="btn" id="btn-criar-chamado">Enviar e Abrir Chat</button>
-            </form>
-            <h3 style="margin-top: 2.5rem; border-top: 1px solid #eee; padding-top: 2rem;">Meus Chamados</h3>
-            <div class="ticket-grid-container"> <table class="ticket-grid"> <thead> <tr> <th>Nº</th> <th>Título</th> <th>Abertura</th> <th>Status</th> </tr> </thead> <tbody id="client-ticket-grid-body"></tbody> </table> </div>
+
+            <div class="tab-nav">
+                <button class="tab-link active" id="tab-link-client-novo">Abrir Chamado</button>
+                <button class="tab-link" id="tab-link-client-lista">Meus Chamados</button>
+                <button class="tab-link" id="tab-link-client-perfil">Meu Perfil</button>
+            </div>
+
+            <div id="tab-content-client-novo" class="tab-content active">
+                <h3>Abrir Novo Chamado</h3>
+                <form id="client-ticket-form">
+                    <div class="form-group"> <label for="ticket-titulo">Título</label> <input type="text" id="ticket-titulo" required> </div>
+                    <div class="form-group"> <label for="ticket-descricao">Descrição</label> <textarea id="ticket-descricao" rows="5" required></textarea> </div>
+                    <div id="faq-sugestoes-container" style="display: none; margin-top: 1rem;"> <strong>Sugestões (FAQ):</strong> <ul id="faq-sugestoes-list" style="margin-top: 0.5rem; padding-left: 20px; list-style: disc;"></ul> </div>
+                    <div class="form-group" style="margin-top: 1rem;"> <label for="ticket-imagens">Anexos (Opcional)</label> <input type="file" id="ticket-imagens" accept="image/*" multiple> </div>
+                    <button type="submit" class="btn" id="btn-criar-chamado">Enviar e Abrir Chat</button>
+                </form>
+            </div>
+
+            <div id="tab-content-client-lista" class="tab-content">
+                <h3>Meus Chamados</h3>
+                <div class="ticket-grid-container"> <table class="ticket-grid"> <thead> <tr> <th>Nº</th> <th>Título</th> <th>Abertura</th> <th>Status</th> </tr> </thead> <tbody id="client-ticket-grid-body"></tbody> </table> </div>
+            </div>
+
+            <div id="tab-content-client-perfil" class="tab-content">
+                <h3>Alterar Minha Senha</h3>
+                <form id="mudar-senha-form-client">
+                    <div class="form-group"> <label for="client-senha-antiga">Senha Antiga</label> <input type="password" id="client-senha-antiga" required autocomplete="current-password"> </div>
+                    <div class="form-group"> <label for="client-nova-senha">Nova Senha (mín. 6)</label> <input type="password" id="client-nova-senha" minlength="6" required autocomplete="new-password"> </div>
+                    <div class="form-group"> <label for="client-confirmar-nova-senha">Confirmar Nova Senha</label> <input type="password" id="client-confirmar-nova-senha" required autocomplete="new-password"> </div>
+                    <button type="submit" class="btn btn-success">Salvar Nova Senha</button>
+                </form>
+            </div>
         </div>
 
         <div id="employee-dashboard-screen" class="screen">
@@ -728,52 +762,24 @@
                 <button class="tab-link active" id="tab-link-reports">Relatórios</button>
                 <button class="tab-link" id="tab-link-tickets">Chamados</button>
                 <button class="tab-link" id="tab-link-admin">Gestão Admin</button>
+                <button class="tab-link" id="tab-link-perfil">Meu Perfil</button>
             </div>
 
             <div id="tab-content-reports" class="tab-content active">
                 <h3>Visão Geral</h3>
                 <div class="db-card-container">
-                    <div class="db-card">
-                        <h4>Total de Chamados Abertos</h4>
-                        <div id="report-total-abertos" class="db-stat-number db-loading">...</div>
-                    </div>
-                    <div class="db-card">
-                        <h4>Abertos por Prioridade</h4>
-                        <ul id="report-por-prioridade" class="db-priority-list">
-                            <li class="db-loading">Carregando...</li>
-                        </ul>
-                    </div>
+                    <div class="db-card"> <h4>Total de Chamados Abertos</h4> <div id="report-total-abertos" class="db-stat-number db-loading">...</div> </div>
+                    <div class="db-card"> <h4>Abertos por Prioridade</h4> <ul id="report-por-prioridade" class="db-priority-list"> <li class="db-loading">Carregando...</li> </ul> </div>
                 </div>
                 <h3>Chamados Abertos Recentemente (Últimos 7 dias)</h3>
-                <div class="ticket-grid-container" style="margin-top: 1rem; max-height: 250px;">
-                    <table class="ticket-grid">
-                        <thead>
-                            <tr>
-                                <th>Nº</th>
-                                <th>Título</th>
-                                <th>Abertura</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="report-recentes-body">
-                            <tr><td colspan="4" class="db-loading" style="text-align: center;">Carregando...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+                <div class="ticket-grid-container" style="margin-top: 1rem; max-height: 250px;"> <table class="ticket-grid"> <thead> <tr> <th>Nº</th> <th>Título</th> <th>Abertura</th> <th>Status</th> </tr> </thead> <tbody id="report-recentes-body"> <tr><td colspan="4" class="db-loading" style="text-align: center;">Carregando...</td></tr> </tbody> </table> </div>
                 <h3 style="margin-top: 2.5rem; border-top: 1px solid #eee; padding-top: 2rem;">Relatório de Status</h3>
-                <div id="dashboard-stats-container">
-                    <p id="stats-loading-message" style="color: #666;">Carregando estatísticas...</p>
-                </div>
+                <div id="dashboard-stats-container"> <p id="stats-loading-message" style="color: #666;">Carregando estatísticas...</p> </div>
             </div>
 
             <div id="tab-content-tickets" class="tab-content">
                 <h3>Meus Chamados Atribuídos (Não Concluídos)</h3>
-                <div class="ticket-grid-container">
-                    <table class="ticket-grid">
-                        <thead> <tr> <th>Nº</th> <th>Título</th> <th>Cliente</th> <th>Abertura</th> <th>Status</th> </tr> </thead>
-                        <tbody id="my-assigned-grid-body"></tbody>
-                    </table>
-                </div>
+                <div class="ticket-grid-container"> <table class="ticket-grid"> <thead> <tr> <th>Nº</th> <th>Título</th> <th>Cliente</th> <th>Abertura</th> <th>Status</th> </tr> </thead> <tbody id="my-assigned-grid-body"></tbody> </table> </div>
                 <h3 style="margin-top: 2.5rem; border-top: 1px solid #eee; padding-top: 2rem;">Todos Chamados (Abertos/Em Andamento)</h3>
                 <div class="ticket-grid-container"> <table class="ticket-grid"> <thead> <tr> <th>Nº</th> <th>Título</th> <th>Cliente</th> <th>Abertura</th> <th>Status</th> <th>Analista</th> </tr> </thead> <tbody id="analyst-ticket-grid-body"></tbody> </table> </div>
             </div>
@@ -787,13 +793,36 @@
                     <div class="form-group"> <label for="admin-role">Cargo (Ex: Analista N1, Admin)</label> <input type="text" id="admin-role" required> </div>
                     <div class="form-group"> <label for="admin-password">Senha (mín. 6)</label> <input type="password" id="admin-password" minlength="6" required autocomplete="new-password"> </div>
                     <div class="form-group"> <label for="admin-confirm-password">Confirmar Senha</label> <input type="password" id="admin-confirm-password" required autocomplete="new-password"> </div>
-
-                    <div class="admin-checkbox-group">
-                        <input type="checkbox" id="admin-is-admin">
-                        <label for="admin-is-admin">Tornar este usuário um Administrador</label>
-                    </div>
-
+                    <div class="admin-checkbox-group"> <input type="checkbox" id="admin-is-admin"> <label for="admin-is-admin">Tornar este usuário um Administrador</label> </div>
                     <button type="submit" class="btn">Cadastrar Novo Funcionário</button>
+                </form>
+
+                <h3 style="margin-top: 2.5rem; border-top: 1px solid #eee; padding-top: 2rem;">Redefinir Senha de Usuário</h3>
+                <p>Use este formulário para forçar uma nova senha para qualquer usuário (Cliente ou Funcionário) que a esqueceu.</p>
+                <form id="admin-reset-password-form">
+                    <div class="form-group">
+                        <label for="admin-reset-email">E-mail do Usuário (Cliente ou Funcionário)</label>
+                        <input type="email" id="admin-reset-email" required autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-reset-nova-senha">Nova Senha (mín. 6)</label>
+                        <input type="password" id="admin-reset-nova-senha" minlength="6" required autocomplete="new-password">
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-reset-confirmar-nova-senha">Confirmar Nova Senha</label>
+                        <input type="password" id="admin-reset-confirmar-nova-senha" required autocomplete="new-password">
+                    </div>
+                    <button type="submit" class="btn btn-success">Redefinir Senha do Usuário</button>
+                </form>
+            </div>
+
+            <div id="tab-content-perfil" class="tab-content">
+                <h3>Alterar Minha Senha</h3>
+                <form id="mudar-senha-form-employee">
+                    <div class="form-group"> <label for="employee-senha-antiga">Senha Antiga</label> <input type="password" id="employee-senha-antiga" required autocomplete="current-password"> </div>
+                    <div class="form-group"> <label for="employee-nova-senha">Nova Senha (mín. 6)</label> <input type="password" id="employee-nova-senha" minlength="6" required autocomplete="new-password"> </div>
+                    <div class="form-group"> <label for="employee-confirmar-nova-senha">Confirmar Nova Senha</label> <input type="password" id="employee-confirmar-nova-senha" required autocomplete="new-password"> </div>
+                    <button type="submit" class="btn btn-success">Salvar Nova Senha</button>
                 </form>
             </div>
         </div>
@@ -833,7 +862,7 @@
             const mainContainer = document.getElementById('main-container');
 
             let currentUserType = null;
-            let currentUserIsAdmin = false; // <-- NOVO: Variável de estado para Admin
+            let currentUserIsAdmin = false;
             let currentChamadoId = null;
             let faqSuggestionTimeoutId = null;
             let currentChamadoDetails = null;
@@ -881,19 +910,14 @@
             function formatISODate(isoDateString) {
                 if (!isoDateString) return '-';
                 try {
-                    return new Date(isoDateString).toLocaleString('pt-BR', {
-                        day: '2-digit', month: '2-digit', year: 'numeric',
-                        hour: '2-digit', minute: '2-digit'
-                    });
+                    return new Date(isoDateString).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
                 } catch (e) { console.error("Erro formatar data:", isoDateString, e); return isoDateString; }
             }
 
             function formatISODateRecente(isoDateString) {
                 if (!isoDateString) return '-';
                 try {
-                    return new Date(isoDateString).toLocaleString('pt-BR', {
-                        day: '2-digit', month: '2-digit', year: 'numeric'
-                    });
+                    return new Date(isoDateString).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
                 } catch (e) { return isoDateString; }
             }
 
@@ -901,23 +925,18 @@
                 try {
                     const formOrDiv = document.getElementById(formId);
                     if (!formOrDiv) { console.warn("Elemento não encontrado:", formId); return; }
-
                     const elements = formOrDiv.querySelectorAll('input, select, textarea, button');
                     elements.forEach(el => { if (el) el.disabled = disable; });
-
                     let button;
-                    if (formId === 'analyst-controls') {
-                        button = document.getElementById('btn-save-analyst-changes');
-                    } else if (formOrDiv.tagName === 'FORM') {
-                        button = formOrDiv.querySelector('button[type="submit"]');
-                    } else {
-                        return;
-                    }
-
+                    if (formId === 'analyst-controls') { button = document.getElementById('btn-save-analyst-changes'); }
+                    else if (formOrDiv.tagName === 'FORM') { button = formOrDiv.querySelector('button[type="submit"]'); }
+                    else { return; }
                     if (button) {
                         const originalText = button.dataset.originalText || button.textContent;
                         if (disable && !button.dataset.originalText) { button.dataset.originalText = originalText; }
-                        const waitText = (formId === 'analyst-controls' ? 'Salvando...' : 'Aguarde...');
+                        let waitText = 'Aguarde...';
+                        if (formId === 'analyst-controls' || formId.startsWith('mudar-senha-form') || formId === 'admin-reset-password-form') { waitText = 'Salvando...'; }
+                        if (formId === 'admin-register-form') { waitText = 'Cadastrando...'; }
                         button.textContent = disable ? waitText : originalText;
                         if (!disable) delete button.dataset.originalText;
                     }
@@ -925,51 +944,29 @@
             }
 
             function logout() {
-                // Limpa variáveis de estado
-                currentUserType = null;
-                currentChamadoId = null;
-                listaAnalistasCache = null;
-                currentUserIsAdmin = false; // <-- NOVO: Reseta o status de Admin
-
-                // Limpa armazenamento local
-                localStorage.removeItem('jwtToken');
-                localStorage.removeItem('userName');
-                localStorage.removeItem('isAdmin'); // <-- NOVO: Limpa o status de Admin
-
-                // Limpa grids
+                currentUserType = null; currentChamadoId = null; listaAnalistasCache = null; currentUserIsAdmin = false;
+                localStorage.removeItem('jwtToken'); localStorage.removeItem('userName'); localStorage.removeItem('isAdmin');
                 try { document.getElementById('analyst-ticket-grid-body').innerHTML = ''; } catch (e) { }
                 try { document.getElementById('my-assigned-grid-body').innerHTML = ''; } catch (e) { }
                 try { document.getElementById('client-ticket-grid-body').innerHTML = ''; } catch (e) { }
-
-                // Limpa relatórios
                 try {
-                    if (statsChartInstance) {
-                        statsChartInstance.destroy();
-                        statsChartInstance = null;
-                    }
+                    if (statsChartInstance) { statsChartInstance.destroy(); statsChartInstance = null; }
                     const statsContainer = document.getElementById('dashboard-stats-container');
-                    if (statsContainer) {
-                        statsContainer.innerHTML = '<p id="stats-loading-message" style="color: #666;">Carregando...</p>';
-                    }
+                    if (statsContainer) { statsContainer.innerHTML = '<p id="stats-loading-message" style="color: #666;">Carregando...</p>'; }
                 } catch (e) { }
                 try { document.getElementById('report-total-abertos').innerHTML = '<div class="db-stat-number db-loading">...</div>'; } catch (e) { }
                 try { document.getElementById('report-por-prioridade').innerHTML = '<li class="db-loading">Carregando...</li>'; } catch (e) { }
                 try { document.getElementById('report-recentes-body').innerHTML = '<tr><td colspan="4" class="db-loading" style="text-align: center;">Carregando...</td></tr>'; } catch (e) { }
-
-                // Reseta formulários
-                ['login-form', 'client-register-form', 'client-ticket-form', 'chat-message-form', 'analyst-controls', 'admin-register-form'].forEach(id => {
+                ['login-form', 'client-register-form', 'client-ticket-form', 'chat-message-form', 'analyst-controls', 'admin-register-form', 'mudar-senha-form-client', 'mudar-senha-form-employee', 'admin-reset-password-form'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) {
                         if (el.tagName === 'FORM') el.reset();
                         else { try { el.querySelectorAll('select').forEach(s => s.selectedIndex = 0); el.querySelectorAll('input:not([type=hidden])').forEach(i => i.value = ''); } catch (e) { } }
                     }
                 });
-
-                // Reseta títulos e visibilidade
                 try { document.getElementById('client-dashboard-title').textContent = "Portal do Cliente"; } catch (e) { }
                 try { document.getElementById('employee-dashboard-title').textContent = "Painel do Analista"; } catch (e) { }
-                try { document.getElementById('tab-link-admin').style.display = 'none'; } catch (e) { } // <-- NOVO: Esconde a aba Admin
-
+                try { document.getElementById('tab-link-admin').style.display = 'none'; } catch (e) { }
                 showScreen('login-screen');
             }
 
@@ -988,497 +985,180 @@
             }
 
             // --- LÓGICA DE CARREGAMENTO DOS PAINÉIS ---
-
             async function loadNewDashboardReports() {
                 const totalEl = document.getElementById('report-total-abertos');
                 const prioridadeEl = document.getElementById('report-por-prioridade');
                 const recentesEl = document.getElementById('report-recentes-body');
-
                 if (totalEl) totalEl.innerHTML = '<div class="db-stat-number db-loading">...</div>';
                 if (prioridadeEl) prioridadeEl.innerHTML = '<li class="db-loading">Carregando...</li>';
                 if (recentesEl) recentesEl.innerHTML = '<tr><td colspan="4" class="db-loading" style="text-align: center;">Carregando...</td></tr>';
-
                 try {
                     const [totalResponse, prioridadeResponse, recentesResponse] = await Promise.all([
                         fetchAutenticado(`${DASHBOARD_API_URL}/total-abertos`),
                         fetchAutenticado(`${DASHBOARD_API_URL}/por-prioridade`),
                         fetchAutenticado(`${DASHBOARD_API_URL}/recentes?dias=7`)
                     ]);
-
-                    // Total Abertos
-                    if (totalResponse.ok) { renderNewTotal(totalEl, await totalResponse.json()); }
-                    else { renderNewTotal(totalEl, 'Erro'); }
-                    // Por Prioridade
-                    if (prioridadeResponse.ok) { renderNewPrioridade(prioridadeEl, await prioridadeResponse.json()); }
-                    else { renderNewPrioridade(prioridadeEl, null, true); }
-                    // Recentes
-                    if (recentesResponse.ok) { renderNewRecentes(recentesEl, await recentesResponse.json()); }
-                    else { renderNewRecentes(recentesEl, null, true); }
-
+                    if (totalResponse.ok) { renderNewTotal(totalEl, await totalResponse.json()); } else { renderNewTotal(totalEl, 'Erro'); }
+                    if (prioridadeResponse.ok) { renderNewPrioridade(prioridadeEl, await prioridadeResponse.json()); } else { renderNewPrioridade(prioridadeEl, null, true); }
+                    if (recentesResponse.ok) { renderNewRecentes(recentesEl, await recentesResponse.json()); } else { renderNewRecentes(recentesEl, null, true); }
                 } catch (error) {
                     console.error('Erro ao carregar novos relatórios:', error);
-                    if (error.message !== "Sessão expirada.") {
-                        renderNewTotal(totalEl, 'X');
-                        renderNewPrioridade(prioridadeEl, null, true);
-                        renderNewRecentes(recentesEl, null, true);
-                    }
+                    if (error.message !== "Sessão expirada.") { renderNewTotal(totalEl, 'X'); renderNewPrioridade(prioridadeEl, null, true); renderNewRecentes(recentesEl, null, true); }
                 }
             }
-
-            function renderNewTotal(element, total) {
-                if (!element) return;
-                element.textContent = total;
-                element.classList.remove('db-loading');
-                if (isNaN(total)) element.style.fontSize = "2rem";
-                else element.style.fontSize = "3.5rem";
-            }
-
-            function renderNewPrioridade(listElement, prioridadeData, isError = false) {
-                if (!listElement) return;
-                listElement.innerHTML = '';
-                if (isError) {
-                    listElement.innerHTML = '<li style="color: red;">Erro ao carregar.</li>';
-                    return;
-                }
-                if (!prioridadeData || Object.keys(prioridadeData).length === 0) {
-                    listElement.innerHTML = '<li>Nenhum chamado aberto.</li>';
-                    return;
-                }
-                const entries = Object.entries(prioridadeData);
-                entries.forEach(([prioridade, total]) => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<strong>${prioridade}</strong> <span>${total}</span>`;
-                    listElement.appendChild(li);
-                });
-            }
-
-            function renderNewRecentes(tableBodyElement, recentesData, isError = false) {
-                if (!tableBodyElement) return;
-                tableBodyElement.innerHTML = '';
-                if (isError) {
-                    tableBodyElement.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Erro ao carregar.</td></tr>';
-                    return;
-                }
-                if (!recentesData || recentesData.length === 0) {
-                    tableBodyElement.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhum chamado aberto recentemente.</td></tr>';
-                    return;
-                }
-                recentesData.forEach(chamado => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                            <td data-action="abrirChat" class="grid-clickable-cell">${chamado.numeroChamado || chamado.id}</td>
-                            <td>${chamado.titulo || '-'}</td>
-                            <td>${formatISODateRecente(chamado.dataAbertura)}</td>
-                            <td>${chamado.status || '-'}</td>
-                        `;
-                    tr.dataset.id = chamado.id;
-                    tableBodyElement.appendChild(tr);
-                });
-            }
-
+            function renderNewTotal(element, total) { if (!element) return; element.textContent = total; element.classList.remove('db-loading'); if (isNaN(total)) element.style.fontSize = "2rem"; else element.style.fontSize = "3.5rem"; }
+            function renderNewPrioridade(listElement, prioridadeData, isError = false) { if (!listElement) return; listElement.innerHTML = ''; if (isError) { listElement.innerHTML = '<li style="color: red;">Erro ao carregar.</li>'; return; } if (!prioridadeData || Object.keys(prioridadeData).length === 0) { listElement.innerHTML = '<li>Nenhum chamado aberto.</li>'; return; } const entries = Object.entries(prioridadeData); entries.forEach(([prioridade, total]) => { const li = document.createElement('li'); li.innerHTML = `<strong>${prioridade}</strong> <span>${total}</span>`; listElement.appendChild(li); }); }
+            function renderNewRecentes(tableBodyElement, recentesData, isError = false) { if (!tableBodyElement) return; tableBodyElement.innerHTML = ''; if (isError) { tableBodyElement.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Erro ao carregar.</td></tr>'; return; } if (!recentesData || recentesData.length === 0) { tableBodyElement.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhum chamado aberto recentemente.</td></tr>'; return; } recentesData.forEach(chamado => { const tr = document.createElement('tr'); tr.innerHTML = ` <td data-action="abrirChat" class="grid-clickable-cell">${chamado.numeroChamado || chamado.id}</td> <td>${chamado.titulo || '-'}</td> <td>${formatISODateRecente(chamado.dataAbertura)}</td> <td>${chamado.status || '-'}</td> `; tr.dataset.id = chamado.id; tableBodyElement.appendChild(tr); }); }
             async function loadDashboardStats() {
-                const statsContainer = document.getElementById('dashboard-stats-container');
-                const loadingMessage = document.getElementById('stats-loading-message');
-                if (!statsContainer) { console.error("Contêiner de stats não encontrado."); return; }
-
-                if (statsContainer.querySelector('.stats-layout')) statsContainer.querySelector('.stats-layout').remove();
-                if (statsChartInstance) {
-                    statsChartInstance.destroy();
-                    statsChartInstance = null;
-                }
-
-                if (loadingMessage) {
-                    loadingMessage.textContent = "Carregando estatísticas...";
-                    loadingMessage.style.display = 'block';
-                } else {
-                    statsContainer.innerHTML = '<p id="stats-loading-message" style="color: #666;">Carregando...</p>';
-                }
-
+                const statsContainer = document.getElementById('dashboard-stats-container'); const loadingMessage = document.getElementById('stats-loading-message'); if (!statsContainer) return; if (statsContainer.querySelector('.stats-layout')) statsContainer.querySelector('.stats-layout').remove(); if (statsChartInstance) { statsChartInstance.destroy(); statsChartInstance = null; } if (loadingMessage) { loadingMessage.textContent = "Carregando estatísticas..."; loadingMessage.style.display = 'block'; } else { statsContainer.innerHTML = '<p id="stats-loading-message" style="color: #666;">Carregando...</p>'; }
                 try {
-                    const response = await fetchAutenticado(`${API_URL}/api/Dashboard/stats/por-status`);
-                    if (!response.ok) { const e = await response.json(); throw new Error(e.message || `Erro ${response.status}`); }
-                    const stats = await response.json();
-
-                    const loadingMsg = document.getElementById('stats-loading-message');
-                    if (loadingMsg) loadingMsg.style.display = 'none';
-
-                    if (!stats || stats.length === 0) {
-                        statsContainer.innerHTML = '<p id="stats-loading-message">Nenhuma estatística encontrada.</p>';
-                        return;
-                    }
-
-                    statsContainer.innerHTML = `
-                                <div class="stats-layout">
-                                    <div class="stats-numeros"><ul id="stats-list"></ul></div>
-                                    <div class="stats-grafico"><canvas id="stats-chart-canvas"></canvas></div>
-                                </div>
-                            `;
-
-                    const statsList = document.getElementById('stats-list');
-                    let total = 0;
-                    stats.forEach(item => {
-                        total += item.contagem;
-                        statsList.innerHTML += `<li><span class="stat-label">${item.status}</span><span class="stat-count">${item.contagem}</span></li>`;
-                    });
-                    statsList.innerHTML += `<li style="border-top:2px solid #007bff; margin-top:0.5rem; padding-top:0.5rem;"><span class="stat-label"><strong>Total</strong></span><span class="stat-count"><strong>${total}</strong></span></li>`;
-
-                    if (typeof Chart !== 'undefined') {
-                        const ctx = document.getElementById('stats-chart-canvas').getContext('2d');
-                        statsChartInstance = new Chart(ctx, {
-                            type: 'pie', data: { labels: stats.map(i => i.status), datasets: [{ data: stats.map(i => i.contagem), backgroundColor: ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(255, 206, 86, 0.7)', 'rgba(75, 192, 192, 0.7)', 'rgba(153, 102, 255, 0.7)', 'rgba(255, 159, 64, 0.7)', 'rgba(100, 100, 100, 0.7)'], borderColor: '#fff', borderWidth: 1 }] },
-                            options: { responsive: true, plugins: { legend: { position: 'top' }, title: { display: true, text: 'Distribuição de Status' } } }
-                        });
-                    } else {
-                        console.error("Chart.js não foi carregado. O gráfico não pode ser renderizado.");
-                        const graficoDiv = document.querySelector('.stats-grafico');
-                        if (graficoDiv) graficoDiv.innerHTML = `<p style="color:red;">Erro: Biblioteca de gráfico não carregou.</p>`;
-                    }
-                } catch (error) {
-                    console.error("Erro stats:", error);
-                    if (error.message !== "Sessão expirada.") {
-                        const loadingMsg = document.getElementById('stats-loading-message');
-                        if (loadingMsg) loadingMsg.style.display = 'none';
-                        else statsContainer.innerHTML = '';
-                        statsContainer.innerHTML += `<p style="color:red;">Erro ao carregar gráfico: ${error.message}</p>`;
-                    }
-                }
+                    const response = await fetchAutenticado(`${API_URL}/api/Dashboard/stats/por-status`); if (!response.ok) { const e = await response.json(); throw new Error(e.message || `Erro ${response.status}`); } const stats = await response.json(); const loadingMsg = document.getElementById('stats-loading-message'); if (loadingMsg) loadingMsg.style.display = 'none'; if (!stats || stats.length === 0) { statsContainer.innerHTML = '<p id="stats-loading-message">Nenhuma estatística encontrada.</p>'; return; }
+                    statsContainer.innerHTML = ` <div class="stats-layout"> <div class="stats-numeros"><ul id="stats-list"></ul></div> <div class="stats-grafico"><canvas id="stats-chart-canvas"></canvas></div> </div> `; const statsList = document.getElementById('stats-list'); let total = 0; stats.forEach(item => { total += item.contagem; statsList.innerHTML += `<li><span class="stat-label">${item.status}</span><span class="stat-count">${item.contagem}</span></li>`; }); statsList.innerHTML += `<li style="border-top:2px solid #007bff; margin-top:0.5rem; padding-top:0.5rem;"><span class="stat-label"><strong>Total</strong></span><span class="stat-count"><strong>${total}</strong></span></li>`; if (typeof Chart !== 'undefined') { const ctx = document.getElementById('stats-chart-canvas').getContext('2d'); statsChartInstance = new Chart(ctx, { type: 'pie', data: { labels: stats.map(i => i.status), datasets: [{ data: stats.map(i => i.contagem), backgroundColor: ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(255, 206, 86, 0.7)', 'rgba(75, 192, 192, 0.7)', 'rgba(153, 102, 255, 0.7)', 'rgba(255, 159, 64, 0.7)', 'rgba(100, 100, 100, 0.7)'], borderColor: '#fff', borderWidth: 1 }] }, options: { responsive: true, plugins: { legend: { position: 'top' }, title: { display: true, text: 'Distribuição de Status' } } } }); } else { console.error("Chart.js não foi carregado."); const g = document.querySelector('.stats-grafico'); if (g) g.innerHTML = `<p style="color:red;">Erro: Gráfico não carregou.</p>`; }
+                } catch (error) { console.error("Erro stats:", error); if (error.message !== "Sessão expirada.") { const m = document.getElementById('stats-loading-message'); if (m) m.style.display = 'none'; else statsContainer.innerHTML = ''; statsContainer.innerHTML += `<p style="color:red;">Erro: ${error.message}</p>`; } }
             }
-
             async function loadEmployeeDashboard() {
-                try {
-                    const userName = localStorage.getItem('userName') || 'Analista';
-                    document.getElementById('employee-dashboard-title').innerHTML = `Painel do Analista <span class="user-name">(${userName})</span>`;
-                } catch (e) { console.error("Erro setar nome analista:", e); }
-
-                // --- NOVO: Mostra/Esconde a aba Admin ---
-                try {
-                    const adminTab = document.getElementById('tab-link-admin');
-                    if (currentUserIsAdmin) {
-                        adminTab.style.display = 'block'; // Mostra a aba
-                    } else {
-                        adminTab.style.display = 'none'; // Esconde a aba
-                    }
-                } catch (e) { console.error("Erro ao mostrar/esconder aba admin:", e); }
-                // --- FIM NOVO ---
-
-                showAnalystTab('reports');
-
-                loadNewDashboardReports();
-                loadDashboardStats();
-                loadEmployeeGrids();
+                try { const userName = localStorage.getItem('userName') || 'Analista'; document.getElementById('employee-dashboard-title').innerHTML = `Painel do Analista <span class="user-name">(${userName})</span>`; } catch (e) { console.error("Erro setar nome analista:", e); }
+                try { const adminTab = document.getElementById('tab-link-admin'); if (currentUserIsAdmin) { adminTab.style.display = 'block'; } else { adminTab.style.display = 'none'; } } catch (e) { console.error("Erro ao mostrar/esconder aba admin:", e); }
+                showAnalystTab('reports'); loadNewDashboardReports(); loadDashboardStats(); loadEmployeeGrids();
             }
-
             async function loadEmployeeGrids() {
-                const myGridBody = document.getElementById('my-assigned-grid-body');
-                if (myGridBody) {
-                    myGridBody.innerHTML = `<tr><td colspan="5">Carregando...</td></tr>`;
-                    try {
-                        const response = await fetchAutenticado(`${API_URL}/api/Chamado/meus-chamados-analista`);
-                        if (!response.ok) throw new Error(`Erro ${response.status}.`); const chamados = await response.json(); myGridBody.innerHTML = '';
-                        if (!chamados || chamados.length === 0) { myGridBody.innerHTML = `<tr><td colspan="5">Nenhum chamado.</td></tr>`; }
-                        else {
-                            chamados.forEach(c => {
-                                const opts = ["Aberto (IA)", "Aguardando Analista", "Em Andamento (Analista)", "Aguardando Cliente", "Concluído", "Encerrado", "Cancelado"];
-                                let selHtml = `<select class="status-select" data-id="${c.id}" data-grid-type="my-grid">`;
-                                opts.forEach(opt => {
-                                    const isSelected = (opt === (c.status || '')) ? 'selected' : '';
-                                    selHtml += `<option value="${opt}" ${isSelected}>${opt}</option>`;
-                                });
-                                selHtml += `</select>`;
-                                myGridBody.innerHTML += `<tr data-id="${c.id}"><td data-action="abrirChat" class="grid-clickable-cell">${c.numeroChamado || '-'}</td><td>${c.titulo || '-'}</td><td>${c.nomeCliente || '-'}</td><td>${formatISODate(c.dataAbertura)}</td> <td>${selHtml}</td></tr>`;
-                            });
-                        }
-                    } catch (e) { console.error('Erro meus chamados:', e); if (e.message !== "Sessão expirada.") myGridBody.innerHTML = `<tr><td colspan="5" style="color:red;">${e.message || 'Erro.'}</td></tr>`; }
-                }
-                const gridBody = document.getElementById('analyst-ticket-grid-body');
-                if (!gridBody) return;
-                gridBody.innerHTML = `<tr><td colspan="6">Carregando...</td></tr>`;
-                try {
-                    const response = await fetchAutenticado(`${API_URL}/api/Chamado/abertos`);
-                    if (!response.ok) throw new Error(`Erro ${response.status}.`); const chamados = await response.json(); gridBody.innerHTML = '';
-                    if (!chamados || chamados.length === 0) { gridBody.innerHTML = `<tr><td colspan="6">Nenhum chamado.</td></tr>`; return; }
-                    chamados.forEach(c => {
-                        const opts = ["Aberto (IA)", "Aguardando Analista", "Em Andamento (Analista)", "Aguardando Cliente", "Concluído", "Encerrado", "Cancelado"];
-                        let selHtml = `<select class="status-select" data-id="${c.id}" data-grid-type="all-grid">`;
-                        opts.forEach(opt => {
-                            const isSelected = (opt === (c.status || '')) ? 'selected' : '';
-                            selHtml += `<option value="${opt}" ${isSelected}>${opt}</option>`;
-                        });
-                        selHtml += `</select>`;
-                        gridBody.innerHTML += `<tr data-id="${c.id}"><td data-action="abrirChat" class="grid-clickable-cell">${c.numeroChamado || '-'}</td><td>${c.titulo || '-'}</td><td>${c.nomeCliente || '-'}</td><td>${formatISODate(c.dataAbertura)}</td><td>${selHtml}</td><td>${c.nomeAnalista || '--'}</td></tr>`;
-                    });
-                } catch (e) { console.error('Erro todos chamados:', e); if (e.message !== "Sessão expirada.") gridBody.innerHTML = `<tr><td colspan="6" style="color:red;">${e.message || 'Erro.'}</td></tr>`; }
+                const myGridBody = document.getElementById('my-assigned-grid-body'); if (myGridBody) { myGridBody.innerHTML = `<tr><td colspan="5">Carregando...</td></tr>`; try { const response = await fetchAutenticado(`${API_URL}/api/Chamado/meus-chamados-analista`); if (!response.ok) throw new Error(`Erro ${response.status}.`); const chamados = await response.json(); myGridBody.innerHTML = ''; if (!chamados || chamados.length === 0) { myGridBody.innerHTML = `<tr><td colspan="5">Nenhum chamado.</td></tr>`; } else { chamados.forEach(c => { const opts = ["Aberto (IA)", "Aguardando Analista", "Em Andamento (Analista)", "Aguardando Cliente", "Concluído", "Encerrado", "Cancelado"]; let selHtml = `<select class="status-select" data-id="${c.id}" data-grid-type="my-grid">`; opts.forEach(opt => { selHtml += `<option value="${opt}" ${opt === (c.status || '') ? 'selected' : ''}>${opt}</option>`; }); selHtml += `</select>`; myGridBody.innerHTML += `<tr data-id="${c.id}"><td data-action="abrirChat" class="grid-clickable-cell">${c.numeroChamado || '-'}</td><td>${c.titulo || '-'}</td><td>${c.nomeCliente || '-'}</td><td>${formatISODate(c.dataAbertura)}</td> <td>${selHtml}</td></tr>`; }); } } catch (e) { console.error('Erro meus chamados:', e); if (e.message !== "Sessão expirada.") myGridBody.innerHTML = `<tr><td colspan="5" style="color:red;">${e.message || 'Erro.'}</td></tr>`; } }
+                const gridBody = document.getElementById('analyst-ticket-grid-body'); if (!gridBody) return; gridBody.innerHTML = `<tr><td colspan="6">Carregando...</td></tr>`; try { const response = await fetchAutenticado(`${API_URL}/api/Chamado/abertos`); if (!response.ok) throw new Error(`Erro ${response.status}.`); const chamados = await response.json(); gridBody.innerHTML = ''; if (!chamados || chamados.length === 0) { gridBody.innerHTML = `<tr><td colspan="6">Nenhum chamado.</td></tr>`; return; } chamados.forEach(c => { const opts = ["Aberto (IA)", "Aguardando Analista", "Em Andamento (Analista)", "Aguardando Cliente", "Concluído", "Encerrado", "Cancelado"]; let selHtml = `<select class="status-select" data-id="${c.id}" data-grid-type="all-grid">`; opts.forEach(opt => { selHtml += `<option value="${opt}" ${opt === (c.status || '') ? 'selected' : ''}>${opt}</option>`; }); selHtml += `</select>`; gridBody.innerHTML += `<tr data-id="${c.id}"><td data-action="abrirChat" class="grid-clickable-cell">${c.numeroChamado || '-'}</td><td>${c.titulo || '-'}</td><td>${c.nomeCliente || '-'}</td><td>${formatISODate(c.dataAbertura)}</td><td>${selHtml}</td><td>${c.nomeAnalista || '--'}</td></tr>`; }); } catch (e) { console.error('Erro todos chamados:', e); if (e.message !== "Sessão expirada.") gridBody.innerHTML = `<tr><td colspan="6" style="color:red;">${e.message || 'Erro.'}</td></tr>`; }
             }
-
             async function loadClientDashboard() {
+                try { const userName = localStorage.getItem('userName') || 'Cliente'; document.getElementById('client-dashboard-title').innerHTML = `Portal do Cliente <span class="user-name">(${userName})</span>`; } catch (e) { console.error("Erro setar nome cliente:", e); }
+                showClientTab('client-novo'); const gridBody = document.getElementById('client-ticket-grid-body'); if (!gridBody) return; gridBody.innerHTML = `<tr><td colspan="4">Carregando...</td></tr>`;
                 try {
-                    const userName = localStorage.getItem('userName') || 'Cliente';
-                    document.getElementById('client-dashboard-title').innerHTML = `Portal do Cliente <span class="user-name">(${userName})</span>`;
-                } catch (e) { console.error("Erro setar nome cliente:", e); }
-                const gridBody = document.getElementById('client-ticket-grid-body'); if (!gridBody) return;
-                gridBody.innerHTML = `<tr><td colspan="4">Carregando...</td></tr>`;
-                try {
-                    const response = await fetchAutenticado(`${API_URL}/api/Chamado/meuschamados`);
-                    if (!response.ok) throw new Error(`Erro ${response.status}.`); const chamados = await response.json(); gridBody.innerHTML = '';
-                    if (!chamados || chamados.length === 0) { gridBody.innerHTML = `<tr><td colspan="4">Nenhum chamado.</td></tr>`; return; }
+                    const response = await fetchAutenticado(`${API_URL}/api/Chamado/meuschamados`); if (!response.ok) throw new Error(`Erro ${response.status}.`); const chamados = await response.json(); gridBody.innerHTML = ''; if (!chamados || chamados.length === 0) { gridBody.innerHTML = `<tr><td colspan="4">Nenhum chamado.</td></tr>`; return; }
                     chamados.forEach(c => { gridBody.innerHTML += `<tr data-id="${c.id}"><td data-action="abrirChat" class="grid-clickable-cell">${c.numeroChamado || '-'}</td><td data-action="abrirChat" class="grid-clickable-cell">${c.titulo || '-'}</td><td>${formatISODate(c.dataAbertura)}</td><td>${c.status || '-'}</td></tr>`; });
                 } catch (e) { console.error('Erro load cliente:', e); if (e.message !== "Sessão expirada.") gridBody.innerHTML = `<tr><td colspan="4" style="color:red;">${e.message || 'Erro.'}</td></tr>`; }
             }
-
             async function carregarAnalistasDropdown(selectElementId, selectedAnalistaId = null) {
-                const select = document.getElementById(selectElementId); if (!select) { console.error("Dropdown não encontrado:", selectElementId); return; }
-                select.options.length = 1;
+                const select = document.getElementById(selectElementId); if (!select) { console.error("Dropdown não encontrado:", selectElementId); return; } select.options.length = 1;
                 try {
-                    if (!listaAnalistasCache) {
-                        console.log("Buscando analistas da API...");
-                        const response = await fetchAutenticado(`${API_URL}/api/Employee/analistas`);
-                        if (!response.ok) throw new Error(`Erro ${response.status} buscando analistas.`);
-                        listaAnalistasCache = await response.json();
-                    }
-                    if (listaAnalistasCache && listaAnalistasCache.length > 0) {
-                        listaAnalistasCache.forEach(analista => {
-                            const option = document.createElement('option'); option.value = analista.id;
-                            option.textContent = `${analista.nome} (${analista.funcao || 'N/A'})`;
-                            if (selectedAnalistaId && analista.id === selectedAnalistaId) { option.selected = true; }
-                            select.appendChild(option);
-                        });
-                    }
+                    if (!listaAnalistasCache) { console.log("Buscando analistas da API..."); const response = await fetchAutenticado(`${API_URL}/api/Employee/analistas`); if (!response.ok) throw new Error(`Erro ${response.status} buscando analistas.`); listaAnalistasCache = await response.json(); }
+                    if (listaAnalistasCache && listaAnalistasCache.length > 0) { listaAnalistasCache.forEach(analista => { const option = document.createElement('option'); option.value = analista.id; option.textContent = `${analista.nome} (${analista.funcao || 'N/A'})`; if (selectedAnalistaId && analista.id === selectedAnalistaId) { option.selected = true; } select.appendChild(option); }); }
                 } catch (error) { console.error("Erro carregar analistas:", error); const option = document.createElement('option'); option.value = ""; option.textContent = "Erro ao carregar"; option.disabled = true; select.appendChild(option); }
             }
-
             async function handleStatusChange(selectElement) {
-                const chamadoId = selectElement.dataset.id; const novoStatus = selectElement.value; if (!chamadoId || !novoStatus) return;
-                selectElement.disabled = true; showMessage(`Salvando...`, false); let statusOriginal = '';
+                const chamadoId = selectElement.dataset.id; const novoStatus = selectElement.value; if (!chamadoId || !novoStatus) return; selectElement.disabled = true; showMessage(`Salvando...`, false); let statusOriginal = '';
                 try {
-                    const rGet = await fetchAutenticado(`${API_URL}/api/Chamado/${chamadoId}`); if (!rGet.ok) throw new Error(`Erro ${rGet.status}.`);
-                    const cAtual = await rGet.json(); statusOriginal = cAtual.status || '';
-                    if (!cAtual) throw new Error("Não foi possível carregar dados atuais.");
-
-                    const data = {
-                        Status: novoStatus,
-                        Prioridade: cAtual.prioridade || 'Média',
-                        AnalistaId: cAtual.analistaId || null
-                    };
-
-                    const rPut = await fetchAutenticado(`${API_URL}/api/Chamado/${chamadoId}/atualizar`, { method: 'PUT', body: JSON.stringify(data) });
-                    if (!rPut.ok) { const ed = await rPut.json(); throw new Error(ed.message || `Erro ${rPut.status}.`); }
-                    showMessage('Status atualizado!', false);
-
-                    loadEmployeeGrids();
-                } catch (e) { console.error('Erro status grid:', e); if (e.message !== "Sessão expirada.") showMessage(`Erro: ${e.message}`, true); try { selectElement.value = statusOriginal; } catch (revertError) { } }
-                finally { selectElement.disabled = false; }
+                    const rGet = await fetchAutenticado(`${API_URL}/api/Chamado/${chamadoId}`); if (!rGet.ok) throw new Error(`Erro ${rGet.status}.`); const cAtual = await rGet.json(); statusOriginal = cAtual.status || ''; if (!cAtual) throw new Error("Não foi possível carregar dados atuais."); const data = { Status: novoStatus, Prioridade: cAtual.prioridade || 'Média', AnalistaId: cAtual.analistaId || null }; const rPut = await fetchAutenticado(`${API_URL}/api/Chamado/${chamadoId}/atualizar`, { method: 'PUT', body: JSON.stringify(data) }); if (!rPut.ok) { const ed = await rPut.json(); throw new Error(ed.message || `Erro ${rPut.status}.`); } showMessage('Status atualizado!', false); loadEmployeeGrids();
+                } catch (e) { console.error('Erro status grid:', e); if (e.message !== "Sessão expirada.") showMessage(`Erro: ${e.message}`, true); try { selectElement.value = statusOriginal; } catch (revertError) { } } finally { selectElement.disabled = false; }
             }
-
-            // --- LÓGICA DO CHAT ---
             async function abrirChat(chamadoId) {
-                if (!chamadoId) return; currentChamadoId = chamadoId; showScreen('chat-screen');
-                const controlsDiv = document.getElementById('analyst-controls'); const chatInput = document.getElementById('chat-message-input');
-                const tit = document.getElementById('chat-titulo'); const num = document.getElementById('chat-numero'); const anexC = document.getElementById('chat-anexos-container');
-                const anexL = document.getElementById('chat-anexos-list');
-                const msgA = document.getElementById('chat-messages-area');
-
-                tit.textContent = 'Carregando...'; num.textContent = '...';
-                if (anexL) anexL.innerHTML = '';
-                if (anexC) anexC.style.display = 'none';
-                if (msgA) msgA.innerHTML = '<p style="text-align:center; color:#999;">Carregando...</p>';
-
-                disableForm('chat-message-form', true); disableForm('analyst-controls', true); if (controlsDiv) controlsDiv.style.display = 'none'; currentChamadoDetails = null;
-
+                if (!chamadoId) return; currentChamadoId = chamadoId; showScreen('chat-screen'); const controlsDiv = document.getElementById('analyst-controls'); const chatInput = document.getElementById('chat-message-input'); const tit = document.getElementById('chat-titulo'); const num = document.getElementById('chat-numero'); const anexC = document.getElementById('chat-anexos-container'); const anexL = document.getElementById('chat-anexos-list'); const msgA = document.getElementById('chat-messages-area'); tit.textContent = 'Carregando...'; num.textContent = '...'; if (anexL) anexL.innerHTML = ''; if (anexC) anexC.style.display = 'none'; if (msgA) msgA.innerHTML = '<p style="text-align:center; color:#999;">Carregando...</p>'; disableForm('chat-message-form', true); disableForm('analyst-controls', true); if (controlsDiv) controlsDiv.style.display = 'none'; currentChamadoDetails = null;
                 try {
-                    const response = await fetchAutenticado(`${API_URL}/api/Chamado/${chamadoId}`); if (!response.ok) throw new Error(`Erro ${response.status}.`);
-                    currentChamadoDetails = await response.json(); const c = currentChamadoDetails; console.log("Dados chat:", c); if (!c) throw new Error("Resposta inválida (null).");
-
-                    tit.textContent = c.titulo || 'S/ Título'; num.textContent = `${c.numeroChamado || 'N/A'} (${c.status || 'N/A'})`;
-                    if (c.anexos && c.anexos.length > 0) { let html = ''; c.anexos.forEach(a => { if (a.urlArquivo && a.nomeArquivo) { const safe = a.nomeArquivo.replace(/</g, "&lt;").replace(/>/g, "&gt;"); html += `<li><a href="${a.urlArquivo}" target="_blank">${safe}</a></li>`; } }); if (html) { anexL.innerHTML = html; anexC.style.display = 'block'; } }
-                    renderizarMensagens(c.mensagens || []);
-
-                    if (currentUserType === 'Employee') {
-                        controlsDiv.style.display = 'block';
-                        try { document.getElementById('analyst-select-status').value = c.status || ''; } catch (e) { console.warn(e); }
-                        try { document.getElementById('analyst-select-priority').value = c.prioridade || 'Média'; } catch (e) { console.warn(e); }
-                        await carregarAnalistasDropdown('analyst-select-assignee', c.analistaId);
-                        disableForm('analyst-controls', false);
-                    }
-
-                    let isBlq = false;
-                    if (c.status === 'Encerrado' || c.status === 'Cancelado') {
-                        isBlq = true;
-                    } else if (c.status === 'Concluído' && c.dataConclusao) {
-                        try {
-                            const dC = new Date(c.dataConclusao); const ag = new Date();
-                            const dH = (ag - dC) / 36e5; // Horas
-                            if (dH > 72) isBlq = true; // Bloqueia após 72h (3 dias)
-                        } catch (e) { console.error(e); }
-                    }
-
-                    if (isBlq && currentUserType === 'Client') {
-                        chatInput.placeholder = "Este chamado está encerrado.";
-                        showMessage("Este chamado está encerrado e não pode mais receber mensagens.", true);
-                        disableForm('chat-message-form', true);
-                    } else {
-                        chatInput.placeholder = "Digite sua mensagem...";
-                        disableForm('chat-message-form', false);
-                    }
+                    const response = await fetchAutenticado(`${API_URL}/api/Chamado/${chamadoId}`); if (!response.ok) throw new Error(`Erro ${response.status}.`); currentChamadoDetails = await response.json(); const c = currentChamadoDetails; console.log("Dados chat:", c); if (!c) throw new Error("Resposta inválida (null)."); tit.textContent = c.titulo || 'S/ Título'; num.textContent = `${c.numeroChamado || 'N/A'} (${c.status || 'N/A'})`; if (c.anexos && c.anexos.length > 0) { let html = ''; c.anexos.forEach(a => { if (a.urlArquivo && a.nomeArquivo) { const safe = a.nomeArquivo.replace(/</g, "&lt;").replace(/>/g, "&gt;"); html += `<li><a href="${a.urlArquivo}" target="_blank">${safe}</a></li>`; } }); if (html) { anexL.innerHTML = html; anexC.style.display = 'block'; } } renderizarMensagens(c.mensagens || []);
+                    if (currentUserType === 'Employee') { controlsDiv.style.display = 'block'; try { document.getElementById('analyst-select-status').value = c.status || ''; } catch (e) { console.warn(e); } try { document.getElementById('analyst-select-priority').value = c.prioridade || 'Média'; } catch (e) { console.warn(e); } await carregarAnalistasDropdown('analyst-select-assignee', c.analistaId); disableForm('analyst-controls', false); }
+                    let isBlq = false; if (c.status === 'Encerrado' || c.status === 'Cancelado') { isBlq = true; } else if (c.status === 'Concluído' && c.dataConclusao) { try { const dC = new Date(c.dataConclusao); const ag = new Date(); const dH = (ag - dC) / 36e5; if (dH > 72) isBlq = true; } catch (e) { console.error(e); } } if (isBlq && currentUserType === 'Client') { chatInput.placeholder = "Este chamado está encerrado."; showMessage("Este chamado está encerrado.", true); disableForm('chat-message-form', true); } else { chatInput.placeholder = "Digite sua mensagem..."; disableForm('chat-message-form', false); }
                 } catch (e) { console.error('Erro abrir chat:', e); if (e.message !== "Sessão expirada.") showMessage(`Erro chat: ${e.message}`, true); msgA.innerHTML = `<p style="color:red;">Falha ao carregar dados.</p>`; }
             }
-
             function renderizarMensagens(mensagens) {
-                const area = document.getElementById('chat-messages-area'); if (!area) return; area.innerHTML = '';
-                if (!mensagens || mensagens.length === 0) { area.innerHTML = `<p style="text-align:center; color:#999;">Sem mensagens.</p>`; return; }
+                const area = document.getElementById('chat-messages-area'); if (!area) return; area.innerHTML = ''; if (!mensagens || mensagens.length === 0) { area.innerHTML = `<p style="text-align:center; color:#999;">Sem mensagens.</p>`; return; }
                 try {
-                    mensagens.forEach(msg => {
-                        if (!msg) { console.warn("Msg inválida:", msg); return; }
-                        const d = formatISODate(msg.dataEnvio); let rc = '', ac = '';
-                        const t = msg.tipoRemetente || 'IA'; const u = currentUserType || 'Client';
-                        if (t === 'Client') rc = 'client'; else if (t === 'Employee') rc = 'analyst'; else rc = 'ia';
-                        if ((t === 'Client' && u === 'Client') || (t === 'Employee' && u === 'Employee')) { ac = 'viewer'; } else { ac = 'other'; }
-                        const sC = (msg.conteudo || '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                        const sS = (msg.remetenteNome || 'Desc.').replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                        area.innerHTML += `<div class="chat-message ${ac} ${rc}"><span class="sender">${sS}<span class="timestamp">${d}</span></span><div class="content">${sC}</div></div>`;
-                    });
+                    mensagens.forEach(msg => { if (!msg) { console.warn("Msg inválida:", msg); return; } const d = formatISODate(msg.dataEnvio); let rc = '', ac = ''; const t = msg.tipoRemetente || 'IA'; const u = currentUserType || 'Client'; if (t === 'Client') rc = 'client'; else if (t === 'Employee') rc = 'analyst'; else rc = 'ia'; if ((t === 'Client' && u === 'Client') || (t === 'Employee' && u === 'Employee')) { ac = 'viewer'; } else { ac = 'other'; } const sC = (msg.conteudo || '').replace(/</g, "&lt;").replace(/>/g, "&gt;"); const sS = (msg.remetenteNome || 'Desc.').replace(/</g, "&lt;").replace(/>/g, "&gt;"); area.innerHTML += `<div class="chat-message ${ac} ${rc}"><span class="sender">${sS}<span class="timestamp">${d}</span></span><div class="content">${sC}</div></div>`; });
                     setTimeout(() => { area.scrollTop = area.scrollHeight; }, 50);
                 } catch (err) { console.error("Erro renderizar:", err, mensagens); area.innerHTML = `<p style="color:red;">Erro exibir msgs.</p>`; }
             }
-
-            function showAnalystTab(tabName) {
-                try {
-                    document.querySelectorAll('#employee-dashboard-screen .tab-content').forEach(content => content.classList.remove('active'));
-                    document.querySelectorAll('#employee-dashboard-screen .tab-link').forEach(link => link.classList.remove('active'));
-                    document.getElementById(`tab-content-${tabName}`).classList.add('active');
-                    document.getElementById(`tab-link-${tabName}`).classList.add('active');
-                } catch (e) { console.error("Erro ao trocar de aba:", e); }
-            }
+            function showAnalystTab(tabName) { try { document.querySelectorAll('#employee-dashboard-screen .tab-content').forEach(content => content.classList.remove('active')); document.querySelectorAll('#employee-dashboard-screen .tab-link').forEach(link => link.classList.remove('active')); document.getElementById(`tab-content-${tabName}`).classList.add('active'); document.getElementById(`tab-link-${tabName}`).classList.add('active'); } catch (e) { console.error("Erro ao trocar de aba (Analista):", e, tabName); } }
+            function showClientTab(tabName) { try { document.querySelectorAll('#client-dashboard-screen .tab-content').forEach(content => content.classList.remove('active')); document.querySelectorAll('#client-dashboard-screen .tab-link').forEach(link => link.classList.remove('active')); document.getElementById(`tab-content-${tabName}`).classList.add('active'); document.getElementById(`tab-link-${tabName}`).classList.add('active'); } catch (e) { console.error("Erro ao trocar de aba (Cliente):", e, tabName); } }
 
             // --- EVENT LISTENERS ---
-
             document.getElementById('tab-link-reports').addEventListener('click', () => showAnalystTab('reports'));
             document.getElementById('tab-link-tickets').addEventListener('click', () => showAnalystTab('tickets'));
-            // --- NOVO: Listener para a aba Admin ---
             document.getElementById('tab-link-admin').addEventListener('click', () => showAnalystTab('admin'));
-
-            // Navegação
+            document.getElementById('tab-link-perfil').addEventListener('click', () => showAnalystTab('perfil'));
+            document.getElementById('tab-link-client-novo').addEventListener('click', () => showClientTab('client-novo'));
+            document.getElementById('tab-link-client-lista').addEventListener('click', () => showClientTab('client-lista'));
+            document.getElementById('tab-link-client-perfil').addEventListener('click', () => showClientTab('client-perfil'));
             document.getElementById('nav-to-client-register').addEventListener('click', () => showScreen('client-register-screen'));
             document.getElementById('nav-c-to-login').addEventListener('click', () => showScreen('login-screen'));
-
-            // Ações
             document.getElementById('logout-client').addEventListener('click', logout);
             document.getElementById('logout-employee').addEventListener('click', logout);
             document.getElementById('logout-chat').addEventListener('click', logout);
             document.getElementById('chat-btn-back').addEventListener('click', () => { currentChamadoId = null; const s = currentUserType === "Client" ? 'client-dashboard-screen' : 'employee-dashboard-screen'; showScreen(s); if (currentUserType === "Client") loadClientDashboard(); else loadEmployeeDashboard(); });
             document.getElementById('chat-btn-refresh').addEventListener('click', () => { if (currentChamadoId) { showMessage('Atualizando...', false); abrirChat(currentChamadoId); } });
-
-            // Delegação de clique para grids
-            function handleGridClick(event) {
-                if (event.target && event.target.classList.contains('grid-clickable-cell')) {
-                    const chamadoId = event.target.closest('tr').dataset.id;
-                    if (chamadoId) abrirChat(chamadoId);
-                }
-            }
+            function handleGridClick(event) { if (event.target && event.target.classList.contains('grid-clickable-cell')) { const chamadoId = event.target.closest('tr').dataset.id; if (chamadoId) abrirChat(chamadoId); } }
             document.getElementById('my-assigned-grid-body').addEventListener('click', handleGridClick);
             document.getElementById('analyst-ticket-grid-body').addEventListener('click', handleGridClick);
             document.getElementById('client-ticket-grid-body').addEventListener('click', handleGridClick);
             document.getElementById('report-recentes-body').addEventListener('click', handleGridClick);
-
-            // Delegação de mudança de status
-            function handleGridStatusChange(event) {
-                if (event.target && event.target.classList.contains('status-select')) {
-                    handleStatusChange(event.target);
-                }
-            }
+            function handleGridStatusChange(event) { if (event.target && event.target.classList.contains('status-select')) { handleStatusChange(event.target); } }
             document.getElementById('my-assigned-grid-body').addEventListener('change', handleGridStatusChange);
             document.getElementById('analyst-ticket-grid-body').addEventListener('change', handleGridStatusChange);
 
-
             // --- Listeners de Submit de Formulário ---
-
-            document.getElementById('chat-message-form').addEventListener('submit', async function (ev) {
-                ev.preventDefault(); const i = document.getElementById('chat-message-input'); const c = i.value.trim(); if (!c || !currentChamadoId || !currentUserType) return; disableForm('chat-message-form', true); const ov = c; i.value = '';
-                try {
-                    const r = await fetchAutenticado(`${API_URL}/api/Chamado/${currentChamadoId}/mensagem`, { method: 'POST', body: JSON.stringify({ Conteudo: c, TipoRemetente: currentUserType }) }); if (!r.ok) { const ed = await r.json(); throw new Error(ed.message || `Erro ${r.status}.`); } const ms = await r.json(); renderizarMensagens(ms);
-                } catch (e) { console.error(e); if (e.message !== "Sessão expirada.") showMessage(`Falha: ${e.message}`, true); i.value = ov; } finally { disableForm('chat-message-form', false); }
-            });
-
-            document.getElementById('btn-save-analyst-changes').addEventListener('click', async () => {
-                if (!currentChamadoId || currentUserType !== 'Employee') return;
-                disableForm('analyst-controls', true);
-                const s = document.getElementById('analyst-select-status').value; const p = document.getElementById('analyst-select-priority').value; const aidV = document.getElementById('analyst-select-assignee').value; const aid = aidV ? parseInt(aidV, 10) : null;
-                const d = { Status: s, Prioridade: p, AnalistaId: aid };
-                try {
-                    const r = await fetchAutenticado(`${API_URL}/api/Chamado/${currentChamadoId}/atualizar`, { method: 'PUT', body: JSON.stringify(d) }); if (!r.ok) { const ed = await r.json(); throw new Error(ed.message || `Erro ${r.status}.`); } showMessage('Salvo!', false);
-                    abrirChat(currentChamadoId);
-                } catch (e) { console.error(e); if (e.message !== "Sessão expirada.") showMessage(`Erro: ${e.message}`, true); } finally {
-                    disableForm('analyst-controls', false);
-                }
-            });
-
-            document.getElementById('client-ticket-form').addEventListener('submit', async function (ev) {
-                ev.preventDefault(); showMessage('', false); const iI = document.getElementById('ticket-imagens'); const imgs = iI.files; if (imgs.length > MAX_TOTAL_FILES) { showMessage(`Máx ${MAX_TOTAL_FILES} arquivos.`, true); iI.value = ''; return; } for (let i = 0; i < imgs.length; i++) { if (imgs[i].size > MAX_FILE_SIZE_MB * 1024 * 1024) { showMessage(`"${imgs[i].name}" > ${MAX_FILE_SIZE_MB}MB.`, true); iI.value = ''; return; } } disableForm('client-ticket-form', true); const fd = new FormData(); fd.append('Titulo', document.getElementById('ticket-titulo').value); fd.append('Descricao', document.getElementById('ticket-descricao').value); for (let i = 0; i < imgs.length; i++) { fd.append('Imagens', imgs[i]); }
-                try {
-                    const r = await fetchAutenticado(`${API_URL}/api/Chamado/criar`, { method: 'POST', body: fd }); if (r.status === 201) { const n = await r.json(); document.getElementById('client-ticket-form').reset(); abrirChat(n.id); } else { const err = await r.json(); throw new Error(err.message || `Erro ${r.status}.`); }
-                } catch (e) { console.error(e); if (e.message !== "Sessão expirada.") showMessage(`Falha: ${e.message}`, true); } finally { disableForm('client-ticket-form', false); }
-            });
-
+            document.getElementById('chat-message-form').addEventListener('submit', async function (ev) { ev.preventDefault(); const i = document.getElementById('chat-message-input'); const c = i.value.trim(); if (!c || !currentChamadoId || !currentUserType) return; disableForm('chat-message-form', true); const ov = c; i.value = ''; try { const r = await fetchAutenticado(`${API_URL}/api/Chamado/${currentChamadoId}/mensagem`, { method: 'POST', body: JSON.stringify({ Conteudo: c, TipoRemetente: currentUserType }) }); if (!r.ok) { const ed = await r.json(); throw new Error(ed.message || `Erro ${r.status}.`); } const ms = await r.json(); renderizarMensagens(ms); } catch (e) { console.error(e); if (e.message !== "Sessão expirada.") showMessage(`Falha: ${e.message}`, true); i.value = ov; } finally { disableForm('chat-message-form', false); } });
+            document.getElementById('btn-save-analyst-changes').addEventListener('click', async () => { if (!currentChamadoId || currentUserType !== 'Employee') return; disableForm('analyst-controls', true); const s = document.getElementById('analyst-select-status').value; const p = document.getElementById('analyst-select-priority').value; const aidV = document.getElementById('analyst-select-assignee').value; const aid = aidV ? parseInt(aidV, 10) : null; const d = { Status: s, Prioridade: p, AnalistaId: aid }; try { const r = await fetchAutenticado(`${API_URL}/api/Chamado/${currentChamadoId}/atualizar`, { method: 'PUT', body: JSON.stringify(d) }); if (!r.ok) { const ed = await r.json(); throw new Error(ed.message || `Erro ${r.status}.`); } showMessage('Salvo!', false); abrirChat(currentChamadoId); } catch (e) { console.error(e); if (e.message !== "Sessão expirada.") showMessage(`Erro: ${e.message}`, true); } finally { disableForm('analyst-controls', false); } });
+            document.getElementById('client-ticket-form').addEventListener('submit', async function (ev) { ev.preventDefault(); showMessage('', false); const iI = document.getElementById('ticket-imagens'); const imgs = iI.files; if (imgs.length > MAX_TOTAL_FILES) { showMessage(`Máx ${MAX_TOTAL_FILES} arquivos.`, true); iI.value = ''; return; } for (let i = 0; i < imgs.length; i++) { if (imgs[i].size > MAX_FILE_SIZE_MB * 1024 * 1024) { showMessage(`"${imgs[i].name}" > ${MAX_FILE_SIZE_MB}MB.`, true); iI.value = ''; return; } } disableForm('client-ticket-form', true); const fd = new FormData(); fd.append('Titulo', document.getElementById('ticket-titulo').value); fd.append('Descricao', document.getElementById('ticket-descricao').value); for (let i = 0; i < imgs.length; i++) { fd.append('Imagens', imgs[i]); } try { const r = await fetchAutenticado(`${API_URL}/api/Chamado/criar`, { method: 'POST', body: fd }); if (r.status === 201) { const n = await r.json(); document.getElementById('client-ticket-form').reset(); loadClientDashboard(); showClientTab('client-lista'); abrirChat(n.id); } else { const err = await r.json(); throw new Error(err.message || `Erro ${r.status}.`); } } catch (e) { console.error(e); if (e.message !== "Sessão expirada.") showMessage(`Falha: ${e.message}`, true); } finally { disableForm('client-ticket-form', false); } });
             document.getElementById('login-form').addEventListener('submit', async function (event) {
-                event.preventDefault();
-                showMessage('', false); disableForm('login-form', true); const d = { email: document.getElementById('login-email').value, password: document.getElementById('login-password').value };
+                event.preventDefault(); showMessage('', false); disableForm('login-form', true); const d = { email: document.getElementById('login-email').value, password: document.getElementById('login-password').value };
                 try {
-                    const r = await fetch(`${API_URL}/api/Auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) });
-                    const res = await r.json();
-                    if (!r.ok) {
-                        throw new Error(res.message || `Erro ${r.status}.`);
-                    }
-                    if (!res.token || !res.userName) throw new Error("Resposta de login incompleta.");
-
-                    // --- NOVO: Salva o status de Admin ---
-                    localStorage.setItem('jwtToken', res.token);
-                    localStorage.setItem('userName', res.userName);
-                    localStorage.setItem('isAdmin', res.isAdmin); // Salva 'true' ou 'false'
-
-                    currentUserType = res.userType;
-                    currentUserIsAdmin = res.isAdmin; // Salva na variável de estado
-                    // --- FIM NOVO ---
-
+                    const r = await fetch(`${API_URL}/api/Auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) }); const res = await r.json(); if (!r.ok) { throw new Error(res.message || `Erro ${r.status}.`); } if (!res.token || !res.userName) throw new Error("Resposta de login incompleta.");
+                    localStorage.setItem('jwtToken', res.token); localStorage.setItem('userName', res.userName); localStorage.setItem('isAdmin', res.isAdmin); currentUserType = res.userType; currentUserIsAdmin = res.isAdmin;
                     document.getElementById('login-form').reset();
                     if (currentUserType === "Client") { showScreen('client-dashboard-screen'); loadClientDashboard(); }
                     else if (currentUserType === "Employee") { showScreen('employee-dashboard-screen'); loadEmployeeDashboard(); }
                     else { throw new Error('Tipo user desconhecido.'); }
-                } catch (e) {
-                    console.error(e);
-                    if (e.name === 'SyntaxError' && e.message.includes('Unexpected token')) {
-                        showMessage('Falha: Erro interno no servidor (500). Verifique o console do back-end.', true);
-                    } else {
-                        showMessage(`Falha: ${e.message}`, true);
-                    }
-                } finally { disableForm('login-form', false); }
+                } catch (e) { console.error(e); if (e.name === 'SyntaxError' && e.message.includes('Unexpected token')) { showMessage('Falha: Erro interno no servidor (500). Verifique o console do back-end.', true); } else { showMessage(`Falha: ${e.message}`, true); } } finally { disableForm('login-form', false); }
+            });
+            document.getElementById('admin-register-form').addEventListener('submit', async function (event) {
+                event.preventDefault(); showMessage('', false); const p = document.getElementById('admin-password').value; const cp = document.getElementById('admin-confirm-password').value; if (p !== cp) { showMessage('Senhas não conferem.', true); return; } disableForm('admin-register-form', true); const data = { name: document.getElementById('admin-name').value, email: document.getElementById('admin-email').value, role: document.getElementById('admin-role').value, password: p, confirmPassword: cp, isAdmin: document.getElementById('admin-is-admin').checked };
+                try {
+                    const r = await fetchAutenticado(`${API_URL}/api/Registration/employee`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); const res = await r.json(); if (!r.ok) { const errorMsg = (res.errors && res.errors[0]) ? res.errors[0] : (res.message || `Erro ${r.status}`); throw new Error(errorMsg); } showMessage('Funcionário registrado com sucesso!', false); document.getElementById('admin-register-form').reset();
+                } catch (e) { console.error("Erro ao registrar funcionário:", e); if (e.message !== "Sessão expirada.") { showMessage(`Falha: ${e.message}`, true); } } finally { disableForm('admin-register-form', false); }
+            });
+            document.getElementById('client-register-form').addEventListener('submit', async function (e) {
+                e.preventDefault(); showMessage('', false); disableForm('client-register-form', true); const p = document.getElementById('client-password').value; const cp = document.getElementById('client-confirm-password').value; if (p !== cp) { showMessage('Senhas não conferem.', true); disableForm('client-register-form', false); return; } const data = { name: document.getElementById('client-name').value, email: document.getElementById('client-email').value, cpf: document.getElementById('client-cpf').value, password: p, confirmPassword: cp };
+                try {
+                    const r = await fetch(`${API_URL}/api/Registration/client`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); const res = await r.json(); if (!r.ok) { const errorMsg = (res.errors && res.errors[0]) ? res.errors[0] : (res.message || `Erro ${r.status}`); throw new Error(errorMsg); } showMessage('Cadastrado! Faça login.', false); showScreen('login-screen'); document.getElementById('client-register-form').reset();
+                } catch (e) { console.error(`Erro (client-register):`, e); showMessage(`Falha: ${e.message}`, true); } finally { disableForm('client-register-form', false); }
             });
 
-            // --- NOVO: Listener para o formulário de Admin ---
-            document.getElementById('admin-register-form').addEventListener('submit', async function (event) {
+            // Listener para os formulários de Mudar Senha
+            async function handleMudarSenha(event) {
+                event.preventDefault(); showMessage('', false); const formId = event.target.id; let prefix = (formId === 'mudar-senha-form-client') ? 'client-' : 'employee-';
+                const senhaAntiga = document.getElementById(`${prefix}senha-antiga`).value; const novaSenha = document.getElementById(`${prefix}nova-senha`).value; const confirmarNovaSenha = document.getElementById(`${prefix}confirmar-nova-senha`).value;
+                if (novaSenha !== confirmarNovaSenha) { showMessage('A nova senha e a confirmação não conferem.', true); return; }
+                disableForm(formId, true);
+                const data = { SenhaAntiga: senhaAntiga, NovaSenha: novaSenha, ConfirmarNovaSenha: confirmarNovaSenha };
+                try {
+                    const r = await fetchAutenticado(`${API_URL}/api/auth/mudar-senha`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); const res = await r.json();
+                    if (!r.ok) { const errorMsg = (res.errors && res.errors[0]) ? res.errors[0] : (res.message || `Erro ${r.status}`); throw new Error(errorMsg); }
+                    showMessage('Senha alterada com sucesso!', false); event.target.reset();
+                } catch (e) {
+                    console.error("Erro ao alterar senha:", e); if (e.message !== "Sessão expirada.") { showMessage(`Falha: ${e.message}`, true); }
+                } finally { disableForm(formId, false); }
+            }
+            document.getElementById('mudar-senha-form-client').addEventListener('submit', handleMudarSenha);
+            document.getElementById('mudar-senha-form-employee').addEventListener('submit', handleMudarSenha);
+
+            // --- NOVO: Listener para o formulário de Admin Reset Password ---
+            document.getElementById('admin-reset-password-form').addEventListener('submit', async function (event) {
                 event.preventDefault();
                 showMessage('', false);
 
-                const p = document.getElementById('admin-password').value;
-                const cp = document.getElementById('admin-confirm-password').value;
+                const formId = 'admin-reset-password-form';
+                const p = document.getElementById('admin-reset-nova-senha').value;
+                const cp = document.getElementById('admin-reset-confirmar-nova-senha').value;
 
                 if (p !== cp) {
-                    showMessage('Senhas não conferem.', true);
+                    showMessage('A nova senha e a confirmação não conferem.', true);
                     return;
                 }
 
-                disableForm('admin-register-form', true);
+                disableForm(formId, true);
 
                 const data = {
-                    name: document.getElementById('admin-name').value,
-                    email: document.getElementById('admin-email').value,
-                    role: document.getElementById('admin-role').value,
-                    password: p,
-                    confirmPassword: cp,
-                    isAdmin: document.getElementById('admin-is-admin').checked // Pega o valor do checkbox
+                    Email: document.getElementById('admin-reset-email').value,
+                    NovaSenha: p,
+                    ConfirmarNovaSenha: cp
                 };
 
                 try {
-                    // Usa fetchAutenticado (já envia o token do Admin)
-                    const r = await fetchAutenticado(`${API_URL}/api/Registration/employee`, {
+                    // Chama o novo endpoint /api/auth/admin-reset-password
+                    const r = await fetchAutenticado(`${API_URL}/api/auth/admin-reset-password`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(data)
@@ -1486,67 +1166,25 @@
 
                     const res = await r.json();
                     if (!r.ok) {
-                        // Se o back-end retornar um erro (ex: 400), 'res.errors' existirá
                         const errorMsg = (res.errors && res.errors[0]) ? res.errors[0] : (res.message || `Erro ${r.status}`);
                         throw new Error(errorMsg);
                     }
 
                     // Sucesso!
-                    showMessage('Funcionário registrado com sucesso!', false);
-                    document.getElementById('admin-register-form').reset(); // Limpa o formulário
+                    showMessage(res.message, false); // "Senha do usuário X redefinida..."
+                    document.getElementById(formId).reset(); // Limpa o formulário
 
                 } catch (e) {
-                    console.error("Erro ao registrar funcionário:", e);
+                    console.error("Erro ao redefinir senha:", e);
                     if (e.message !== "Sessão expirada.") {
-                        showMessage(`Falha: ${e.message}`, true);
+                        showMessage(`Falha: ${e.message}`, true); // Exibe o erro (ex: "Usuário não encontrado")
                     }
                 } finally {
-                    disableForm('admin-register-form', false);
+                    disableForm(formId, false);
                 }
             });
             // --- FIM NOVO ---
 
-
-            // Listener de Registro de Cliente (sem alteração)
-            document.getElementById('client-register-form').addEventListener('submit', async function (e) {
-                e.preventDefault();
-                showMessage('', false);
-                disableForm('client-register-form', true);
-
-                const p = document.getElementById('client-password').value;
-                const cp = document.getElementById('client-confirm-password').value;
-                if (p !== cp) {
-                    showMessage('Senhas não conferem.', true);
-                    disableForm('client-register-form', false);
-                    return;
-                }
-
-                const data = {
-                    name: document.getElementById('client-name').value,
-                    email: document.getElementById('client-email').value,
-                    cpf: document.getElementById('client-cpf').value,
-                    password: p,
-                    confirmPassword: cp
-                };
-
-                try {
-                    const r = await fetch(`${API_URL}/api/Registration/client`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-                    const res = await r.json();
-                    if (!r.ok) {
-                        const errorMsg = (res.errors && res.errors[0]) ? res.errors[0] : (res.message || `Erro ${r.status}`);
-                        throw new Error(errorMsg);
-                    }
-
-                    showMessage('Cadastrado! Faça login.', false);
-                    showScreen('login-screen');
-                    document.getElementById('client-register-form').reset();
-                } catch (e) {
-                    console.error(`Erro (client-register):`, e);
-                    showMessage(`Falha: ${e.message}`, true);
-                } finally {
-                    disableForm('client-register-form', false);
-                }
-            });
 
             // Sugestões de FAQ (sem alteração)
             async function buscarSugestoesFaq() {
@@ -1557,7 +1195,7 @@
             document.getElementById('ticket-titulo').addEventListener('input', debounceBuscarSugestoes);
             document.getElementById('ticket-descricao').addEventListener('input', debounceBuscarSugestoes);
 
-            console.log("Portal NextLayer (com Painel Admin) inicializado.");
+            console.log("Portal NextLayer (com Admin Reset) inicializado.");
 
         }); // --- FIM DO DOMContentLoaded ---
         /* --- FIM DO JAVASCRIPT --- */

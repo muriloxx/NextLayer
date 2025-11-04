@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿// --- ARQUIVO: Controllers/AuthController.cs (COM NOVO ENDPOINT DE RESET) ---
+
+using Microsoft.AspNetCore.Mvc;
 using NextLayer.Services;
 using NextLayer.ViewModels;
 using System;
@@ -7,10 +9,11 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using System.Security.Claims; // <-- Importante para ler o Token
 using System.Text;
-using NextLayer.Models; // Necessário para Client e Employee
-using System.Collections.Generic; // Para List<Claim>
+using NextLayer.Models;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization; // <-- Importante para [Authorize]
 
 namespace NextLayer.Controllers
 {
@@ -28,52 +31,122 @@ namespace NextLayer.Controllers
             _configuration = configuration;
         }
 
+        // --- MÉTODO DE LOGIN (sem alterações) ---
         [HttpPost("login")]
+        [AllowAnonymous] // Login é sempre público
         public async Task<IActionResult> Login([FromBody] LoginViewModel model)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            // O AuthService retorna o objeto (Client ou Employee) e o tipo
             var (userObject, userType) = await _authService.AuthenticateAsync(model);
 
             if (userObject != null)
             {
-
                 string userName;
-                bool isAdmin = false; // Padrão é falso (para clientes)
+                bool isAdmin = false;
 
-                // Define userName e isAdmin com base no tipo de usuário
                 if (userType == "Client")
                 {
                     userName = ((Client)userObject).Name;
-                    // isAdmin continua false
                 }
-                else // userType == "Employee"
+                else
                 {
                     var employee = (Employee)userObject;
                     userName = employee.Name;
-                    isAdmin = employee.IsAdmin; // <--- LÊ A NOVA PROPRIEDADE
+                    isAdmin = employee.IsAdmin;
                 }
 
-                // Gera o token JWT, agora passando o status de admin
-                string token = GerarTokenJwt(userObject, userType, isAdmin); // <--- PARÂMETRO ADICIONADO
+                string token = GerarTokenJwt(userObject, userType, isAdmin);
 
-                // Retorna o token, o tipo, o nome E o status de admin
                 return Ok(new
                 {
                     message = "Login bem-sucedido!",
                     userType = userType,
                     token = token,
                     userName = userName,
-                    isAdmin = isAdmin // <--- VALOR ADICIONADO À RESPOSTA
+                    isAdmin = isAdmin
                 });
-
             }
 
             return Unauthorized(new { message = "E-mail ou senha inválidos." });
         }
 
-        // Método privado para gerar o token JWT (agora recebe 'isAdmin')
+        // --- MÉTODO MUDAR SENHA (sem alterações) ---
+        [HttpPost("mudar-senha")]
+        [Authorize] // Apenas usuários logados (Client ou Employee)
+        public async Task<IActionResult> MudarSenha([FromBody] MudarSenhaViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userType = User.FindFirstValue(ClaimTypes.Role);
+
+                if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(userType))
+                {
+                    return Unauthorized(new { message = "Token inválido." });
+                }
+
+                await _authService.MudarSenhaAsync(userId, userType, model);
+                return Ok(new { message = "Senha alterada com sucesso!" });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message, errors = new List<string> { ex.Message } });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "Ocorreu um erro interno." });
+            }
+        }
+
+
+        // --- INÍCIO DO NOVO MÉTODO ADICIONADO ---
+
+        /// <summary>
+        /// (Admin) Força a redefinição da senha de qualquer usuário.
+        /// </summary>
+        [HttpPost("admin-reset-password")]
+        [Authorize(Roles = "Employee")] // 1. Só funcionários podem chamar
+        public async Task<IActionResult> AdminResetPassword([FromBody] AdminResetPasswordViewModel model)
+        {
+            // 2. Verifica se o funcionário logado é um ADMIN
+            var isAdminClaim = User.FindFirstValue("isAdmin");
+            if (isAdminClaim != "True")
+            {
+                return StatusCode(403, new { message = "Acesso negado. Apenas administradores podem redefinir senhas." });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                // 3. Chama o serviço que implementamos no Passo 3
+                await _authService.AdminResetPasswordAsync(model);
+
+                return Ok(new { message = $"Senha do usuário {model.Email} redefinida com sucesso!" });
+            }
+            catch (InvalidOperationException ex) // Erros de negócio (ex: "Usuário não encontrado")
+            {
+                return BadRequest(new { message = ex.Message, errors = new List<string> { ex.Message } });
+            }
+            catch (Exception) // Outros erros
+            {
+                return StatusCode(500, new { message = "Ocorreu um erro interno ao redefinir a senha." });
+            }
+        }
+
+        // --- FIM DO NOVO MÉTODO ADICIONADO ---
+
+
+        // --- MÉTODO GERAR TOKEN (sem alterações) ---
         private string GerarTokenJwt(object userObject, string userType, bool isAdmin)
         {
             var jwtKey = _configuration["Jwt:Key"] ?? throw new ArgumentNullException("Jwt:Key não encontrada");
@@ -83,19 +156,12 @@ namespace NextLayer.Controllers
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            // Claims (informações dentro do token)
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Email, (userType == "Client" ? ((Client)userObject).Email : ((Employee)userObject).Email)),
-                // ClaimTypes.NameIdentifier é o padrão para ID do usuário
                 new Claim(ClaimTypes.NameIdentifier, (userType == "Client" ? ((Client)userObject).Id.ToString() : ((Employee)userObject).Id.ToString())),
-                // ClaimTypes.Role é usado pelo [Authorize(Roles = "...")]
                 new Claim(ClaimTypes.Role, userType),
-                // ClaimTypes.Name é o padrão para o nome
                 new Claim(ClaimTypes.Name, (userType == "Client" ? ((Client)userObject).Name : ((Employee)userObject).Name)),
-                
-                // Adicionamos a claim "isAdmin" ao token.
-                // O .ToString() converte o booleano (true/false) para a string "True"/"False"
                 new Claim("isAdmin", isAdmin.ToString())
             };
 
@@ -103,7 +169,7 @@ namespace NextLayer.Controllers
                 issuer: issuer,
                 audience: audience,
                 claims: claims,
-                expires: DateTime.Now.AddHours(8), // Duração do token
+                expires: DateTime.Now.AddHours(8),
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
