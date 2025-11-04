@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-R">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NextLayer - Portal</title>
 
@@ -515,6 +515,19 @@
                 border-bottom-color: #007bff;
             }
 
+        /* --- NOVO: Estilo para a aba de Admin (escondida por padrão) --- */
+        #tab-link-admin {
+            display: none; /* Escondido por padrão */
+            color: #dc3545; /* Cor de Admin */
+            font-weight: 600;
+        }
+
+            #tab-link-admin.active {
+                border-bottom-color: #dc3545;
+            }
+        /* --- FIM NOVO --- */
+
+
         .tab-content {
             display: none;
         }
@@ -577,7 +590,7 @@
             height: auto;
         }
 
-        /* --- INÍCIO CSS: NOVOS ESTILOS DO DASHBOARD (RELATÓRIOS 1, 2, 3) --- */
+        /* --- Estilos dos Relatórios (sem alteração) --- */
         .db-loading {
             font-style: italic;
             color: #888;
@@ -587,7 +600,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
-            margin-bottom: 2.5rem; /* Espaçamento antes da tabela de recentes */
+            margin-bottom: 2.5rem;
         }
 
         .db-card {
@@ -596,7 +609,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
             padding: 24px;
             border: 1px solid #eee;
-            flex-basis: 250px; /* Largura base */
+            flex-basis: 250px;
             flex-grow: 1;
             min-height: 150px;
         }
@@ -632,7 +645,32 @@
                 .db-priority-list li strong {
                     color: #333;
                 }
-        /* --- FIM CSS: NOVOS ESTILOS DO DASHBOARD --- */
+
+        /* --- NOVO: Estilo para o checkbox de Admin --- */
+        .admin-checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+
+            .admin-checkbox-group input {
+                width: auto;
+                margin-right: 0.75rem;
+                transform: scale(1.2);
+            }
+
+            .admin-checkbox-group label {
+                margin-bottom: 0;
+                font-weight: bold;
+                color: #dc3545;
+            }
+        /* --- FIM NOVO --- */
+
 
         /* --- FIM DO CSS --- */
     </style>
@@ -651,7 +689,6 @@
             </form>
             <div class="nav-links">
                 <span class="nav-link" id="nav-to-client-register">Cadastrar Cliente</span>
-                <span class="nav-link" id="nav-to-employee-register">Cadastrar Funcionário</span>
             </div>
         </div>
 
@@ -667,21 +704,6 @@
             </form>
             <div class="nav-links">
                 <span class="nav-link" id="nav-c-to-login">Voltar</span>
-            </div>
-        </div>
-
-        <div id="employee-register-screen" class="screen">
-            <h2>Cadastro de Funcionário</h2>
-            <form id="employee-register-form">
-                <div class="form-group"> <label for="employee-name">Nome Completo</label> <input type="text" id="employee-name" required autocomplete="name"> </div>
-                <div class="form-group"> <label for="employee-email">E-mail Institucional</label> <input type="email" id="employee-email" required autocomplete="email"> </div>
-                <div class="form-group"> <label for="employee-role">Cargo</label> <input type="text" id="employee-role" required> </div>
-                <div class="form-group"> <label for="employee-password">Senha (mín. 6)</label> <input type="password" id="employee-password" minlength="6" required autocomplete="new-password"> </div>
-                <div class="form-group"> <label for="employee-confirm-password">Confirmar Senha</label> <input type="password" id="employee-confirm-password" required autocomplete="new-password"> </div>
-                <button type="submit" class="btn">Cadastrar</button>
-            </form>
-            <div class="nav-links">
-                <span class="nav-link" id="nav-e-to-login">Voltar</span>
             </div>
         </div>
 
@@ -705,17 +727,16 @@
             <div class="tab-nav">
                 <button class="tab-link active" id="tab-link-reports">Relatórios</button>
                 <button class="tab-link" id="tab-link-tickets">Chamados</button>
+                <button class="tab-link" id="tab-link-admin">Gestão Admin</button>
             </div>
 
             <div id="tab-content-reports" class="tab-content active">
-
                 <h3>Visão Geral</h3>
                 <div class="db-card-container">
                     <div class="db-card">
                         <h4>Total de Chamados Abertos</h4>
                         <div id="report-total-abertos" class="db-stat-number db-loading">...</div>
                     </div>
-
                     <div class="db-card">
                         <h4>Abertos por Prioridade</h4>
                         <ul id="report-por-prioridade" class="db-priority-list">
@@ -743,8 +764,8 @@
                 <div id="dashboard-stats-container">
                     <p id="stats-loading-message" style="color: #666;">Carregando estatísticas...</p>
                 </div>
-
             </div>
+
             <div id="tab-content-tickets" class="tab-content">
                 <h3>Meus Chamados Atribuídos (Não Concluídos)</h3>
                 <div class="ticket-grid-container">
@@ -755,6 +776,25 @@
                 </div>
                 <h3 style="margin-top: 2.5rem; border-top: 1px solid #eee; padding-top: 2rem;">Todos Chamados (Abertos/Em Andamento)</h3>
                 <div class="ticket-grid-container"> <table class="ticket-grid"> <thead> <tr> <th>Nº</th> <th>Título</th> <th>Cliente</th> <th>Abertura</th> <th>Status</th> <th>Analista</th> </tr> </thead> <tbody id="analyst-ticket-grid-body"></tbody> </table> </div>
+            </div>
+
+            <div id="tab-content-admin" class="tab-content">
+                <h3>Cadastrar Novo Funcionário</h3>
+                <p>Use este formulário para criar novas contas de Analista ou Administrador.</p>
+                <form id="admin-register-form">
+                    <div class="form-group"> <label for="admin-name">Nome Completo</label> <input type="text" id="admin-name" required autocomplete="name"> </div>
+                    <div class="form-group"> <label for="admin-email">E-mail Institucional</label> <input type="email" id="admin-email" required autocomplete="email"> </div>
+                    <div class="form-group"> <label for="admin-role">Cargo (Ex: Analista N1, Admin)</label> <input type="text" id="admin-role" required> </div>
+                    <div class="form-group"> <label for="admin-password">Senha (mín. 6)</label> <input type="password" id="admin-password" minlength="6" required autocomplete="new-password"> </div>
+                    <div class="form-group"> <label for="admin-confirm-password">Confirmar Senha</label> <input type="password" id="admin-confirm-password" required autocomplete="new-password"> </div>
+
+                    <div class="admin-checkbox-group">
+                        <input type="checkbox" id="admin-is-admin">
+                        <label for="admin-is-admin">Tornar este usuário um Administrador</label>
+                    </div>
+
+                    <button type="submit" class="btn">Cadastrar Novo Funcionário</button>
+                </form>
             </div>
         </div>
 
@@ -784,28 +824,24 @@
         document.addEventListener("DOMContentLoaded", function () {
 
             // --- CONFIGURAÇÃO E VARIÁVEIS GLOBAIS ---
-            // ⚠️ ATENÇÃO: Ajuste a porta se o seu back-end rodar em outra.
-            // O launchSettings.json indica https://localhost:7121
             const API_URL = "https://localhost:7121";
-
-            // --- NOVA CONSTANTE PARA O NOVO CONTROLLER ---
-            // (Usada pelas novas funções)
             const DASHBOARD_API_URL = `${API_URL}/api/dashboard`;
 
             const MAX_FILE_SIZE_MB = 5;
             const MAX_TOTAL_FILES = 5;
             const messageArea = document.getElementById('message-area');
-            const mainContainer = document.getElementById('main-container'); // Container principal
+            const mainContainer = document.getElementById('main-container');
+
             let currentUserType = null;
+            let currentUserIsAdmin = false; // <-- NOVO: Variável de estado para Admin
             let currentChamadoId = null;
             let faqSuggestionTimeoutId = null;
             let currentChamadoDetails = null;
             let listaAnalistasCache = null;
-            let statsChartInstance = null; // Para o gráfico de pizza
+            let statsChartInstance = null;
 
             // --- FUNÇÕES AUXILIARES ---
 
-            /** Mostra a tela especificada e esconde as outras */
             function showScreen(screenId) {
                 try {
                     document.querySelectorAll('.screen').forEach(screen => {
@@ -814,17 +850,14 @@
                     const screenToShow = document.getElementById(screenId);
                     if (screenToShow) {
                         screenToShow.classList.add('active');
-
-                        // Ajusta a largura do container para dashboards
                         if (screenId.includes('dashboard-screen')) {
                             mainContainer.classList.add('dashboard-active');
                         } else {
                             mainContainer.classList.remove('dashboard-active');
                         }
-
                     } else {
                         console.error("Tela Inválida:", screenId);
-                        document.getElementById('login-screen').classList.add('active'); // Fallback
+                        document.getElementById('login-screen').classList.add('active');
                         mainContainer.classList.remove('dashboard-active');
                     }
                     showMessage('', false);
@@ -832,7 +865,6 @@
                 } catch (e) { console.error("Erro em showScreen:", e); }
             }
 
-            /** Exibe uma mensagem global no topo da caixa */
             function showMessage(message, isError = false) {
                 if (!messageArea) return;
                 try {
@@ -846,7 +878,6 @@
                 } catch (e) { console.error("Erro em showMessage:", e); }
             }
 
-            /** Formata uma data string ISO para o padrão local PT-BR */
             function formatISODate(isoDateString) {
                 if (!isoDateString) return '-';
                 try {
@@ -857,7 +888,6 @@
                 } catch (e) { console.error("Erro formatar data:", isoDateString, e); return isoDateString; }
             }
 
-            /** Formata data para Abertura Recente (sem hora) */
             function formatISODateRecente(isoDateString) {
                 if (!isoDateString) return '-';
                 try {
@@ -867,8 +897,6 @@
                 } catch (e) { return isoDateString; }
             }
 
-
-            /** Desabilita/habilita elementos de formulário dentro de um container (form ou div) */
             function disableForm(formId, disable = true) {
                 try {
                     const formOrDiv = document.getElementById(formId);
@@ -883,7 +911,7 @@
                     } else if (formOrDiv.tagName === 'FORM') {
                         button = formOrDiv.querySelector('button[type="submit"]');
                     } else {
-                        return; // Não mexe no texto de outros botões
+                        return;
                     }
 
                     if (button) {
@@ -893,25 +921,27 @@
                         button.textContent = disable ? waitText : originalText;
                         if (!disable) delete button.dataset.originalText;
                     }
-
-                    const firstInput = formOrDiv.querySelector('input:not([type=hidden]), textarea, select');
-                    if (!disable && firstInput && formId !== 'login-form' && formId !== 'chat-message-form') {
-                        setTimeout(() => { try { firstInput.focus(); } catch (e) { } }, 100);
-                    } else if (!disable && formId === 'chat-message-form') {
-                        setTimeout(() => { try { document.getElementById('chat-message-input').focus(); } catch (e) { } }, 100);
-                    }
                 } catch (e) { console.error("Erro em disableForm:", e, formId); }
             }
 
-            /** Faz logout, limpa variáveis globais e reseta formulários */
             function logout() {
-                currentUserType = null; currentChamadoId = null; listaAnalistasCache = null;
-                localStorage.removeItem('jwtToken'); // Limpa o token
-                localStorage.removeItem('userName'); // Limpa o nome
+                // Limpa variáveis de estado
+                currentUserType = null;
+                currentChamadoId = null;
+                listaAnalistasCache = null;
+                currentUserIsAdmin = false; // <-- NOVO: Reseta o status de Admin
 
+                // Limpa armazenamento local
+                localStorage.removeItem('jwtToken');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('isAdmin'); // <-- NOVO: Limpa o status de Admin
+
+                // Limpa grids
                 try { document.getElementById('analyst-ticket-grid-body').innerHTML = ''; } catch (e) { }
                 try { document.getElementById('my-assigned-grid-body').innerHTML = ''; } catch (e) { }
                 try { document.getElementById('client-ticket-grid-body').innerHTML = ''; } catch (e) { }
+
+                // Limpa relatórios
                 try {
                     if (statsChartInstance) {
                         statsChartInstance.destroy();
@@ -922,15 +952,12 @@
                         statsContainer.innerHTML = '<p id="stats-loading-message" style="color: #666;">Carregando...</p>';
                     }
                 } catch (e) { }
-
-                // --- NOVO: Limpa novos relatórios ---
                 try { document.getElementById('report-total-abertos').innerHTML = '<div class="db-stat-number db-loading">...</div>'; } catch (e) { }
                 try { document.getElementById('report-por-prioridade').innerHTML = '<li class="db-loading">Carregando...</li>'; } catch (e) { }
                 try { document.getElementById('report-recentes-body').innerHTML = '<tr><td colspan="4" class="db-loading" style="text-align: center;">Carregando...</td></tr>'; } catch (e) { }
-                // --- FIM NOVO ---
 
-
-                ['login-form', 'client-register-form', 'employee-register-form', 'client-ticket-form', 'chat-message-form', 'analyst-controls'].forEach(id => {
+                // Reseta formulários
+                ['login-form', 'client-register-form', 'client-ticket-form', 'chat-message-form', 'analyst-controls', 'admin-register-form'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) {
                         if (el.tagName === 'FORM') el.reset();
@@ -938,13 +965,14 @@
                     }
                 });
 
+                // Reseta títulos e visibilidade
                 try { document.getElementById('client-dashboard-title').textContent = "Portal do Cliente"; } catch (e) { }
                 try { document.getElementById('employee-dashboard-title').textContent = "Painel do Analista"; } catch (e) { }
+                try { document.getElementById('tab-link-admin').style.display = 'none'; } catch (e) { } // <-- NOVO: Esconde a aba Admin
 
                 showScreen('login-screen');
             }
 
-            /** Helper para fazer fetch com autenticação */
             async function fetchAutenticado(url, options = {}) {
                 const token = localStorage.getItem('jwtToken');
                 const headers = new Headers(options.headers || {});
@@ -961,51 +989,31 @@
 
             // --- LÓGICA DE CARREGAMENTO DOS PAINÉIS ---
 
-            // --- INÍCIO: NOVAS FUNÇÕES DO DASHBOARD (Relatórios 1, 2, 3) ---
-
-            /** Carrega os novos relatórios (Total, Prioridade, Recentes) */
             async function loadNewDashboardReports() {
-                // Seleciona os elementos do DOM
                 const totalEl = document.getElementById('report-total-abertos');
                 const prioridadeEl = document.getElementById('report-por-prioridade');
                 const recentesEl = document.getElementById('report-recentes-body');
 
-                // Reseta para o estado de "loading"
                 if (totalEl) totalEl.innerHTML = '<div class="db-stat-number db-loading">...</div>';
                 if (prioridadeEl) prioridadeEl.innerHTML = '<li class="db-loading">Carregando...</li>';
                 if (recentesEl) recentesEl.innerHTML = '<tr><td colspan="4" class="db-loading" style="text-align: center;">Carregando...</td></tr>';
 
                 try {
-                    // Dispara todas as requisições em paralelo (muito mais rápido)
                     const [totalResponse, prioridadeResponse, recentesResponse] = await Promise.all([
                         fetchAutenticado(`${DASHBOARD_API_URL}/total-abertos`),
                         fetchAutenticado(`${DASHBOARD_API_URL}/por-prioridade`),
                         fetchAutenticado(`${DASHBOARD_API_URL}/recentes?dias=7`)
                     ]);
 
-                    // 1. Processa Total Abertos
-                    if (totalResponse.ok) {
-                        const total = await totalResponse.json();
-                        renderNewTotal(totalEl, total);
-                    } else {
-                        renderNewTotal(totalEl, 'Erro');
-                    }
-
-                    // 2. Processa Por Prioridade
-                    if (prioridadeResponse.ok) {
-                        const data = await prioridadeResponse.json();
-                        renderNewPrioridade(prioridadeEl, data);
-                    } else {
-                        renderNewPrioridade(prioridadeEl, null, true); // Passa 'true' para indicar erro
-                    }
-
-                    // 3. Processa Recentes
-                    if (recentesResponse.ok) {
-                        const data = await recentesResponse.json();
-                        renderNewRecentes(recentesEl, data);
-                    } else {
-                        renderNewRecentes(recentesEl, null, true); // Passa 'true' para indicar erro
-                    }
+                    // Total Abertos
+                    if (totalResponse.ok) { renderNewTotal(totalEl, await totalResponse.json()); }
+                    else { renderNewTotal(totalEl, 'Erro'); }
+                    // Por Prioridade
+                    if (prioridadeResponse.ok) { renderNewPrioridade(prioridadeEl, await prioridadeResponse.json()); }
+                    else { renderNewPrioridade(prioridadeEl, null, true); }
+                    // Recentes
+                    if (recentesResponse.ok) { renderNewRecentes(recentesEl, await recentesResponse.json()); }
+                    else { renderNewRecentes(recentesEl, null, true); }
 
                 } catch (error) {
                     console.error('Erro ao carregar novos relatórios:', error);
@@ -1021,24 +1029,21 @@
                 if (!element) return;
                 element.textContent = total;
                 element.classList.remove('db-loading');
-                if (isNaN(total)) element.style.fontSize = "2rem"; // Diminui fonte se for 'Erro'
+                if (isNaN(total)) element.style.fontSize = "2rem";
                 else element.style.fontSize = "3.5rem";
             }
 
             function renderNewPrioridade(listElement, prioridadeData, isError = false) {
                 if (!listElement) return;
-                listElement.innerHTML = ''; // Limpa o "Carregando..."
-
+                listElement.innerHTML = '';
                 if (isError) {
                     listElement.innerHTML = '<li style="color: red;">Erro ao carregar.</li>';
                     return;
                 }
-
                 if (!prioridadeData || Object.keys(prioridadeData).length === 0) {
                     listElement.innerHTML = '<li>Nenhum chamado aberto.</li>';
                     return;
                 }
-
                 const entries = Object.entries(prioridadeData);
                 entries.forEach(([prioridade, total]) => {
                     const li = document.createElement('li');
@@ -1049,50 +1054,39 @@
 
             function renderNewRecentes(tableBodyElement, recentesData, isError = false) {
                 if (!tableBodyElement) return;
-                tableBodyElement.innerHTML = ''; // Limpa o "Carregando..."
-
+                tableBodyElement.innerHTML = '';
                 if (isError) {
                     tableBodyElement.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Erro ao carregar.</td></tr>';
                     return;
                 }
-
                 if (!recentesData || recentesData.length === 0) {
                     tableBodyElement.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhum chamado aberto recentemente.</td></tr>';
                     return;
                 }
-
                 recentesData.forEach(chamado => {
                     const tr = document.createElement('tr');
-
-                    // Reutilizando a célula clicável do seu CSS
                     tr.innerHTML = `
                             <td data-action="abrirChat" class="grid-clickable-cell">${chamado.numeroChamado || chamado.id}</td>
                             <td>${chamado.titulo || '-'}</td>
                             <td>${formatISODateRecente(chamado.dataAbertura)}</td>
                             <td>${chamado.status || '-'}</td>
                         `;
-                    // Adiciona o data-id à linha para o clique funcionar
                     tr.dataset.id = chamado.id;
                     tableBodyElement.appendChild(tr);
                 });
             }
-            // --- FIM: NOVAS FUNÇÕES DO DASHBOARD ---
 
-
-            /** Carrega Estatísticas e desenha o Gráfico (Função Original) */
             async function loadDashboardStats() {
                 const statsContainer = document.getElementById('dashboard-stats-container');
                 const loadingMessage = document.getElementById('stats-loading-message');
                 if (!statsContainer) { console.error("Contêiner de stats não encontrado."); return; }
 
-                // Limpa o gráfico anterior (se existir)
                 if (statsContainer.querySelector('.stats-layout')) statsContainer.querySelector('.stats-layout').remove();
                 if (statsChartInstance) {
                     statsChartInstance.destroy();
                     statsChartInstance = null;
                 }
 
-                // Garante que a mensagem de loading exista e esteja visível
                 if (loadingMessage) {
                     loadingMessage.textContent = "Carregando estatísticas...";
                     loadingMessage.style.display = 'block';
@@ -1101,21 +1095,18 @@
                 }
 
                 try {
-                    // Endpoint original do seu código para o gráfico de pizza
-                    // Usa a API_URL normal, não a DASHBOARD_API_URL (baseado no seu código original)
                     const response = await fetchAutenticado(`${API_URL}/api/Dashboard/stats/por-status`);
                     if (!response.ok) { const e = await response.json(); throw new Error(e.message || `Erro ${response.status}`); }
                     const stats = await response.json();
 
-                    const loadingMsg = document.getElementById('stats-loading-message'); // Pega de novo
-                    if (loadingMsg) loadingMsg.style.display = 'none'; // Esconde a mensagem de "carregando"
+                    const loadingMsg = document.getElementById('stats-loading-message');
+                    if (loadingMsg) loadingMsg.style.display = 'none';
 
                     if (!stats || stats.length === 0) {
                         statsContainer.innerHTML = '<p id="stats-loading-message">Nenhuma estatística encontrada.</p>';
                         return;
                     }
 
-                    // Cria os elementos do gráfico
                     statsContainer.innerHTML = `
                                 <div class="stats-layout">
                                     <div class="stats-numeros"><ul id="stats-list"></ul></div>
@@ -1131,7 +1122,7 @@
                     });
                     statsList.innerHTML += `<li style="border-top:2px solid #007bff; margin-top:0.5rem; padding-top:0.5rem;"><span class="stat-label"><strong>Total</strong></span><span class="stat-count"><strong>${total}</strong></span></li>`;
 
-                    if (typeof Chart !== 'undefined') { // Verifica se Chart.js carregou
+                    if (typeof Chart !== 'undefined') {
                         const ctx = document.getElementById('stats-chart-canvas').getContext('2d');
                         statsChartInstance = new Chart(ctx, {
                             type: 'pie', data: { labels: stats.map(i => i.status), datasets: [{ data: stats.map(i => i.contagem), backgroundColor: ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(255, 206, 86, 0.7)', 'rgba(75, 192, 192, 0.7)', 'rgba(153, 102, 255, 0.7)', 'rgba(255, 159, 64, 0.7)', 'rgba(100, 100, 100, 0.7)'], borderColor: '#fff', borderWidth: 1 }] },
@@ -1153,23 +1144,30 @@
                 }
             }
 
-            /** Carrega os grids do Analista (Meus Chamados e Todos) */
             async function loadEmployeeDashboard() {
                 try {
                     const userName = localStorage.getItem('userName') || 'Analista';
                     document.getElementById('employee-dashboard-title').innerHTML = `Painel do Analista <span class="user-name">(${userName})</span>`;
                 } catch (e) { console.error("Erro setar nome analista:", e); }
 
-                showAnalystTab('reports'); // Mostra relatórios primeiro
+                // --- NOVO: Mostra/Esconde a aba Admin ---
+                try {
+                    const adminTab = document.getElementById('tab-link-admin');
+                    if (currentUserIsAdmin) {
+                        adminTab.style.display = 'block'; // Mostra a aba
+                    } else {
+                        adminTab.style.display = 'none'; // Esconde a aba
+                    }
+                } catch (e) { console.error("Erro ao mostrar/esconder aba admin:", e); }
+                // --- FIM NOVO ---
 
-                // --- MODIFICAÇÃO: Chama as duas funções de carregamento ---
-                loadNewDashboardReports(); // Carrega os novos cards/tabela (Relatórios 1, 2, 3)
-                loadDashboardStats(); // Carrega o gráfico de pizza (Relatório existente)
+                showAnalystTab('reports');
 
-                loadEmployeeGrids(); // Carrega os grids (não espera)
+                loadNewDashboardReports();
+                loadDashboardStats();
+                loadEmployeeGrids();
             }
 
-            /** Função separada para carregar os grids do analista */
             async function loadEmployeeGrids() {
                 const myGridBody = document.getElementById('my-assigned-grid-body');
                 if (myGridBody) {
@@ -1181,20 +1179,13 @@
                         else {
                             chamados.forEach(c => {
                                 const opts = ["Aberto (IA)", "Aguardando Analista", "Em Andamento (Analista)", "Aguardando Cliente", "Concluído", "Encerrado", "Cancelado"];
-                                let selHtml = `<select class="status-select" data-id="${c.id}" data-grid-type="my-grid">`; // Adiciona data-grid-type
+                                let selHtml = `<select class="status-select" data-id="${c.id}" data-grid-type="my-grid">`;
                                 opts.forEach(opt => {
                                     const isSelected = (opt === (c.status || '')) ? 'selected' : '';
                                     selHtml += `<option value="${opt}" ${isSelected}>${opt}</option>`;
                                 });
                                 selHtml += `</select>`;
-
-                                myGridBody.innerHTML += `<tr data-id="${c.id}">
-                                                <td data-action="abrirChat" class="grid-clickable-cell">${c.numeroChamado || '-'}</td>
-                                                <td>${c.titulo || '-'}</td>
-                                                <td>${c.nomeCliente || '-'}</td>
-                                                <td>${formatISODate(c.dataAbertura)}</td>
-                                                <td>${selHtml}</td>
-                                            </tr>`;
+                                myGridBody.innerHTML += `<tr data-id="${c.id}"><td data-action="abrirChat" class="grid-clickable-cell">${c.numeroChamado || '-'}</td><td>${c.titulo || '-'}</td><td>${c.nomeCliente || '-'}</td><td>${formatISODate(c.dataAbertura)}</td> <td>${selHtml}</td></tr>`;
                             });
                         }
                     } catch (e) { console.error('Erro meus chamados:', e); if (e.message !== "Sessão expirada.") myGridBody.innerHTML = `<tr><td colspan="5" style="color:red;">${e.message || 'Erro.'}</td></tr>`; }
@@ -1210,7 +1201,7 @@
                         const opts = ["Aberto (IA)", "Aguardando Analista", "Em Andamento (Analista)", "Aguardando Cliente", "Concluído", "Encerrado", "Cancelado"];
                         let selHtml = `<select class="status-select" data-id="${c.id}" data-grid-type="all-grid">`;
                         opts.forEach(opt => {
-                            const isSelected = (opt === (c.status || '')) ? 'selected' : ''; // Variável local
+                            const isSelected = (opt === (c.status || '')) ? 'selected' : '';
                             selHtml += `<option value="${opt}" ${isSelected}>${opt}</option>`;
                         });
                         selHtml += `</select>`;
@@ -1219,7 +1210,6 @@
                 } catch (e) { console.error('Erro todos chamados:', e); if (e.message !== "Sessão expirada.") gridBody.innerHTML = `<tr><td colspan="6" style="color:red;">${e.message || 'Erro.'}</td></tr>`; }
             }
 
-            /** Carrega o grid de chamados para o Cliente */
             async function loadClientDashboard() {
                 try {
                     const userName = localStorage.getItem('userName') || 'Cliente';
@@ -1235,7 +1225,6 @@
                 } catch (e) { console.error('Erro load cliente:', e); if (e.message !== "Sessão expirada.") gridBody.innerHTML = `<tr><td colspan="4" style="color:red;">${e.message || 'Erro.'}</td></tr>`; }
             }
 
-            /** Carrega Analistas no Dropdown */
             async function carregarAnalistasDropdown(selectElementId, selectedAnalistaId = null) {
                 const select = document.getElementById(selectElementId); if (!select) { console.error("Dropdown não encontrado:", selectElementId); return; }
                 select.options.length = 1;
@@ -1257,21 +1246,17 @@
                 } catch (error) { console.error("Erro carregar analistas:", error); const option = document.createElement('option'); option.value = ""; option.textContent = "Erro ao carregar"; option.disabled = true; select.appendChild(option); }
             }
 
-            /** Atualiza Status pelo Grid */
             async function handleStatusChange(selectElement) {
                 const chamadoId = selectElement.dataset.id; const novoStatus = selectElement.value; if (!chamadoId || !novoStatus) return;
                 selectElement.disabled = true; showMessage(`Salvando...`, false); let statusOriginal = '';
                 try {
-                    // Busca os dados ATUAIS do chamado antes de salvar
                     const rGet = await fetchAutenticado(`${API_URL}/api/Chamado/${chamadoId}`); if (!rGet.ok) throw new Error(`Erro ${rGet.status}.`);
                     const cAtual = await rGet.json(); statusOriginal = cAtual.status || '';
                     if (!cAtual) throw new Error("Não foi possível carregar dados atuais.");
 
-                    // Cria o payload de atualização
                     const data = {
                         Status: novoStatus,
                         Prioridade: cAtual.prioridade || 'Média',
-                        // RoleDesignada: cAtual.roleDesignada || null, // Seu modelo não parece ter isso
                         AnalistaId: cAtual.analistaId || null
                     };
 
@@ -1279,7 +1264,6 @@
                     if (!rPut.ok) { const ed = await rPut.json(); throw new Error(ed.message || `Erro ${rPut.status}.`); }
                     showMessage('Status atualizado!', false);
 
-                    // Recarrega ambos os grids do analista
                     loadEmployeeGrids();
                 } catch (e) { console.error('Erro status grid:', e); if (e.message !== "Sessão expirada.") showMessage(`Erro: ${e.message}`, true); try { selectElement.value = statusOriginal; } catch (revertError) { } }
                 finally { selectElement.disabled = false; }
@@ -1316,7 +1300,6 @@
                         disableForm('analyst-controls', false);
                     }
 
-                    // Lógica para bloquear chat se encerrado/concluído
                     let isBlq = false;
                     if (c.status === 'Encerrado' || c.status === 'Cancelado') {
                         isBlq = true;
@@ -1339,7 +1322,6 @@
                 } catch (e) { console.error('Erro abrir chat:', e); if (e.message !== "Sessão expirada.") showMessage(`Erro chat: ${e.message}`, true); msgA.innerHTML = `<p style="color:red;">Falha ao carregar dados.</p>`; }
             }
 
-            /** Renderiza as mensagens na tela de chat */
             function renderizarMensagens(mensagens) {
                 const area = document.getElementById('chat-messages-area'); if (!area) return; area.innerHTML = '';
                 if (!mensagens || mensagens.length === 0) { area.innerHTML = `<p style="text-align:center; color:#999;">Sem mensagens.</p>`; return; }
@@ -1358,7 +1340,6 @@
                 } catch (err) { console.error("Erro renderizar:", err, mensagens); area.innerHTML = `<p style="color:red;">Erro exibir msgs.</p>`; }
             }
 
-            /** Função para mostrar Abas do Analista */
             function showAnalystTab(tabName) {
                 try {
                     document.querySelectorAll('#employee-dashboard-screen .tab-content').forEach(content => content.classList.remove('active'));
@@ -1372,25 +1353,23 @@
 
             document.getElementById('tab-link-reports').addEventListener('click', () => showAnalystTab('reports'));
             document.getElementById('tab-link-tickets').addEventListener('click', () => showAnalystTab('tickets'));
+            // --- NOVO: Listener para a aba Admin ---
+            document.getElementById('tab-link-admin').addEventListener('click', () => showAnalystTab('admin'));
 
-            // Listeners dos links de navegação
+            // Navegação
             document.getElementById('nav-to-client-register').addEventListener('click', () => showScreen('client-register-screen'));
-            document.getElementById('nav-to-employee-register').addEventListener('click', () => showScreen('employee-register-screen'));
             document.getElementById('nav-c-to-login').addEventListener('click', () => showScreen('login-screen'));
-            document.getElementById('nav-e-to-login').addEventListener('click', () => showScreen('login-screen'));
 
-            // Listeners dos botões de ação
+            // Ações
             document.getElementById('logout-client').addEventListener('click', logout);
             document.getElementById('logout-employee').addEventListener('click', logout);
             document.getElementById('logout-chat').addEventListener('click', logout);
             document.getElementById('chat-btn-back').addEventListener('click', () => { currentChamadoId = null; const s = currentUserType === "Client" ? 'client-dashboard-screen' : 'employee-dashboard-screen'; showScreen(s); if (currentUserType === "Client") loadClientDashboard(); else loadEmployeeDashboard(); });
             document.getElementById('chat-btn-refresh').addEventListener('click', () => { if (currentChamadoId) { showMessage('Atualizando...', false); abrirChat(currentChamadoId); } });
 
-            // Event delegation para cliques nos grids (abrir chat)
+            // Delegação de clique para grids
             function handleGridClick(event) {
-                // Verifica se o clique foi em uma célula clicável
                 if (event.target && event.target.classList.contains('grid-clickable-cell')) {
-                    // Encontra a linha (tr) pai e pega o data-id
                     const chamadoId = event.target.closest('tr').dataset.id;
                     if (chamadoId) abrirChat(chamadoId);
                 }
@@ -1398,12 +1377,9 @@
             document.getElementById('my-assigned-grid-body').addEventListener('click', handleGridClick);
             document.getElementById('analyst-ticket-grid-body').addEventListener('click', handleGridClick);
             document.getElementById('client-ticket-grid-body').addEventListener('click', handleGridClick);
-
-            // --- NOVO LISTENER: Adiciona listener de clique para a nova tabela de Recentes ---
             document.getElementById('report-recentes-body').addEventListener('click', handleGridClick);
 
-
-            // Event delegation para mudança de status
+            // Delegação de mudança de status
             function handleGridStatusChange(event) {
                 if (event.target && event.target.classList.contains('status-select')) {
                     handleStatusChange(event.target);
@@ -1413,23 +1389,22 @@
             document.getElementById('analyst-ticket-grid-body').addEventListener('change', handleGridStatusChange);
 
 
-            // Listeners de submit de formulário
+            // --- Listeners de Submit de Formulário ---
+
             document.getElementById('chat-message-form').addEventListener('submit', async function (ev) {
                 ev.preventDefault(); const i = document.getElementById('chat-message-input'); const c = i.value.trim(); if (!c || !currentChamadoId || !currentUserType) return; disableForm('chat-message-form', true); const ov = c; i.value = '';
                 try {
                     const r = await fetchAutenticado(`${API_URL}/api/Chamado/${currentChamadoId}/mensagem`, { method: 'POST', body: JSON.stringify({ Conteudo: c, TipoRemetente: currentUserType }) }); if (!r.ok) { const ed = await r.json(); throw new Error(ed.message || `Erro ${r.status}.`); } const ms = await r.json(); renderizarMensagens(ms);
-                } catch (e) { console.error(e); if (e.message !== "Sessão expirada.") showMessage(`Falha: ${e.message}`, true); i.value = ov; } finally { disableForm('chat-message-form', false); setTimeout(() => { try { i.focus(); } catch (e) { } }, 100); }
+                } catch (e) { console.error(e); if (e.message !== "Sessão expirada.") showMessage(`Falha: ${e.message}`, true); i.value = ov; } finally { disableForm('chat-message-form', false); }
             });
 
             document.getElementById('btn-save-analyst-changes').addEventListener('click', async () => {
                 if (!currentChamadoId || currentUserType !== 'Employee') return;
                 disableForm('analyst-controls', true);
                 const s = document.getElementById('analyst-select-status').value; const p = document.getElementById('analyst-select-priority').value; const aidV = document.getElementById('analyst-select-assignee').value; const aid = aidV ? parseInt(aidV, 10) : null;
-                // No seu ViewModel, RoleDesignada não existe, então removemos
                 const d = { Status: s, Prioridade: p, AnalistaId: aid };
                 try {
                     const r = await fetchAutenticado(`${API_URL}/api/Chamado/${currentChamadoId}/atualizar`, { method: 'PUT', body: JSON.stringify(d) }); if (!r.ok) { const ed = await r.json(); throw new Error(ed.message || `Erro ${r.status}.`); } showMessage('Salvo!', false);
-                    // Atualiza o chat para refletir o novo status
                     abrirChat(currentChamadoId);
                 } catch (e) { console.error(e); if (e.message !== "Sessão expirada.") showMessage(`Erro: ${e.message}`, true); } finally {
                     disableForm('analyst-controls', false);
@@ -1448,21 +1423,27 @@
                 showMessage('', false); disableForm('login-form', true); const d = { email: document.getElementById('login-email').value, password: document.getElementById('login-password').value };
                 try {
                     const r = await fetch(`${API_URL}/api/Auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) });
-                    const res = await r.json(); // Tenta ler o JSON
+                    const res = await r.json();
                     if (!r.ok) {
-                        // Se não for OK, 'res' contém a mensagem de erro
                         throw new Error(res.message || `Erro ${r.status}.`);
                     }
                     if (!res.token || !res.userName) throw new Error("Resposta de login incompleta.");
+
+                    // --- NOVO: Salva o status de Admin ---
                     localStorage.setItem('jwtToken', res.token);
                     localStorage.setItem('userName', res.userName);
-                    currentUserType = res.userType; document.getElementById('login-form').reset();
+                    localStorage.setItem('isAdmin', res.isAdmin); // Salva 'true' ou 'false'
+
+                    currentUserType = res.userType;
+                    currentUserIsAdmin = res.isAdmin; // Salva na variável de estado
+                    // --- FIM NOVO ---
+
+                    document.getElementById('login-form').reset();
                     if (currentUserType === "Client") { showScreen('client-dashboard-screen'); loadClientDashboard(); }
                     else if (currentUserType === "Employee") { showScreen('employee-dashboard-screen'); loadEmployeeDashboard(); }
                     else { throw new Error('Tipo user desconhecido.'); }
                 } catch (e) {
                     console.error(e);
-                    // Se o erro for 'Unexpected token...', é o erro 500
                     if (e.name === 'SyntaxError' && e.message.includes('Unexpected token')) {
                         showMessage('Falha: Erro interno no servidor (500). Verifique o console do back-end.', true);
                     } else {
@@ -1471,18 +1452,103 @@
                 } finally { disableForm('login-form', false); }
             });
 
-            async function handleRegistration(fId, apiUrl) {
-                const f = document.getElementById(fId); if (!f) return; showMessage('', false); disableForm(fId, true); const pI = f.querySelector('input[type="password"][id$="-password"]'); const cpI = f.querySelector('input[type="password"][id$="-confirm-password"]'); if (pI && cpI && pI.value !== cpI.value) { showMessage('Senhas não conferem.', true); disableForm(fId, false); return; } const vm = {};
-                try {
-                    if (fId === 'client-register-form') { vm.name = document.getElementById('client-name').value; vm.email = document.getElementById('client-email').value; vm.cpf = document.getElementById('client-cpf').value; vm.password = pI.value; vm.confirmPassword = cpI.value; }
-                    else if (fId === 'employee-register-form') { vm.name = document.getElementById('employee-name').value; vm.email = document.getElementById('employee-email').value; vm.role = document.getElementById('employee-role').value; vm.password = pI.value; vm.confirmPassword = cpI.value; }
-                    else { throw new Error("ID inválido."); }
-                } catch (e) { showMessage("Erro lendo form.", true); console.error(e); disableForm(fId, false); return; }
-                try { const r = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(vm) }); if (r.status === 201) { showMessage('Cadastrado! Faça login.', false); showScreen('login-screen'); f.reset(); } else { const err = await r.json(); if (err.errors) { const k = Object.keys(err.errors)[0]; showMessage(err.errors[k][0], true); } else { showMessage(err.message || `Erro ${r.status}.`, true); } } } catch (e) { console.error(`Erro (${fId}):`, e); showMessage('Não foi possível conectar.', true); } finally { disableForm(fId, false); }
-            }
-            document.getElementById('client-register-form').addEventListener('submit', (e) => { e.preventDefault(); handleRegistration('client-register-form', `${API_URL}/api/Registration/client`); });
-            document.getElementById('employee-register-form').addEventListener('submit', (e) => { e.preventDefault(); handleRegistration('employee-register-form', `${API_URL}/api/Registration/employee`); });
+            // --- NOVO: Listener para o formulário de Admin ---
+            document.getElementById('admin-register-form').addEventListener('submit', async function (event) {
+                event.preventDefault();
+                showMessage('', false);
 
+                const p = document.getElementById('admin-password').value;
+                const cp = document.getElementById('admin-confirm-password').value;
+
+                if (p !== cp) {
+                    showMessage('Senhas não conferem.', true);
+                    return;
+                }
+
+                disableForm('admin-register-form', true);
+
+                const data = {
+                    name: document.getElementById('admin-name').value,
+                    email: document.getElementById('admin-email').value,
+                    role: document.getElementById('admin-role').value,
+                    password: p,
+                    confirmPassword: cp,
+                    isAdmin: document.getElementById('admin-is-admin').checked // Pega o valor do checkbox
+                };
+
+                try {
+                    // Usa fetchAutenticado (já envia o token do Admin)
+                    const r = await fetchAutenticado(`${API_URL}/api/Registration/employee`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+
+                    const res = await r.json();
+                    if (!r.ok) {
+                        // Se o back-end retornar um erro (ex: 400), 'res.errors' existirá
+                        const errorMsg = (res.errors && res.errors[0]) ? res.errors[0] : (res.message || `Erro ${r.status}`);
+                        throw new Error(errorMsg);
+                    }
+
+                    // Sucesso!
+                    showMessage('Funcionário registrado com sucesso!', false);
+                    document.getElementById('admin-register-form').reset(); // Limpa o formulário
+
+                } catch (e) {
+                    console.error("Erro ao registrar funcionário:", e);
+                    if (e.message !== "Sessão expirada.") {
+                        showMessage(`Falha: ${e.message}`, true);
+                    }
+                } finally {
+                    disableForm('admin-register-form', false);
+                }
+            });
+            // --- FIM NOVO ---
+
+
+            // Listener de Registro de Cliente (sem alteração)
+            document.getElementById('client-register-form').addEventListener('submit', async function (e) {
+                e.preventDefault();
+                showMessage('', false);
+                disableForm('client-register-form', true);
+
+                const p = document.getElementById('client-password').value;
+                const cp = document.getElementById('client-confirm-password').value;
+                if (p !== cp) {
+                    showMessage('Senhas não conferem.', true);
+                    disableForm('client-register-form', false);
+                    return;
+                }
+
+                const data = {
+                    name: document.getElementById('client-name').value,
+                    email: document.getElementById('client-email').value,
+                    cpf: document.getElementById('client-cpf').value,
+                    password: p,
+                    confirmPassword: cp
+                };
+
+                try {
+                    const r = await fetch(`${API_URL}/api/Registration/client`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                    const res = await r.json();
+                    if (!r.ok) {
+                        const errorMsg = (res.errors && res.errors[0]) ? res.errors[0] : (res.message || `Erro ${r.status}`);
+                        throw new Error(errorMsg);
+                    }
+
+                    showMessage('Cadastrado! Faça login.', false);
+                    showScreen('login-screen');
+                    document.getElementById('client-register-form').reset();
+                } catch (e) {
+                    console.error(`Erro (client-register):`, e);
+                    showMessage(`Falha: ${e.message}`, true);
+                } finally {
+                    disableForm('client-register-form', false);
+                }
+            });
+
+            // Sugestões de FAQ (sem alteração)
             async function buscarSugestoesFaq() {
                 const t = document.getElementById('ticket-titulo').value; const d = document.getElementById('ticket-descricao').value; const sC = document.getElementById('faq-sugestoes-container'); const sL = document.getElementById('faq-sugestoes-list'); if (!sC || !sL) return; sL.innerHTML = ''; sC.style.display = 'none'; if ((t.trim().length + d.trim().length) < 5) return;
                 try { const r = await fetch(`${API_URL}/api/Faq/sugerir`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ Titulo: t, Descricao: d }) }); if (!r.ok) { console.error('Erro sugestões:', r.status); return; } const s = await r.json(); if (s && s.length > 0) { s.forEach(f => { const li = document.createElement('li'); const a = document.createElement('a'); a.href = '#'; a.textContent = f.pergunta; a.title = f.resposta; a.onclick = (e) => { e.preventDefault(); alert(`Resposta:\n\n${f.resposta}`); }; li.appendChild(a); sL.appendChild(li); }); sC.style.display = 'block'; } } catch (e) { console.error('Erro rede sugestões:', e); }
@@ -1491,7 +1557,7 @@
             document.getElementById('ticket-titulo').addEventListener('input', debounceBuscarSugestoes);
             document.getElementById('ticket-descricao').addEventListener('input', debounceBuscarSugestoes);
 
-            console.log("Portal NextLayer (com novos relatórios) inicializado.");
+            console.log("Portal NextLayer (com Painel Admin) inicializado.");
 
         }); // --- FIM DO DOMContentLoaded ---
         /* --- FIM DO JAVASCRIPT --- */

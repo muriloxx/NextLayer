@@ -1,6 +1,4 @@
-﻿// --- ARQUIVO: Controllers/AuthController.cs (COMPLETO E ATUALIZADO) ---
-
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NextLayer.Services;
 using NextLayer.ViewModels;
 using System;
@@ -23,7 +21,7 @@ namespace NextLayer.Controllers
         private readonly IAuthService _authService;
         private readonly IConfiguration _configuration;
 
-        // Construtor atualizado para injetar IConfiguration
+        // Construtor (sem alterações)
         public AuthController(IAuthService authService, IConfiguration configuration)
         {
             _authService = authService;
@@ -40,31 +38,43 @@ namespace NextLayer.Controllers
 
             if (userObject != null)
             {
-                // Gera o token JWT
-                string token = GerarTokenJwt(userObject, userType);
 
-                // --- ATUALIZAÇÃO AQUI ---
-                // Pega o nome do usuário a partir do objeto retornado
-                string userName = (userType == "Client")
-                    ? ((Client)userObject).Name
-                    : ((Employee)userObject).Name;
-                // --- FIM DA ATUALIZAÇÃO ---
+                string userName;
+                bool isAdmin = false; // Padrão é falso (para clientes)
 
-                // Retorna o token, o tipo E o nome do usuário
+                // Define userName e isAdmin com base no tipo de usuário
+                if (userType == "Client")
+                {
+                    userName = ((Client)userObject).Name;
+                    // isAdmin continua false
+                }
+                else // userType == "Employee"
+                {
+                    var employee = (Employee)userObject;
+                    userName = employee.Name;
+                    isAdmin = employee.IsAdmin; // <--- LÊ A NOVA PROPRIEDADE
+                }
+
+                // Gera o token JWT, agora passando o status de admin
+                string token = GerarTokenJwt(userObject, userType, isAdmin); // <--- PARÂMETRO ADICIONADO
+
+                // Retorna o token, o tipo, o nome E o status de admin
                 return Ok(new
                 {
                     message = "Login bem-sucedido!",
                     userType = userType,
                     token = token,
-                    userName = userName // <-- Nome adicionado à resposta
+                    userName = userName,
+                    isAdmin = isAdmin // <--- VALOR ADICIONADO À RESPOSTA
                 });
+
             }
 
             return Unauthorized(new { message = "E-mail ou senha inválidos." });
         }
 
-        // Método privado para gerar o token JWT (sem alterações)
-        private string GerarTokenJwt(object userObject, string userType)
+        // Método privado para gerar o token JWT (agora recebe 'isAdmin')
+        private string GerarTokenJwt(object userObject, string userType, bool isAdmin)
         {
             var jwtKey = _configuration["Jwt:Key"] ?? throw new ArgumentNullException("Jwt:Key não encontrada");
             var issuer = _configuration["Jwt:Issuer"] ?? throw new ArgumentNullException("Jwt:Issuer não encontrado");
@@ -82,7 +92,11 @@ namespace NextLayer.Controllers
                 // ClaimTypes.Role é usado pelo [Authorize(Roles = "...")]
                 new Claim(ClaimTypes.Role, userType),
                 // ClaimTypes.Name é o padrão para o nome
-                new Claim(ClaimTypes.Name, (userType == "Client" ? ((Client)userObject).Name : ((Employee)userObject).Name))
+                new Claim(ClaimTypes.Name, (userType == "Client" ? ((Client)userObject).Name : ((Employee)userObject).Name)),
+                
+                // Adicionamos a claim "isAdmin" ao token.
+                // O .ToString() converte o booleano (true/false) para a string "True"/"False"
+                new Claim("isAdmin", isAdmin.ToString())
             };
 
             var token = new JwtSecurityToken(
