@@ -112,6 +112,15 @@
                 background-color: #218838;
             }
 
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+            .btn-warning:hover {
+                background-color: #e0a800;
+            }
+
         .nav-links {
             text-align: center;
             margin-top: 1.5rem;
@@ -261,6 +270,55 @@
             text-decoration: underline;
             color: #0056b3;
         }
+
+        /* --- NOVO: Estilos para botões de grid --- */
+        .btn-grid-edit, .btn-grid-delete {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.85rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .btn-grid-edit {
+            background-color: #e7f3ff;
+            color: #0056b3;
+            border-color: #b8d6f3;
+        }
+
+            .btn-grid-edit:hover {
+                background-color: #cce5ff;
+            }
+
+        .btn-grid-delete {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+            .btn-grid-delete:hover {
+                background-color: #f1b0b7;
+            }
+
+        .btn-grid-cancel {
+            width: auto;
+            margin-top: 0;
+            margin-left: 10px;
+            padding: 0.85rem;
+            font-size: 1rem;
+            background-color: #6c757d;
+        }
+
+            .btn-grid-cancel:hover {
+                background-color: #5a6268;
+            }
+
+        .hidden {
+            display: none;
+        }
+        /* --- FIM NOVO --- */
+
 
         .ticket-grid td:last-child, .ticket-grid th:last-child {
             padding-right: 1rem;
@@ -785,34 +843,56 @@
             </div>
 
             <div id="tab-content-admin" class="tab-content">
-                <h3>Cadastrar Novo Funcionário</h3>
-                <p>Use este formulário para criar novas contas de Analista ou Administrador.</p>
+
+                <h3>Funcionários Cadastrados</h3>
+                <div class="ticket-grid-container" style="margin-top: 1rem; max-height: 250px;">
+                    <table class="ticket-grid">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>E-mail</th>
+                                <th>Cargo</th>
+                                <th>Admin?</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employee-list-body">
+                            <tr><td colspan="5" class="db-loading" style="text-align: center;">Carregando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h3 style="margin-top: 2.5rem; border-top: 1px solid #eee; padding-top: 2rem;" id="admin-form-title">Cadastrar Novo Funcionário</h3>
+                <p id="admin-form-desc">Use este formulário para criar novas contas de Analista ou Administrador.</p>
+
                 <form id="admin-register-form">
+                    <input type="hidden" id="admin-editing-user-id" value="">
+
                     <div class="form-group"> <label for="admin-name">Nome Completo</label> <input type="text" id="admin-name" required autocomplete="name"> </div>
+
                     <div class="form-group"> <label for="admin-email">E-mail Institucional</label> <input type="email" id="admin-email" required autocomplete="email"> </div>
+
                     <div class="form-group"> <label for="admin-role">Cargo (Ex: Analista N1, Admin)</label> <input type="text" id="admin-role" required> </div>
-                    <div class="form-group"> <label for="admin-password">Senha (mín. 6)</label> <input type="password" id="admin-password" minlength="6" required autocomplete="new-password"> </div>
-                    <div class="form-group"> <label for="admin-confirm-password">Confirmar Senha</label> <input type="password" id="admin-confirm-password" required autocomplete="new-password"> </div>
+
+                    <div id="admin-password-group">
+                        <div class="form-group"> <label for="admin-password">Senha (mín. 6)</label> <input type="password" id="admin-password" minlength="6" required autocomplete="new-password"> </div>
+                        <div class="form-group"> <label for="admin-confirm-password">Confirmar Senha</label> <input type="password" id="admin-confirm-password" required autocomplete="new-password"> </div>
+                    </div>
                     <div class="admin-checkbox-group"> <input type="checkbox" id="admin-is-admin"> <label for="admin-is-admin">Tornar este usuário um Administrador</label> </div>
-                    <button type="submit" class="btn">Cadastrar Novo Funcionário</button>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit" class="btn" id="admin-submit-button">Cadastrar Novo Funcionário</button>
+                        <button type="button" class="btn btn-grid-cancel hidden" id="btn-cancel-edit">Cancelar Edição</button>
+                    </div>
                 </form>
+
 
                 <h3 style="margin-top: 2.5rem; border-top: 1px solid #eee; padding-top: 2rem;">Redefinir Senha de Usuário</h3>
                 <p>Use este formulário para forçar uma nova senha para qualquer usuário (Cliente ou Funcionário) que a esqueceu.</p>
                 <form id="admin-reset-password-form">
-                    <div class="form-group">
-                        <label for="admin-reset-email">E-mail do Usuário (Cliente ou Funcionário)</label>
-                        <input type="email" id="admin-reset-email" required autocomplete="email">
-                    </div>
-                    <div class="form-group">
-                        <label for="admin-reset-nova-senha">Nova Senha (mín. 6)</label>
-                        <input type="password" id="admin-reset-nova-senha" minlength="6" required autocomplete="new-password">
-                    </div>
-                    <div class="form-group">
-                        <label for="admin-reset-confirmar-nova-senha">Confirmar Nova Senha</label>
-                        <input type="password" id="admin-reset-confirmar-nova-senha" required autocomplete="new-password">
-                    </div>
-                    <button type="submit" class="btn btn-success">Redefinir Senha do Usuário</button>
+                    <div class="form-group"> <label for="admin-reset-email">E-mail do Usuário (Cliente ou Funcionário)</label> <input type="email" id="admin-reset-email" required autocomplete="email"> </div>
+                    <div class="form-group"> <label for="admin-reset-nova-senha">Nova Senha (mín. 6)</label> <input type="password" id="admin-reset-nova-senha" minlength="6" required autocomplete="new-password"> </div>
+                    <div class="form-group"> <label for="admin-reset-confirmar-nova-senha">Confirmar Nova Senha</label> <input type="password" id="admin-reset-confirmar-nova-senha" required autocomplete="new-password"> </div>
+                    <button type="submit" class="btn btn-warning">Redefinir Senha do Usuário</button>
                 </form>
             </div>
 
@@ -855,6 +935,8 @@
             // --- CONFIGURAÇÃO E VARIÁVEIS GLOBAIS ---
             const API_URL = "https://localhost:7121";
             const DASHBOARD_API_URL = `${API_URL}/api/dashboard`;
+            // --- NOVO: API de Funcionários ---
+            const EMPLOYEE_API_URL = `${API_URL}/api/employee`;
 
             const MAX_FILE_SIZE_MB = 5;
             const MAX_TOTAL_FILES = 5;
@@ -869,205 +951,38 @@
             let listaAnalistasCache = null;
             let statsChartInstance = null;
 
-            // --- FUNÇÕES AUXILIARES ---
+            // --- NOVO: Cache para a lista de funcionários (para edição) ---
+            let employeeListCache = [];
 
-            function showScreen(screenId) {
-                try {
-                    document.querySelectorAll('.screen').forEach(screen => {
-                        if (screen) screen.classList.remove('active');
-                    });
-                    const screenToShow = document.getElementById(screenId);
-                    if (screenToShow) {
-                        screenToShow.classList.add('active');
-                        if (screenId.includes('dashboard-screen')) {
-                            mainContainer.classList.add('dashboard-active');
-                        } else {
-                            mainContainer.classList.remove('dashboard-active');
-                        }
-                    } else {
-                        console.error("Tela Inválida:", screenId);
-                        document.getElementById('login-screen').classList.add('active');
-                        mainContainer.classList.remove('dashboard-active');
-                    }
-                    showMessage('', false);
-                    window.scrollTo(0, 0);
-                } catch (e) { console.error("Erro em showScreen:", e); }
-            }
+            // --- FUNÇÕES AUXILIARES (Sem alterações) ---
+            function showScreen(screenId) { try { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); const sS = document.getElementById(screenId); if (sS) { sS.classList.add('active'); if (screenId.includes('dashboard-screen')) { mainContainer.classList.add('dashboard-active'); } else { mainContainer.classList.remove('dashboard-active'); } } else { console.error("Tela Inválida:", screenId); document.getElementById('login-screen').classList.add('active'); mainContainer.classList.remove('dashboard-active'); } showMessage('', false); window.scrollTo(0, 0); } catch (e) { console.error("Erro em showScreen:", e); } }
+            function showMessage(message, isError = false) { if (!messageArea) return; try { if (messageArea.timerId) clearTimeout(messageArea.timerId); messageArea.textContent = message; messageArea.className = message ? (isError ? 'error' : 'success') : ''; const t = isError ? 8000 : 5000; if (message) { messageArea.timerId = setTimeout(() => { showMessage(''); }, t); } } catch (e) { console.error("Erro em showMessage:", e); } }
+            function formatISODate(iso) { if (!iso) return '-'; try { return new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch (e) { console.error("Erro formatar data:", iso, e); return iso; } }
+            function formatISODateRecente(iso) { if (!iso) return '-'; try { return new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }); } catch (e) { return iso; } }
+            function disableForm(formId, disable = true) { try { const f = document.getElementById(formId); if (!f) { console.warn("Elemento não encontrado:", formId); return; } const els = f.querySelectorAll('input, select, textarea, button'); els.forEach(el => { if (el) el.disabled = disable; }); let btn; if (formId === 'analyst-controls') { btn = document.getElementById('btn-save-analyst-changes'); } else if (f.tagName === 'FORM') { btn = f.querySelector('button[type="submit"]'); } else { return; } if (btn) { const oTxt = btn.dataset.originalText || btn.textContent; if (disable && !btn.dataset.originalText) { btn.dataset.originalText = oTxt; } let wTxt = 'Aguarde...'; if (formId === 'analyst-controls' || formId.startsWith('mudar-senha-form') || formId === 'admin-reset-password-form') { wTxt = 'Salvando...'; } if (formId === 'admin-register-form') { wTxt = 'Cadastrando...'; } if (formId === 'client-ticket-form') { wTxt = 'Enviando...'; } btn.textContent = disable ? wTxt : oTxt; if (!disable) delete btn.dataset.originalText; } } catch (e) { console.error("Erro em disableForm:", e, formId); } }
+            function logout() { currentUserType = null; currentChamadoId = null; listaAnalistasCache = null; currentUserIsAdmin = false; localStorage.removeItem('jwtToken'); localStorage.removeItem('userName'); localStorage.removeItem('isAdmin'); try { document.getElementById('analyst-ticket-grid-body').innerHTML = ''; } catch (e) { } try { document.getElementById('my-assigned-grid-body').innerHTML = ''; } catch (e) { } try { document.getElementById('client-ticket-grid-body').innerHTML = ''; } catch (e) { } try { if (statsChartInstance) { statsChartInstance.destroy(); statsChartInstance = null; } const sC = document.getElementById('dashboard-stats-container'); if (sC) { sC.innerHTML = '<p id="stats-loading-message" style="color: #666;">Carregando...</p>'; } } catch (e) { } try { document.getElementById('report-total-abertos').innerHTML = '<div class="db-stat-number db-loading">...</div>'; } catch (e) { } try { document.getElementById('report-por-prioridade').innerHTML = '<li class="db-loading">Carregando...</li>'; } catch (e) { } try { document.getElementById('report-recentes-body').innerHTML = '<tr><td colspan="4" class="db-loading" style="text-align: center;">Carregando...</td></tr>'; } catch (e) { } try { document.getElementById('employee-list-body').innerHTML = ''; } catch (e) { } ['login-form', 'client-register-form', 'client-ticket-form', 'chat-message-form', 'analyst-controls', 'admin-register-form', 'mudar-senha-form-client', 'mudar-senha-form-employee', 'admin-reset-password-form'].forEach(id => { const el = document.getElementById(id); if (el) { if (el.tagName === 'FORM') el.reset(); else { try { el.querySelectorAll('select').forEach(s => s.selectedIndex = 0); el.querySelectorAll('input:not([type=hidden])').forEach(i => i.value = ''); } catch (e) { } } } }); try { document.getElementById('client-dashboard-title').textContent = "Portal do Cliente"; } catch (e) { } try { document.getElementById('employee-dashboard-title').textContent = "Painel do Analista"; } catch (e) { } try { document.getElementById('tab-link-admin').style.display = 'none'; } catch (e) { } showScreen('login-screen'); }
+            async function fetchAutenticado(url, options = {}) { const t = localStorage.getItem('jwtToken'); const h = new Headers(options.headers || {}); if (t) { h.append('Authorization', `Bearer ${t}`); } if (options.body && !(options.body instanceof FormData) && !h.has('Content-Type')) { h.append('Content-Type', 'application/json'); } options.headers = h; const r = await fetch(url, options); if (r.status === 401) { console.warn("401. Forçando logout."); showMessage("Sessão expirada. Faça login.", true); logout(); throw new Error("Sessão expirada."); } if (r.status === 403) { console.warn("403. Proibido."); try { const e = await r.json(); throw new Error(e.message || "Acesso negado."); } catch (e) { throw new Error("Acesso negado."); } } return r; }
 
-            function showMessage(message, isError = false) {
-                if (!messageArea) return;
-                try {
-                    if (messageArea.timerId) clearTimeout(messageArea.timerId);
-                    messageArea.textContent = message;
-                    messageArea.className = message ? (isError ? 'error' : 'success') : '';
-                    const timeout = isError ? 8000 : 5000;
-                    if (message) {
-                        messageArea.timerId = setTimeout(() => { showMessage(''); }, timeout);
-                    }
-                } catch (e) { console.error("Erro em showMessage:", e); }
-            }
-
-            function formatISODate(isoDateString) {
-                if (!isoDateString) return '-';
-                try {
-                    return new Date(isoDateString).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-                } catch (e) { console.error("Erro formatar data:", isoDateString, e); return isoDateString; }
-            }
-
-            function formatISODateRecente(isoDateString) {
-                if (!isoDateString) return '-';
-                try {
-                    return new Date(isoDateString).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                } catch (e) { return isoDateString; }
-            }
-
-            function disableForm(formId, disable = true) {
-                try {
-                    const formOrDiv = document.getElementById(formId);
-                    if (!formOrDiv) { console.warn("Elemento não encontrado:", formId); return; }
-                    const elements = formOrDiv.querySelectorAll('input, select, textarea, button');
-                    elements.forEach(el => { if (el) el.disabled = disable; });
-                    let button;
-                    if (formId === 'analyst-controls') { button = document.getElementById('btn-save-analyst-changes'); }
-                    else if (formOrDiv.tagName === 'FORM') { button = formOrDiv.querySelector('button[type="submit"]'); }
-                    else { return; }
-                    if (button) {
-                        const originalText = button.dataset.originalText || button.textContent;
-                        if (disable && !button.dataset.originalText) { button.dataset.originalText = originalText; }
-                        let waitText = 'Aguarde...';
-                        if (formId === 'analyst-controls' || formId.startsWith('mudar-senha-form') || formId === 'admin-reset-password-form') { waitText = 'Salvando...'; }
-                        if (formId === 'admin-register-form') { waitText = 'Cadastrando...'; }
-                        button.textContent = disable ? waitText : originalText;
-                        if (!disable) delete button.dataset.originalText;
-                    }
-                } catch (e) { console.error("Erro em disableForm:", e, formId); }
-            }
-
-            function logout() {
-                currentUserType = null; currentChamadoId = null; listaAnalistasCache = null; currentUserIsAdmin = false;
-                localStorage.removeItem('jwtToken'); localStorage.removeItem('userName'); localStorage.removeItem('isAdmin');
-                try { document.getElementById('analyst-ticket-grid-body').innerHTML = ''; } catch (e) { }
-                try { document.getElementById('my-assigned-grid-body').innerHTML = ''; } catch (e) { }
-                try { document.getElementById('client-ticket-grid-body').innerHTML = ''; } catch (e) { }
-                try {
-                    if (statsChartInstance) { statsChartInstance.destroy(); statsChartInstance = null; }
-                    const statsContainer = document.getElementById('dashboard-stats-container');
-                    if (statsContainer) { statsContainer.innerHTML = '<p id="stats-loading-message" style="color: #666;">Carregando...</p>'; }
-                } catch (e) { }
-                try { document.getElementById('report-total-abertos').innerHTML = '<div class="db-stat-number db-loading">...</div>'; } catch (e) { }
-                try { document.getElementById('report-por-prioridade').innerHTML = '<li class="db-loading">Carregando...</li>'; } catch (e) { }
-                try { document.getElementById('report-recentes-body').innerHTML = '<tr><td colspan="4" class="db-loading" style="text-align: center;">Carregando...</td></tr>'; } catch (e) { }
-                ['login-form', 'client-register-form', 'client-ticket-form', 'chat-message-form', 'analyst-controls', 'admin-register-form', 'mudar-senha-form-client', 'mudar-senha-form-employee', 'admin-reset-password-form'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) {
-                        if (el.tagName === 'FORM') el.reset();
-                        else { try { el.querySelectorAll('select').forEach(s => s.selectedIndex = 0); el.querySelectorAll('input:not([type=hidden])').forEach(i => i.value = ''); } catch (e) { } }
-                    }
-                });
-                try { document.getElementById('client-dashboard-title').textContent = "Portal do Cliente"; } catch (e) { }
-                try { document.getElementById('employee-dashboard-title').textContent = "Painel do Analista"; } catch (e) { }
-                try { document.getElementById('tab-link-admin').style.display = 'none'; } catch (e) { }
-                showScreen('login-screen');
-            }
-
-            async function fetchAutenticado(url, options = {}) {
-                const token = localStorage.getItem('jwtToken');
-                const headers = new Headers(options.headers || {});
-                if (token) { headers.append('Authorization', `Bearer ${token}`); }
-                if (options.body && !(options.body instanceof FormData) && !headers.has('Content-Type')) {
-                    headers.append('Content-Type', 'application/json');
-                }
-                options.headers = headers;
-                const response = await fetch(url, options);
-                if (response.status === 401) { console.warn("401. Forçando logout."); showMessage("Sessão expirada. Faça login.", true); logout(); throw new Error("Sessão expirada."); }
-                if (response.status === 403) { console.warn("403. Proibido."); try { const e = await response.json(); throw new Error(e.message || "Acesso negado."); } catch (e) { throw new Error("Acesso negado."); } }
-                return response;
-            }
-
-            // --- LÓGICA DE CARREGAMENTO DOS PAINÉIS ---
-            async function loadNewDashboardReports() {
-                const totalEl = document.getElementById('report-total-abertos');
-                const prioridadeEl = document.getElementById('report-por-prioridade');
-                const recentesEl = document.getElementById('report-recentes-body');
-                if (totalEl) totalEl.innerHTML = '<div class="db-stat-number db-loading">...</div>';
-                if (prioridadeEl) prioridadeEl.innerHTML = '<li class="db-loading">Carregando...</li>';
-                if (recentesEl) recentesEl.innerHTML = '<tr><td colspan="4" class="db-loading" style="text-align: center;">Carregando...</td></tr>';
-                try {
-                    const [totalResponse, prioridadeResponse, recentesResponse] = await Promise.all([
-                        fetchAutenticado(`${DASHBOARD_API_URL}/total-abertos`),
-                        fetchAutenticado(`${DASHBOARD_API_URL}/por-prioridade`),
-                        fetchAutenticado(`${DASHBOARD_API_URL}/recentes?dias=7`)
-                    ]);
-                    if (totalResponse.ok) { renderNewTotal(totalEl, await totalResponse.json()); } else { renderNewTotal(totalEl, 'Erro'); }
-                    if (prioridadeResponse.ok) { renderNewPrioridade(prioridadeEl, await prioridadeResponse.json()); } else { renderNewPrioridade(prioridadeEl, null, true); }
-                    if (recentesResponse.ok) { renderNewRecentes(recentesEl, await recentesResponse.json()); } else { renderNewRecentes(recentesEl, null, true); }
-                } catch (error) {
-                    console.error('Erro ao carregar novos relatórios:', error);
-                    if (error.message !== "Sessão expirada.") { renderNewTotal(totalEl, 'X'); renderNewPrioridade(prioridadeEl, null, true); renderNewRecentes(recentesEl, null, true); }
-                }
-            }
-            function renderNewTotal(element, total) { if (!element) return; element.textContent = total; element.classList.remove('db-loading'); if (isNaN(total)) element.style.fontSize = "2rem"; else element.style.fontSize = "3.5rem"; }
-            function renderNewPrioridade(listElement, prioridadeData, isError = false) { if (!listElement) return; listElement.innerHTML = ''; if (isError) { listElement.innerHTML = '<li style="color: red;">Erro ao carregar.</li>'; return; } if (!prioridadeData || Object.keys(prioridadeData).length === 0) { listElement.innerHTML = '<li>Nenhum chamado aberto.</li>'; return; } const entries = Object.entries(prioridadeData); entries.forEach(([prioridade, total]) => { const li = document.createElement('li'); li.innerHTML = `<strong>${prioridade}</strong> <span>${total}</span>`; listElement.appendChild(li); }); }
-            function renderNewRecentes(tableBodyElement, recentesData, isError = false) { if (!tableBodyElement) return; tableBodyElement.innerHTML = ''; if (isError) { tableBodyElement.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Erro ao carregar.</td></tr>'; return; } if (!recentesData || recentesData.length === 0) { tableBodyElement.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhum chamado aberto recentemente.</td></tr>'; return; } recentesData.forEach(chamado => { const tr = document.createElement('tr'); tr.innerHTML = ` <td data-action="abrirChat" class="grid-clickable-cell">${chamado.numeroChamado || chamado.id}</td> <td>${chamado.titulo || '-'}</td> <td>${formatISODateRecente(chamado.dataAbertura)}</td> <td>${chamado.status || '-'}</td> `; tr.dataset.id = chamado.id; tableBodyElement.appendChild(tr); }); }
-            async function loadDashboardStats() {
-                const statsContainer = document.getElementById('dashboard-stats-container'); const loadingMessage = document.getElementById('stats-loading-message'); if (!statsContainer) return; if (statsContainer.querySelector('.stats-layout')) statsContainer.querySelector('.stats-layout').remove(); if (statsChartInstance) { statsChartInstance.destroy(); statsChartInstance = null; } if (loadingMessage) { loadingMessage.textContent = "Carregando estatísticas..."; loadingMessage.style.display = 'block'; } else { statsContainer.innerHTML = '<p id="stats-loading-message" style="color: #666;">Carregando...</p>'; }
-                try {
-                    const response = await fetchAutenticado(`${API_URL}/api/Dashboard/stats/por-status`); if (!response.ok) { const e = await response.json(); throw new Error(e.message || `Erro ${response.status}`); } const stats = await response.json(); const loadingMsg = document.getElementById('stats-loading-message'); if (loadingMsg) loadingMsg.style.display = 'none'; if (!stats || stats.length === 0) { statsContainer.innerHTML = '<p id="stats-loading-message">Nenhuma estatística encontrada.</p>'; return; }
-                    statsContainer.innerHTML = ` <div class="stats-layout"> <div class="stats-numeros"><ul id="stats-list"></ul></div> <div class="stats-grafico"><canvas id="stats-chart-canvas"></canvas></div> </div> `; const statsList = document.getElementById('stats-list'); let total = 0; stats.forEach(item => { total += item.contagem; statsList.innerHTML += `<li><span class="stat-label">${item.status}</span><span class="stat-count">${item.contagem}</span></li>`; }); statsList.innerHTML += `<li style="border-top:2px solid #007bff; margin-top:0.5rem; padding-top:0.5rem;"><span class="stat-label"><strong>Total</strong></span><span class="stat-count"><strong>${total}</strong></span></li>`; if (typeof Chart !== 'undefined') { const ctx = document.getElementById('stats-chart-canvas').getContext('2d'); statsChartInstance = new Chart(ctx, { type: 'pie', data: { labels: stats.map(i => i.status), datasets: [{ data: stats.map(i => i.contagem), backgroundColor: ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(255, 206, 86, 0.7)', 'rgba(75, 192, 192, 0.7)', 'rgba(153, 102, 255, 0.7)', 'rgba(255, 159, 64, 0.7)', 'rgba(100, 100, 100, 0.7)'], borderColor: '#fff', borderWidth: 1 }] }, options: { responsive: true, plugins: { legend: { position: 'top' }, title: { display: true, text: 'Distribuição de Status' } } } }); } else { console.error("Chart.js não foi carregado."); const g = document.querySelector('.stats-grafico'); if (g) g.innerHTML = `<p style="color:red;">Erro: Gráfico não carregou.</p>`; }
-                } catch (error) { console.error("Erro stats:", error); if (error.message !== "Sessão expirada.") { const m = document.getElementById('stats-loading-message'); if (m) m.style.display = 'none'; else statsContainer.innerHTML = ''; statsContainer.innerHTML += `<p style="color:red;">Erro: ${error.message}</p>`; } }
-            }
-            async function loadEmployeeDashboard() {
-                try { const userName = localStorage.getItem('userName') || 'Analista'; document.getElementById('employee-dashboard-title').innerHTML = `Painel do Analista <span class="user-name">(${userName})</span>`; } catch (e) { console.error("Erro setar nome analista:", e); }
-                try { const adminTab = document.getElementById('tab-link-admin'); if (currentUserIsAdmin) { adminTab.style.display = 'block'; } else { adminTab.style.display = 'none'; } } catch (e) { console.error("Erro ao mostrar/esconder aba admin:", e); }
-                showAnalystTab('reports'); loadNewDashboardReports(); loadDashboardStats(); loadEmployeeGrids();
-            }
-            async function loadEmployeeGrids() {
-                const myGridBody = document.getElementById('my-assigned-grid-body'); if (myGridBody) { myGridBody.innerHTML = `<tr><td colspan="5">Carregando...</td></tr>`; try { const response = await fetchAutenticado(`${API_URL}/api/Chamado/meus-chamados-analista`); if (!response.ok) throw new Error(`Erro ${response.status}.`); const chamados = await response.json(); myGridBody.innerHTML = ''; if (!chamados || chamados.length === 0) { myGridBody.innerHTML = `<tr><td colspan="5">Nenhum chamado.</td></tr>`; } else { chamados.forEach(c => { const opts = ["Aberto (IA)", "Aguardando Analista", "Em Andamento (Analista)", "Aguardando Cliente", "Concluído", "Encerrado", "Cancelado"]; let selHtml = `<select class="status-select" data-id="${c.id}" data-grid-type="my-grid">`; opts.forEach(opt => { selHtml += `<option value="${opt}" ${opt === (c.status || '') ? 'selected' : ''}>${opt}</option>`; }); selHtml += `</select>`; myGridBody.innerHTML += `<tr data-id="${c.id}"><td data-action="abrirChat" class="grid-clickable-cell">${c.numeroChamado || '-'}</td><td>${c.titulo || '-'}</td><td>${c.nomeCliente || '-'}</td><td>${formatISODate(c.dataAbertura)}</td> <td>${selHtml}</td></tr>`; }); } } catch (e) { console.error('Erro meus chamados:', e); if (e.message !== "Sessão expirada.") myGridBody.innerHTML = `<tr><td colspan="5" style="color:red;">${e.message || 'Erro.'}</td></tr>`; } }
-                const gridBody = document.getElementById('analyst-ticket-grid-body'); if (!gridBody) return; gridBody.innerHTML = `<tr><td colspan="6">Carregando...</td></tr>`; try { const response = await fetchAutenticado(`${API_URL}/api/Chamado/abertos`); if (!response.ok) throw new Error(`Erro ${response.status}.`); const chamados = await response.json(); gridBody.innerHTML = ''; if (!chamados || chamados.length === 0) { gridBody.innerHTML = `<tr><td colspan="6">Nenhum chamado.</td></tr>`; return; } chamados.forEach(c => { const opts = ["Aberto (IA)", "Aguardando Analista", "Em Andamento (Analista)", "Aguardando Cliente", "Concluído", "Encerrado", "Cancelado"]; let selHtml = `<select class="status-select" data-id="${c.id}" data-grid-type="all-grid">`; opts.forEach(opt => { selHtml += `<option value="${opt}" ${opt === (c.status || '') ? 'selected' : ''}>${opt}</option>`; }); selHtml += `</select>`; gridBody.innerHTML += `<tr data-id="${c.id}"><td data-action="abrirChat" class="grid-clickable-cell">${c.numeroChamado || '-'}</td><td>${c.titulo || '-'}</td><td>${c.nomeCliente || '-'}</td><td>${formatISODate(c.dataAbertura)}</td><td>${selHtml}</td><td>${c.nomeAnalista || '--'}</td></tr>`; }); } catch (e) { console.error('Erro todos chamados:', e); if (e.message !== "Sessão expirada.") gridBody.innerHTML = `<tr><td colspan="6" style="color:red;">${e.message || 'Erro.'}</td></tr>`; }
-            }
-            async function loadClientDashboard() {
-                try { const userName = localStorage.getItem('userName') || 'Cliente'; document.getElementById('client-dashboard-title').innerHTML = `Portal do Cliente <span class="user-name">(${userName})</span>`; } catch (e) { console.error("Erro setar nome cliente:", e); }
-                showClientTab('client-novo'); const gridBody = document.getElementById('client-ticket-grid-body'); if (!gridBody) return; gridBody.innerHTML = `<tr><td colspan="4">Carregando...</td></tr>`;
-                try {
-                    const response = await fetchAutenticado(`${API_URL}/api/Chamado/meuschamados`); if (!response.ok) throw new Error(`Erro ${response.status}.`); const chamados = await response.json(); gridBody.innerHTML = ''; if (!chamados || chamados.length === 0) { gridBody.innerHTML = `<tr><td colspan="4">Nenhum chamado.</td></tr>`; return; }
-                    chamados.forEach(c => { gridBody.innerHTML += `<tr data-id="${c.id}"><td data-action="abrirChat" class="grid-clickable-cell">${c.numeroChamado || '-'}</td><td data-action="abrirChat" class="grid-clickable-cell">${c.titulo || '-'}</td><td>${formatISODate(c.dataAbertura)}</td><td>${c.status || '-'}</td></tr>`; });
-                } catch (e) { console.error('Erro load cliente:', e); if (e.message !== "Sessão expirada.") gridBody.innerHTML = `<tr><td colspan="4" style="color:red;">${e.message || 'Erro.'}</td></tr>`; }
-            }
-            async function carregarAnalistasDropdown(selectElementId, selectedAnalistaId = null) {
-                const select = document.getElementById(selectElementId); if (!select) { console.error("Dropdown não encontrado:", selectElementId); return; } select.options.length = 1;
-                try {
-                    if (!listaAnalistasCache) { console.log("Buscando analistas da API..."); const response = await fetchAutenticado(`${API_URL}/api/Employee/analistas`); if (!response.ok) throw new Error(`Erro ${response.status} buscando analistas.`); listaAnalistasCache = await response.json(); }
-                    if (listaAnalistasCache && listaAnalistasCache.length > 0) { listaAnalistasCache.forEach(analista => { const option = document.createElement('option'); option.value = analista.id; option.textContent = `${analista.nome} (${analista.funcao || 'N/A'})`; if (selectedAnalistaId && analista.id === selectedAnalistaId) { option.selected = true; } select.appendChild(option); }); }
-                } catch (error) { console.error("Erro carregar analistas:", error); const option = document.createElement('option'); option.value = ""; option.textContent = "Erro ao carregar"; option.disabled = true; select.appendChild(option); }
-            }
-            async function handleStatusChange(selectElement) {
-                const chamadoId = selectElement.dataset.id; const novoStatus = selectElement.value; if (!chamadoId || !novoStatus) return; selectElement.disabled = true; showMessage(`Salvando...`, false); let statusOriginal = '';
-                try {
-                    const rGet = await fetchAutenticado(`${API_URL}/api/Chamado/${chamadoId}`); if (!rGet.ok) throw new Error(`Erro ${rGet.status}.`); const cAtual = await rGet.json(); statusOriginal = cAtual.status || ''; if (!cAtual) throw new Error("Não foi possível carregar dados atuais."); const data = { Status: novoStatus, Prioridade: cAtual.prioridade || 'Média', AnalistaId: cAtual.analistaId || null }; const rPut = await fetchAutenticado(`${API_URL}/api/Chamado/${chamadoId}/atualizar`, { method: 'PUT', body: JSON.stringify(data) }); if (!rPut.ok) { const ed = await rPut.json(); throw new Error(ed.message || `Erro ${rPut.status}.`); } showMessage('Status atualizado!', false); loadEmployeeGrids();
-                } catch (e) { console.error('Erro status grid:', e); if (e.message !== "Sessão expirada.") showMessage(`Erro: ${e.message}`, true); try { selectElement.value = statusOriginal; } catch (revertError) { } } finally { selectElement.disabled = false; }
-            }
-            async function abrirChat(chamadoId) {
-                if (!chamadoId) return; currentChamadoId = chamadoId; showScreen('chat-screen'); const controlsDiv = document.getElementById('analyst-controls'); const chatInput = document.getElementById('chat-message-input'); const tit = document.getElementById('chat-titulo'); const num = document.getElementById('chat-numero'); const anexC = document.getElementById('chat-anexos-container'); const anexL = document.getElementById('chat-anexos-list'); const msgA = document.getElementById('chat-messages-area'); tit.textContent = 'Carregando...'; num.textContent = '...'; if (anexL) anexL.innerHTML = ''; if (anexC) anexC.style.display = 'none'; if (msgA) msgA.innerHTML = '<p style="text-align:center; color:#999;">Carregando...</p>'; disableForm('chat-message-form', true); disableForm('analyst-controls', true); if (controlsDiv) controlsDiv.style.display = 'none'; currentChamadoDetails = null;
-                try {
-                    const response = await fetchAutenticado(`${API_URL}/api/Chamado/${chamadoId}`); if (!response.ok) throw new Error(`Erro ${response.status}.`); currentChamadoDetails = await response.json(); const c = currentChamadoDetails; console.log("Dados chat:", c); if (!c) throw new Error("Resposta inválida (null)."); tit.textContent = c.titulo || 'S/ Título'; num.textContent = `${c.numeroChamado || 'N/A'} (${c.status || 'N/A'})`; if (c.anexos && c.anexos.length > 0) { let html = ''; c.anexos.forEach(a => { if (a.urlArquivo && a.nomeArquivo) { const safe = a.nomeArquivo.replace(/</g, "&lt;").replace(/>/g, "&gt;"); html += `<li><a href="${a.urlArquivo}" target="_blank">${safe}</a></li>`; } }); if (html) { anexL.innerHTML = html; anexC.style.display = 'block'; } } renderizarMensagens(c.mensagens || []);
-                    if (currentUserType === 'Employee') { controlsDiv.style.display = 'block'; try { document.getElementById('analyst-select-status').value = c.status || ''; } catch (e) { console.warn(e); } try { document.getElementById('analyst-select-priority').value = c.prioridade || 'Média'; } catch (e) { console.warn(e); } await carregarAnalistasDropdown('analyst-select-assignee', c.analistaId); disableForm('analyst-controls', false); }
-                    let isBlq = false; if (c.status === 'Encerrado' || c.status === 'Cancelado') { isBlq = true; } else if (c.status === 'Concluído' && c.dataConclusao) { try { const dC = new Date(c.dataConclusao); const ag = new Date(); const dH = (ag - dC) / 36e5; if (dH > 72) isBlq = true; } catch (e) { console.error(e); } } if (isBlq && currentUserType === 'Client') { chatInput.placeholder = "Este chamado está encerrado."; showMessage("Este chamado está encerrado.", true); disableForm('chat-message-form', true); } else { chatInput.placeholder = "Digite sua mensagem..."; disableForm('chat-message-form', false); }
-                } catch (e) { console.error('Erro abrir chat:', e); if (e.message !== "Sessão expirada.") showMessage(`Erro chat: ${e.message}`, true); msgA.innerHTML = `<p style="color:red;">Falha ao carregar dados.</p>`; }
-            }
-            function renderizarMensagens(mensagens) {
-                const area = document.getElementById('chat-messages-area'); if (!area) return; area.innerHTML = ''; if (!mensagens || mensagens.length === 0) { area.innerHTML = `<p style="text-align:center; color:#999;">Sem mensagens.</p>`; return; }
-                try {
-                    mensagens.forEach(msg => { if (!msg) { console.warn("Msg inválida:", msg); return; } const d = formatISODate(msg.dataEnvio); let rc = '', ac = ''; const t = msg.tipoRemetente || 'IA'; const u = currentUserType || 'Client'; if (t === 'Client') rc = 'client'; else if (t === 'Employee') rc = 'analyst'; else rc = 'ia'; if ((t === 'Client' && u === 'Client') || (t === 'Employee' && u === 'Employee')) { ac = 'viewer'; } else { ac = 'other'; } const sC = (msg.conteudo || '').replace(/</g, "&lt;").replace(/>/g, "&gt;"); const sS = (msg.remetenteNome || 'Desc.').replace(/</g, "&lt;").replace(/>/g, "&gt;"); area.innerHTML += `<div class="chat-message ${ac} ${rc}"><span class="sender">${sS}<span class="timestamp">${d}</span></span><div class="content">${sC}</div></div>`; });
-                    setTimeout(() => { area.scrollTop = area.scrollHeight; }, 50);
-                } catch (err) { console.error("Erro renderizar:", err, mensagens); area.innerHTML = `<p style="color:red;">Erro exibir msgs.</p>`; }
-            }
-            function showAnalystTab(tabName) { try { document.querySelectorAll('#employee-dashboard-screen .tab-content').forEach(content => content.classList.remove('active')); document.querySelectorAll('#employee-dashboard-screen .tab-link').forEach(link => link.classList.remove('active')); document.getElementById(`tab-content-${tabName}`).classList.add('active'); document.getElementById(`tab-link-${tabName}`).classList.add('active'); } catch (e) { console.error("Erro ao trocar de aba (Analista):", e, tabName); } }
-            function showClientTab(tabName) { try { document.querySelectorAll('#client-dashboard-screen .tab-content').forEach(content => content.classList.remove('active')); document.querySelectorAll('#client-dashboard-screen .tab-link').forEach(link => link.classList.remove('active')); document.getElementById(`tab-content-${tabName}`).classList.add('active'); document.getElementById(`tab-link-${tabName}`).classList.add('active'); } catch (e) { console.error("Erro ao trocar de aba (Cliente):", e, tabName); } }
+            // --- LÓGICA DE CARREGAMENTO DOS PAINÉIS (Sem alterações) ---
+            async function loadNewDashboardReports() { const t = document.getElementById('report-total-abertos'); const p = document.getElementById('report-por-prioridade'); const r = document.getElementById('report-recentes-body'); if (t) t.innerHTML = '<div class="db-stat-number db-loading">...</div>'; if (p) p.innerHTML = '<li class="db-loading">Carregando...</li>'; if (r) r.innerHTML = '<tr><td colspan="4" class="db-loading" style="text-align: center;">Carregando...</td></tr>'; try { const [tR, pR, rR] = await Promise.all([fetchAutenticado(`${DASHBOARD_API_URL}/total-abertos`), fetchAutenticado(`${DASHBOARD_API_URL}/por-prioridade`), fetchAutenticado(`${DASHBOARD_API_URL}/recentes?dias=7`)]); if (tR.ok) { renderNewTotal(t, await tR.json()); } else { renderNewTotal(t, 'Erro'); } if (pR.ok) { renderNewPrioridade(p, await pR.json()); } else { renderNewPrioridade(p, null, true); } if (rR.ok) { renderNewRecentes(r, await rR.json()); } else { renderNewRecentes(r, null, true); } } catch (e) { console.error('Erro ao carregar novos relatórios:', e); if (e.message !== "Sessão expirada.") { renderNewTotal(t, 'X'); renderNewPrioridade(p, null, true); renderNewRecentes(r, null, true); } } }
+            function renderNewTotal(el, tot) { if (!el) return; el.textContent = tot; el.classList.remove('db-loading'); if (isNaN(tot)) el.style.fontSize = "2rem"; else el.style.fontSize = "3.5rem"; }
+            function renderNewPrioridade(listEl, data, isErr = false) { if (!listEl) return; listEl.innerHTML = ''; if (isErr) { listEl.innerHTML = '<li style="color: red;">Erro.</li>'; return; } if (!data || Object.keys(data).length === 0) { listEl.innerHTML = '<li>Nenhum chamado.</li>'; return; } Object.entries(data).forEach(([p, t]) => { const li = document.createElement('li'); li.innerHTML = `<strong>${p}</strong> <span>${t}</span>`; listEl.appendChild(li); }); }
+            function renderNewRecentes(tbl, data, isErr = false) { if (!tbl) return; tbl.innerHTML = ''; if (isErr) { tbl.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Erro.</td></tr>'; return; } if (!data || data.length === 0) { tbl.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhum chamado.</td></tr>'; return; } data.forEach(c => { const tr = document.createElement('tr'); tr.innerHTML = ` <td data-action="abrirChat" class="grid-clickable-cell">${c.numeroChamado || c.id}</td> <td>${c.titulo || '-'}</td> <td>${formatISODateRecente(c.dataAbertura)}</td> <td>${c.status || '-'}</td> `; tr.dataset.id = c.id; tbl.appendChild(tr); }); }
+            async function loadDashboardStats() { const sC = document.getElementById('dashboard-stats-container'); const lM = document.getElementById('stats-loading-message'); if (!sC) return; if (sC.querySelector('.stats-layout')) sC.querySelector('.stats-layout').remove(); if (statsChartInstance) { statsChartInstance.destroy(); statsChartInstance = null; } if (lM) { lM.textContent = "Carregando..."; lM.style.display = 'block'; } else { sC.innerHTML = '<p id="stats-loading-message" style="color: #666;">Carregando...</p>'; } try { const r = await fetchAutenticado(`${API_URL}/api/Dashboard/stats/por-status`); if (!r.ok) { const e = await r.json(); throw new Error(e.message || `Erro ${r.status}`); } const s = await r.json(); const lM2 = document.getElementById('stats-loading-message'); if (lM2) lM2.style.display = 'none'; if (!s || s.length === 0) { sC.innerHTML = '<p id="stats-loading-message">Nenhum dado.</p>'; return; } sC.innerHTML = ` <div class="stats-layout"> <div class="stats-numeros"><ul id="stats-list"></ul></div> <div class="stats-grafico"><canvas id="stats-chart-canvas"></canvas></div> </div> `; const sL = document.getElementById('stats-list'); let t = 0; s.forEach(i => { t += i.contagem; sL.innerHTML += `<li><span class="stat-label">${i.status}</span><span class="stat-count">${i.contagem}</span></li>`; }); sL.innerHTML += `<li style="border-top:2px solid #007bff; margin-top:0.5rem; padding-top:0.5rem;"><span class="stat-label"><strong>Total</strong></span><span class="stat-count"><strong>${t}</strong></span></li>`; if (typeof Chart !== 'undefined') { const ctx = document.getElementById('stats-chart-canvas').getContext('2d'); statsChartInstance = new Chart(ctx, { type: 'pie', data: { labels: s.map(i => i.status), datasets: [{ data: s.map(i => i.contagem), backgroundColor: ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(255, 206, 86, 0.7)', 'rgba(75, 192, 192, 0.7)', 'rgba(153, 102, 255, 0.7)', 'rgba(255, 159, 64, 0.7)', 'rgba(100, 100, 100, 0.7)'], borderColor: '#fff', borderWidth: 1 }] }, options: { responsive: true, plugins: { legend: { position: 'top' }, title: { display: true, text: 'Distribuição de Status' } } } }); } else { console.error("Chart.js não foi carregado."); const g = document.querySelector('.stats-grafico'); if (g) g.innerHTML = `<p style="color:red;">Erro: Gráfico não carregou.</p>`; } } catch (e) { console.error("Erro stats:", e); if (e.message !== "Sessão expirada.") { const m = document.getElementById('stats-loading-message'); if (m) m.style.display = 'none'; else sC.innerHTML = ''; sC.innerHTML += `<p style="color:red;">Erro: ${e.message}</p>`; } } }
+            async function loadEmployeeDashboard() { try { const u = localStorage.getItem('userName') || 'Analista'; document.getElementById('employee-dashboard-title').innerHTML = `Painel <span class="user-name">(${u})</span>`; } catch (e) { console.error("Erro nome analista:", e); } try { const aT = document.getElementById('tab-link-admin'); if (currentUserIsAdmin) { aT.style.display = 'block'; } else { aT.style.display = 'none'; } } catch (e) { console.error("Erro aba admin:", e); } showAnalystTab('reports'); loadNewDashboardReports(); loadDashboardStats(); loadEmployeeGrids(); loadEmployeeList(); /* <-- NOVO: Carrega a lista de funcionários */ }
+            async function loadEmployeeGrids() { const myGb = document.getElementById('my-assigned-grid-body'); if (myGb) { myGb.innerHTML = `<tr><td colspan="5">Carregando...</td></tr>`; try { const r = await fetchAutenticado(`${API_URL}/api/Chamado/meus-chamados-analista`); if (!r.ok) throw new Error(`Erro ${r.status}.`); const c = await r.json(); myGb.innerHTML = ''; if (!c || c.length === 0) { myGb.innerHTML = `<tr><td colspan="5">Nenhum chamado.</td></tr>`; } else { c.forEach(ch => { const o = ["Aberto (IA)", "Aguardando Analista", "Em Andamento (Analista)", "Aguardando Cliente", "Concluído", "Encerrado", "Cancelado"]; let sH = `<select class="status-select" data-id="${ch.id}" data-grid-type="my-grid">`; o.forEach(opt => { sH += `<option value="${opt}" ${opt === (ch.status || '') ? 'selected' : ''}>${opt}</option>`; }); sH += `</select>`; myGb.innerHTML += `<tr data-id="${ch.id}"><td data-action="abrirChat" class="grid-clickable-cell">${ch.numeroChamado || '-'}</td><td>${ch.titulo || '-'}</td><td>${ch.nomeCliente || '-'}</td><td>${formatISODate(ch.dataAbertura)}</td> <td>${sH}</td></tr>`; }); } } catch (e) { console.error('Erro meus chamados:', e); if (e.message !== "Sessão expirada.") myGb.innerHTML = `<tr><td colspan="5" style="color:red;">${e.message || 'Erro.'}</td></tr>`; } } const gB = document.getElementById('analyst-ticket-grid-body'); if (!gB) return; gB.innerHTML = `<tr><td colspan="6">Carregando...</td></tr>`; try { const r = await fetchAutenticado(`${API_URL}/api/Chamado/abertos`); if (!r.ok) throw new Error(`Erro ${r.status}.`); const c = await r.json(); gB.innerHTML = ''; if (!c || c.length === 0) { gB.innerHTML = `<tr><td colspan="6">Nenhum chamado.</td></tr>`; return; } c.forEach(ch => { const o = ["Aberto (IA)", "Aguardando Analista", "Em Andamento (Analista)", "Aguardando Cliente", "Concluído", "Encerrado", "Cancelado"]; let sH = `<select class="status-select" data-id="${ch.id}" data-grid-type="all-grid">`; o.forEach(opt => { sH += `<option value="${opt}" ${opt === (ch.status || '') ? 'selected' : ''}>${opt}</option>`; }); sH += `</select>`; gB.innerHTML += `<tr data-id="${ch.id}"><td data-action="abrirChat" class="grid-clickable-cell">${ch.numeroChamado || '-'}</td><td>${ch.titulo || '-'}</td><td>${ch.nomeCliente || '-'}</td><td>${formatISODate(ch.dataAbertura)}</td><td>${sH}</td><td>${ch.nomeAnalista || '--'}</td></tr>`; }); } catch (e) { console.error('Erro todos chamados:', e); if (e.message !== "Sessão expirada.") gB.innerHTML = `<tr><td colspan="6" style="color:red;">${e.message || 'Erro.'}</td></tr>`; } }
+            async function loadClientDashboard() { try { const u = localStorage.getItem('userName') || 'Cliente'; document.getElementById('client-dashboard-title').innerHTML = `Portal <span class="user-name">(${u})</span>`; } catch (e) { console.error("Erro nome cliente:", e); } showClientTab('client-novo'); const gB = document.getElementById('client-ticket-grid-body'); if (!gB) return; gB.innerHTML = `<tr><td colspan="4">Carregando...</td></tr>`; try { const r = await fetchAutenticado(`${API_URL}/api/Chamado/meuschamados`); if (!r.ok) throw new Error(`Erro ${r.status}.`); const c = await r.json(); gB.innerHTML = ''; if (!c || c.length === 0) { gB.innerHTML = `<tr><td colspan="4">Nenhum chamado.</td></tr>`; return; } c.forEach(ch => { gB.innerHTML += `<tr data-id="${ch.id}"><td data-action="abrirChat" class="grid-clickable-cell">${ch.numeroChamado || '-'}</td><td data-action="abrirChat" class="grid-clickable-cell">${ch.titulo || '-'}</td><td>${formatISODate(ch.dataAbertura)}</td><td>${ch.status || '-'}</td></tr>`; }); } catch (e) { console.error('Erro load cliente:', e); if (e.message !== "Sessão expirada.") gB.innerHTML = `<tr><td colspan="4" style="color:red;">${e.message || 'Erro.'}</td></tr>`; } }
+            async function carregarAnalistasDropdown(selId, selAId = null) { const s = document.getElementById(selId); if (!s) { console.error("Dropdown não encontrado:", selId); return; } s.options.length = 1; try { if (!listaAnalistasCache) { console.log("Buscando analistas..."); const r = await fetchAutenticado(`${API_URL}/api/Employee/analistas`); if (!r.ok) throw new Error(`Erro ${r.status}`); listaAnalistasCache = await r.json(); } if (listaAnalistasCache && listaAnalistasCache.length > 0) { listaAnalistasCache.forEach(a => { const o = document.createElement('option'); o.value = a.id; o.textContent = `${a.nome} (${a.funcao || 'N/A'})`; if (selAId && a.id === selAId) { o.selected = true; } s.appendChild(o); }); } } catch (e) { console.error("Erro carregar analistas:", e); const o = document.createElement('option'); o.value = ""; o.textContent = "Erro"; o.disabled = true; s.appendChild(o); } }
+            async function handleStatusChange(sel) { const id = sel.dataset.id; const s = sel.value; if (!id || !s) return; sel.disabled = true; showMessage(`Salvando...`, false); let oS = ''; try { const rG = await fetchAutenticado(`${API_URL}/api/Chamado/${id}`); if (!rG.ok) throw new Error(`Erro ${rG.status}.`); const cA = await rG.json(); oS = cA.status || ''; if (!cA) throw new Error("Dados atuais não carregados."); const d = { Status: s, Prioridade: cA.prioridade || 'Média', AnalistaId: cA.analistaId || null }; const rP = await fetchAutenticado(`${API_URL}/api/Chamado/${id}/atualizar`, { method: 'PUT', body: JSON.stringify(d) }); if (!rP.ok) { const ed = await rP.json(); throw new Error(ed.message || `Erro ${rP.status}.`); } showMessage('Status atualizado!', false); loadEmployeeGrids(); } catch (e) { console.error('Erro status grid:', e); if (e.message !== "Sessão expirada.") showMessage(`Erro: ${e.message}`, true); try { sel.value = oS; } catch (rE) { } } finally { sel.disabled = false; } }
+            async function abrirChat(chamadoId) { if (!chamadoId) return; currentChamadoId = chamadoId; showScreen('chat-screen'); const ctl = document.getElementById('analyst-controls'); const cI = document.getElementById('chat-message-input'); const tit = document.getElementById('chat-titulo'); const num = document.getElementById('chat-numero'); const aC = document.getElementById('chat-anexos-container'); const aL = document.getElementById('chat-anexos-list'); const mA = document.getElementById('chat-messages-area'); tit.textContent = 'Carregando...'; num.textContent = '...'; if (aL) aL.innerHTML = ''; if (aC) aC.style.display = 'none'; if (mA) mA.innerHTML = '<p style="text-align:center; color:#999;">Carregando...</p>'; disableForm('chat-message-form', true); disableForm('analyst-controls', true); if (ctl) ctl.style.display = 'none'; currentChamadoDetails = null; try { const r = await fetchAutenticado(`${API_URL}/api/Chamado/${chamadoId}`); if (!r.ok) throw new Error(`Erro ${r.status}.`); currentChamadoDetails = await r.json(); const c = currentChamadoDetails; console.log("Dados chat:", c); if (!c) throw new Error("Resposta inválida (null)."); tit.textContent = c.titulo || 'S/ Título'; num.textContent = `${c.numeroChamado || 'N/A'} (${c.status || 'N/A'})`; if (c.anexos && c.anexos.length > 0) { let h = ''; c.anexos.forEach(a => { if (a.urlArquivo && a.nomeArquivo) { const s = a.nomeArquivo.replace(/</g, "&lt;").replace(/>/g, "&gt;"); h += `<li><a href="${a.urlArquivo}" target="_blank">${s}</a></li>`; } }); if (h) { aL.innerHTML = h; aC.style.display = 'block'; } } renderizarMensagens(c.mensagens || []); if (currentUserType === 'Employee') { ctl.style.display = 'block'; try { document.getElementById('analyst-select-status').value = c.status || ''; } catch (e) { console.warn(e); } try { document.getElementById('analyst-select-priority').value = c.prioridade || 'Média'; } catch (e) { console.warn(e); } await carregarAnalistasDropdown('analyst-select-assignee', c.analistaId); disableForm('analyst-controls', false); } let iB = false; if (c.status === 'Encerrado' || c.status === 'Cancelado') { iB = true; } else if (c.status === 'Concluído' && c.dataConclusao) { try { const dC = new Date(c.dataConclusao); const ag = new Date(); const dH = (ag - dC) / 36e5; if (dH > 72) iB = true; } catch (e) { console.error(e); } } if (iB && currentUserType === 'Client') { cI.placeholder = "Este chamado está encerrado."; showMessage("Este chamado está encerrado.", true); disableForm('chat-message-form', true); } else { cI.placeholder = "Digite sua mensagem..."; disableForm('chat-message-form', false); } } catch (e) { console.error('Erro abrir chat:', e); if (e.message !== "Sessão expirada.") showMessage(`Erro chat: ${e.message}`, true); mA.innerHTML = `<p style="color:red;">Falha ao carregar dados.</p>`; } }
+            function renderizarMensagens(msgs) { const a = document.getElementById('chat-messages-area'); if (!a) return; a.innerHTML = ''; if (!msgs || msgs.length === 0) { a.innerHTML = `<p style="text-align:center; color:#999;">Sem mensagens.</p>`; return; } try { msgs.forEach(m => { if (!m) { console.warn("Msg inválida:", m); return; } const d = formatISODate(m.dataEnvio); let rc = '', ac = ''; const t = m.tipoRemetente || 'IA'; const u = currentUserType || 'Client'; if (t === 'Client') rc = 'client'; else if (t === 'Employee') rc = 'analyst'; else rc = 'ia'; if ((t === 'Client' && u === 'Client') || (t === 'Employee' && u === 'Employee')) { ac = 'viewer'; } else { ac = 'other'; } const sC = (m.conteudo || '').replace(/</g, "&lt;").replace(/>/g, "&gt;"); const sS = (m.remetenteNome || 'Desc.').replace(/</g, "&lt;").replace(/>/g, "&gt;"); a.innerHTML += `<div class="chat-message ${ac} ${rc}"><span class="sender">${sS}<span class="timestamp">${d}</span></span><div class="content">${sC}</div></div>`; }); setTimeout(() => { a.scrollTop = a.scrollHeight; }, 50); } catch (err) { console.error("Erro renderizar:", err, msgs); a.innerHTML = `<p style="color:red;">Erro exibir msgs.</p>`; } }
+            function showAnalystTab(tabName) { try { document.querySelectorAll('#employee-dashboard-screen .tab-content').forEach(c => c.classList.remove('active')); document.querySelectorAll('#employee-dashboard-screen .tab-link').forEach(l => l.classList.remove('active')); document.getElementById(`tab-content-${tabName}`).classList.add('active'); document.getElementById(`tab-link-${tabName}`).classList.add('active'); } catch (e) { console.error("Erro aba Analista:", e, tabName); } }
+            function showClientTab(tabName) { try { document.querySelectorAll('#client-dashboard-screen .tab-content').forEach(c => c.classList.remove('active')); document.querySelectorAll('#client-dashboard-screen .tab-link').forEach(l => l.classList.remove('active')); document.getElementById(`tab-content-${tabName}`).classList.add('active'); document.getElementById(`tab-link-${tabName}`).classList.add('active'); } catch (e) { console.error("Erro aba Cliente:", e, tabName); } }
 
             // --- EVENT LISTENERS ---
             document.getElementById('tab-link-reports').addEventListener('click', () => showAnalystTab('reports'));
             document.getElementById('tab-link-tickets').addEventListener('click', () => showAnalystTab('tickets'));
-            document.getElementById('tab-link-admin').addEventListener('click', () => showAnalystTab('admin'));
+            document.getElementById('tab-link-admin').addEventListener('click', () => { showAnalystTab('admin'); loadEmployeeList(); /* <-- NOVO: Carrega a lista ao clicar na aba */ });
             document.getElementById('tab-link-perfil').addEventListener('click', () => showAnalystTab('perfil'));
             document.getElementById('tab-link-client-novo').addEventListener('click', () => showClientTab('client-novo'));
             document.getElementById('tab-link-client-lista').addEventListener('click', () => showClientTab('client-lista'));
@@ -1103,12 +1018,257 @@
                     else { throw new Error('Tipo user desconhecido.'); }
                 } catch (e) { console.error(e); if (e.name === 'SyntaxError' && e.message.includes('Unexpected token')) { showMessage('Falha: Erro interno no servidor (500). Verifique o console do back-end.', true); } else { showMessage(`Falha: ${e.message}`, true); } } finally { disableForm('login-form', false); }
             });
-            document.getElementById('admin-register-form').addEventListener('submit', async function (event) {
-                event.preventDefault(); showMessage('', false); const p = document.getElementById('admin-password').value; const cp = document.getElementById('admin-confirm-password').value; if (p !== cp) { showMessage('Senhas não conferem.', true); return; } disableForm('admin-register-form', true); const data = { name: document.getElementById('admin-name').value, email: document.getElementById('admin-email').value, role: document.getElementById('admin-role').value, password: p, confirmPassword: cp, isAdmin: document.getElementById('admin-is-admin').checked };
+            document.getElementById('client-register-form').addEventListener('submit', async function (e) {
+                e.preventDefault(); showMessage('', false); disableForm('client-register-form', true); const p = document.getElementById('client-password').value; const cp = document.getElementById('client-confirm-password').value; if (p !== cp) { showMessage('Senhas não conferem.', true); disableForm('client-register-form', false); return; } const data = { name: document.getElementById('client-name').value, email: document.getElementById('client-email').value, cpf: document.getElementById('client-cpf').value, password: p, confirmPassword: cp };
                 try {
-                    const r = await fetchAutenticado(`${API_URL}/api/Registration/employee`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); const res = await r.json(); if (!r.ok) { const errorMsg = (res.errors && res.errors[0]) ? res.errors[0] : (res.message || `Erro ${r.status}`); throw new Error(errorMsg); } showMessage('Funcionário registrado com sucesso!', false); document.getElementById('admin-register-form').reset();
-                } catch (e) { console.error("Erro ao registrar funcionário:", e); if (e.message !== "Sessão expirada.") { showMessage(`Falha: ${e.message}`, true); } } finally { disableForm('admin-register-form', false); }
+                    const r = await fetch(`${API_URL}/api/Registration/client`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); const res = await r.json(); if (!r.ok) { const errorMsg = (res.errors && res.errors[0]) ? res.errors[0] : (res.message || `Erro ${r.status}`); throw new Error(errorMsg); } showMessage('Cadastrado! Faça login.', false); showScreen('login-screen'); document.getElementById('client-register-form').reset();
+                } catch (e) { console.error(`Erro (client-register):`, e); showMessage(`Falha: ${e.message}`, true); } finally { disableForm('client-register-form', false); }
             });
+            async function handleMudarSenha(event) {
+                event.preventDefault(); showMessage('', false); const formId = event.target.id; let prefix = (formId === 'mudar-senha-form-client') ? 'client-' : 'employee-';
+                const senhaAntiga = document.getElementById(`${prefix}senha-antiga`).value; const novaSenha = document.getElementById(`${prefix}nova-senha`).value; const confirmarNovaSenha = document.getElementById(`${prefix}confirmar-nova-senha`).value;
+                if (novaSenha !== confirmarNovaSenha) { showMessage('A nova senha e a confirmação não conferem.', true); return; }
+                disableForm(formId, true);
+                const data = { SenhaAntiga: senhaAntiga, NovaSenha: novaSenha, ConfirmarNovaSenha: confirmarNovaSenha };
+                try {
+                    const r = await fetchAutenticado(`${API_URL}/api/auth/mudar-senha`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); const res = await r.json();
+                    if (!r.ok) { const errorMsg = (res.errors && res.errors[0]) ? res.errors[0] : (res.message || `Erro ${r.status}`); throw new Error(errorMsg); }
+                    showMessage('Senha alterada com sucesso!', false); event.target.reset();
+                } catch (e) {
+                    console.error("Erro ao alterar senha:", e); if (e.message !== "Sessão expirada.") { showMessage(`Falha: ${e.message}`, true); }
+                } finally { disableForm(formId, false); }
+            }
+            document.getElementById('mudar-senha-form-client').addEventListener('submit', handleMudarSenha);
+            document.getElementById('mudar-senha-form-employee').addEventListener('submit', handleMudarSenha);
+            document.getElementById('admin-reset-password-form').addEventListener('submit', async function (event) {
+                event.preventDefault(); showMessage('', false); const formId = 'admin-reset-password-form'; const p = document.getElementById('admin-reset-nova-senha').value; const cp = document.getElementById('admin-reset-confirmar-nova-senha').value;
+                if (p !== cp) { showMessage('A nova senha e a confirmação não conferem.', true); return; }
+                disableForm(formId, true);
+                const data = { Email: document.getElementById('admin-reset-email').value, NovaSenha: p, ConfirmarNovaSenha: cp };
+                try {
+                    const r = await fetchAutenticado(`${API_URL}/api/auth/admin-reset-password`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); const res = await r.json();
+                    if (!r.ok) { const errorMsg = (res.errors && res.errors[0]) ? res.errors[0] : (res.message || `Erro ${r.status}`); throw new Error(errorMsg); }
+                    showMessage(res.message, false); document.getElementById(formId).reset();
+                } catch (e) {
+                    console.error("Erro ao redefinir senha:", e); if (e.message !== "Sessão expirada.") { showMessage(`Falha: ${e.message}`, true); }
+                } finally { disableForm(formId, false); }
+            });
+
+            // --- NOVO: Funções de Gerenciamento de Funcionários ---
+            const adminForm = document.getElementById('admin-register-form');
+            const adminFormTitle = document.getElementById('admin-form-title');
+            const adminFormDesc = document.getElementById('admin-form-desc');
+            const adminFormSubmitBtn = document.getElementById('admin-submit-button');
+            const adminFormCancelBtn = document.getElementById('btn-cancel-edit');
+            const adminEditingUserId = document.getElementById('admin-editing-user-id');
+            const adminPasswordGroup = document.getElementById('admin-password-group');
+            const adminEmailInput = document.getElementById('admin-email');
+            const adminPasswordInput = document.getElementById('admin-password');
+            const adminConfirmPasswordInput = document.getElementById('admin-confirm-password');
+
+            // 1. Carrega a lista de funcionários
+            async function loadEmployeeList() {
+                const listBody = document.getElementById('employee-list-body');
+                if (!listBody) return;
+                listBody.innerHTML = `<tr><td colspan="5" class="db-loading" style="text-align: center;">Carregando...</td></tr>`;
+
+                try {
+                    const r = await fetchAutenticado(EMPLOYEE_API_URL); // GET /api/employee
+                    if (!r.ok) { const e = await r.json(); throw new Error(e.message || `Erro ${r.status}`); }
+
+                    const employees = await r.json();
+                    employeeListCache = employees; // Salva no cache para edição
+                    listBody.innerHTML = '';
+
+                    if (!employees || employees.length === 0) {
+                        listBody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Nenhum funcionário cadastrado.</td></tr>`;
+                        return;
+                    }
+
+                    employees.forEach(emp => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                                <td>${emp.name}</td>
+                                <td>${emp.email}</td>
+                                <td>${emp.role}</td>
+                                <td>${emp.isAdmin ? 'Sim' : 'Não'}</td>
+                                <td>
+                                    <button class="btn-grid-edit" data-id="${emp.id}">Editar</button>
+                                    <button class="btn-grid-delete" data-id="${emp.id}">Excluir</button>
+                                </td>
+                            `;
+                        listBody.appendChild(tr);
+                    });
+                } catch (e) {
+                    console.error("Erro ao carregar lista de funcionários:", e);
+                    if (e.message !== "Sessão expirada.") {
+                        listBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Erro ao carregar: ${e.message}</td></tr>`;
+                    }
+                }
+            }
+
+            // 2. Reseta o formulário de admin para o modo "Cadastrar"
+            function resetAdminForm() {
+                adminForm.reset();
+                adminEditingUserId.value = '';
+                adminFormTitle.textContent = 'Cadastrar Novo Funcionário';
+                adminFormDesc.style.display = 'block';
+                adminFormSubmitBtn.textContent = 'Cadastrar Novo Funcionário';
+                adminFormSubmitBtn.classList.remove('btn-success');
+                adminFormCancelBtn.classList.add('hidden');
+
+                // Mostra e habilita campos de senha e e-mail
+                adminPasswordGroup.style.display = 'block';
+                adminEmailInput.disabled = false;
+                adminPasswordInput.required = true;
+                adminConfirmPasswordInput.required = true;
+            }
+
+            // 3. Listener para o formulário de Admin (Criação e Edição)
+            adminForm.addEventListener('submit', async function (event) {
+                event.preventDefault();
+                showMessage('', false);
+                const formId = 'admin-register-form';
+
+                const editingId = adminEditingUserId.value;
+                const isEditing = !!editingId; // Converte para booleano (true se tiver ID)
+
+                let data;
+                let url;
+                let method;
+
+                if (isEditing) {
+                    // --- MODO EDIÇÃO ---
+                    method = 'PUT';
+                    url = `${EMPLOYEE_API_URL}/${editingId}`; // PUT /api/employee/{id}
+                    data = {
+                        name: document.getElementById('admin-name').value,
+                        role: document.getElementById('admin-role').value,
+                        isAdmin: document.getElementById('admin-is-admin').checked
+                    };
+
+                    // Validação de senha não é necessária na edição
+                } else {
+                    // --- MODO CRIAÇÃO ---
+                    method = 'POST';
+                    url = `${API_URL}/api/Registration/employee`; // POST /api/Registration/employee
+                    const p = document.getElementById('admin-password').value;
+                    const cp = document.getElementById('admin-confirm-password').value;
+
+                    if (p !== cp) {
+                        showMessage('Senhas não conferem.', true);
+                        return;
+                    }
+                    data = {
+                        name: document.getElementById('admin-name').value,
+                        email: document.getElementById('admin-email').value,
+                        role: document.getElementById('admin-role').value,
+                        password: p,
+                        confirmPassword: cp,
+                        isAdmin: document.getElementById('admin-is-admin').checked
+                    };
+                }
+
+                disableForm(formId, true);
+
+                try {
+                    const r = await fetchAutenticado(url, {
+                        method: method,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+
+                    const res = await r.json();
+                    if (!r.ok) {
+                        const errorMsg = (res.errors && res.errors[0]) ? res.errors[0] : (res.message || `Erro ${r.status}`);
+                        throw new Error(errorMsg);
+                    }
+
+                    const successMessage = isEditing ? 'Funcionário atualizado com sucesso!' : 'Funcionário registrado com sucesso!';
+                    showMessage(successMessage, false);
+                    resetAdminForm();
+                    await loadEmployeeList(); // Atualiza a tabela
+
+                } catch (e) {
+                    console.error("Erro ao salvar funcionário:", e);
+                    if (e.message !== "Sessão expirada.") {
+                        showMessage(`Falha: ${e.message}`, true);
+                    }
+                } finally {
+                    disableForm(formId, false);
+                }
+            });
+
+            // 4. Listener para a tabela de funcionários (Editar e Excluir)
+            document.getElementById('employee-list-body').addEventListener('click', async function (event) {
+                const target = event.target;
+                const id = target.dataset.id;
+                if (!id) return;
+
+                // --- AÇÃO DE EXCLUIR ---
+                if (target.classList.contains('btn-grid-delete')) {
+                    if (!confirm(`Tem certeza de que deseja excluir o funcionário ID ${id}? Esta ação não pode ser desfeita.`)) {
+                        return;
+                    }
+                    showMessage('Excluindo...', false);
+                    try {
+                        const r = await fetchAutenticado(`${EMPLOYEE_API_URL}/${id}`, { method: 'DELETE' });
+                        const res = await r.json();
+                        if (!r.ok) { throw new Error(res.message || `Erro ${r.status}`); }
+
+                        showMessage('Funcionário excluído com sucesso!', false);
+                        await loadEmployeeList(); // Atualiza a tabela
+
+                    } catch (e) {
+                        console.error("Erro ao excluir:", e);
+                        if (e.message !== "Sessão expirada.") { showMessage(`Falha ao excluir: ${e.message}`, true); }
+                    }
+                }
+
+                // --- AÇÃO DE EDITAR ---
+                if (target.classList.contains('btn-grid-edit')) {
+                    // Encontra o usuário no cache
+                    const user = employeeListCache.find(u => u.id == id);
+                    if (!user) {
+                        showMessage('Erro: Não foi possível encontrar os dados deste usuário.', true);
+                        return;
+                    }
+
+                    // Preenche o formulário
+                    adminFormTitle.textContent = `Editando: ${user.name}`;
+                    adminFormDesc.style.display = 'none'; // Esconde descrição
+                    adminEditingUserId.value = user.id;
+
+                    document.getElementById('admin-name').value = user.name;
+                    document.getElementById('admin-email').value = user.email;
+                    document.getElementById('admin-role').value = user.role;
+                    document.getElementById('admin-is-admin').checked = user.isAdmin;
+
+                    // Desabilita e-mail (não pode ser alterado)
+                    adminEmailInput.disabled = true;
+
+                    // Esconde e desabilita campos de senha (são tratados no reset)
+                    adminPasswordGroup.style.display = 'none';
+                    adminPasswordInput.required = false;
+                    adminConfirmPasswordInput.required = false;
+
+                    // Ajusta os botões
+                    adminFormSubmitBtn.textContent = 'Salvar Alterações';
+                    adminFormSubmitBtn.classList.add('btn-success');
+                    adminFormCancelBtn.classList.remove('hidden');
+
+                    // Rola a página para o formulário
+                    adminForm.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+
+            // 5. Listener para o botão "Cancelar Edição"
+            adminFormCancelBtn.addEventListener('click', resetAdminForm);
+
+            // --- FIM NOVO ---
+
+
+            // Listener de Registro de Cliente (sem alteração)
             document.getElementById('client-register-form').addEventListener('submit', async function (e) {
                 e.preventDefault(); showMessage('', false); disableForm('client-register-form', true); const p = document.getElementById('client-password').value; const cp = document.getElementById('client-confirm-password').value; if (p !== cp) { showMessage('Senhas não conferem.', true); disableForm('client-register-form', false); return; } const data = { name: document.getElementById('client-name').value, email: document.getElementById('client-email').value, cpf: document.getElementById('client-cpf').value, password: p, confirmPassword: cp };
                 try {
@@ -1134,68 +1294,28 @@
             document.getElementById('mudar-senha-form-client').addEventListener('submit', handleMudarSenha);
             document.getElementById('mudar-senha-form-employee').addEventListener('submit', handleMudarSenha);
 
-            // --- NOVO: Listener para o formulário de Admin Reset Password ---
+            // Listener para o formulário de Admin Reset Password
             document.getElementById('admin-reset-password-form').addEventListener('submit', async function (event) {
-                event.preventDefault();
-                showMessage('', false);
-
-                const formId = 'admin-reset-password-form';
-                const p = document.getElementById('admin-reset-nova-senha').value;
-                const cp = document.getElementById('admin-reset-confirmar-nova-senha').value;
-
-                if (p !== cp) {
-                    showMessage('A nova senha e a confirmação não conferem.', true);
-                    return;
-                }
-
+                event.preventDefault(); showMessage('', false); const formId = 'admin-reset-password-form'; const p = document.getElementById('admin-reset-nova-senha').value; const cp = document.getElementById('admin-reset-confirmar-nova-senha').value;
+                if (p !== cp) { showMessage('A nova senha e a confirmação não conferem.', true); return; }
                 disableForm(formId, true);
-
-                const data = {
-                    Email: document.getElementById('admin-reset-email').value,
-                    NovaSenha: p,
-                    ConfirmarNovaSenha: cp
-                };
-
+                const data = { Email: document.getElementById('admin-reset-email').value, NovaSenha: p, ConfirmarNovaSenha: cp };
                 try {
-                    // Chama o novo endpoint /api/auth/admin-reset-password
-                    const r = await fetchAutenticado(`${API_URL}/api/auth/admin-reset-password`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data)
-                    });
-
-                    const res = await r.json();
-                    if (!r.ok) {
-                        const errorMsg = (res.errors && res.errors[0]) ? res.errors[0] : (res.message || `Erro ${r.status}`);
-                        throw new Error(errorMsg);
-                    }
-
-                    // Sucesso!
-                    showMessage(res.message, false); // "Senha do usuário X redefinida..."
-                    document.getElementById(formId).reset(); // Limpa o formulário
-
+                    const r = await fetchAutenticado(`${API_URL}/api/auth/admin-reset-password`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); const res = await r.json();
+                    if (!r.ok) { const errorMsg = (res.errors && res.errors[0]) ? res.errors[0] : (res.message || `Erro ${r.status}`); throw new Error(errorMsg); }
+                    showMessage(res.message, false); document.getElementById(formId).reset();
                 } catch (e) {
-                    console.error("Erro ao redefinir senha:", e);
-                    if (e.message !== "Sessão expirada.") {
-                        showMessage(`Falha: ${e.message}`, true); // Exibe o erro (ex: "Usuário não encontrado")
-                    }
-                } finally {
-                    disableForm(formId, false);
-                }
+                    console.error("Erro ao redefinir senha:", e); if (e.message !== "Sessão expirada.") { showMessage(`Falha: ${e.message}`, true); }
+                } finally { disableForm(formId, false); }
             });
-            // --- FIM NOVO ---
-
 
             // Sugestões de FAQ (sem alteração)
-            async function buscarSugestoesFaq() {
-                const t = document.getElementById('ticket-titulo').value; const d = document.getElementById('ticket-descricao').value; const sC = document.getElementById('faq-sugestoes-container'); const sL = document.getElementById('faq-sugestoes-list'); if (!sC || !sL) return; sL.innerHTML = ''; sC.style.display = 'none'; if ((t.trim().length + d.trim().length) < 5) return;
-                try { const r = await fetch(`${API_URL}/api/Faq/sugerir`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ Titulo: t, Descricao: d }) }); if (!r.ok) { console.error('Erro sugestões:', r.status); return; } const s = await r.json(); if (s && s.length > 0) { s.forEach(f => { const li = document.createElement('li'); const a = document.createElement('a'); a.href = '#'; a.textContent = f.pergunta; a.title = f.resposta; a.onclick = (e) => { e.preventDefault(); alert(`Resposta:\n\n${f.resposta}`); }; li.appendChild(a); sL.appendChild(li); }); sC.style.display = 'block'; } } catch (e) { console.error('Erro rede sugestões:', e); }
-            }
+            async function buscarSugestoesFaq() { const t = document.getElementById('ticket-titulo').value; const d = document.getElementById('ticket-descricao').value; const sC = document.getElementById('faq-sugestoes-container'); const sL = document.getElementById('faq-sugestoes-list'); if (!sC || !sL) return; sL.innerHTML = ''; sC.style.display = 'none'; if ((t.trim().length + d.trim().length) < 5) return; try { const r = await fetch(`${API_URL}/api/Faq/sugerir`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ Titulo: t, Descricao: d }) }); if (!r.ok) { console.error('Erro sugestões:', r.status); return; } const s = await r.json(); if (s && s.length > 0) { s.forEach(f => { const li = document.createElement('li'); const a = document.createElement('a'); a.href = '#'; a.textContent = f.pergunta; a.title = f.resposta; a.onclick = (e) => { e.preventDefault(); alert(`Resposta:\n\n${f.resposta}`); }; li.appendChild(a); sL.appendChild(li); }); sC.style.display = 'block'; } } catch (e) { console.error('Erro rede sugestões:', e); } }
             function debounceBuscarSugestoes() { clearTimeout(faqSuggestionTimeoutId); faqSuggestionTimeoutId = setTimeout(buscarSugestoesFaq, 750); }
             document.getElementById('ticket-titulo').addEventListener('input', debounceBuscarSugestoes);
             document.getElementById('ticket-descricao').addEventListener('input', debounceBuscarSugestoes);
 
-            console.log("Portal NextLayer (com Admin Reset) inicializado.");
+            console.log("Portal NextLayer (com CRUD de Admin) inicializado.");
 
         }); // --- FIM DO DOMContentLoaded ---
         /* --- FIM DO JAVASCRIPT --- */
