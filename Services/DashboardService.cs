@@ -1,11 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NextLayer.Data; // Para AppDbContext
-using NextLayer.ViewModels; // Para StatusReportViewModel
+using NextLayer.Data;
+using NextLayer.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.Linq; // Para GroupBy e Select
+using System.Linq;
 using System.Threading.Tasks;
+// Adicionamos a referência ao Modelo 'Chamado'
+using NextLayer.Models;
 
 namespace NextLayer.Services
 {
@@ -17,6 +19,10 @@ namespace NextLayer.Services
         private readonly AppDbContext _context;
         private readonly ILogger<DashboardService> _logger;
 
+        // Lista de status que consideramos como "não abertos"
+        // Baseado na lógica encontrada em seu ChamadoService
+        private readonly string[] statusFechados = { "Concluído", "Encerrado", "Cancelado" };
+
         public DashboardService(AppDbContext context, ILogger<DashboardService> logger)
         {
             _context = context;
@@ -25,30 +31,98 @@ namespace NextLayer.Services
 
         /// <summary>
         /// Implementação do método que busca no banco e agrupa os chamados por status.
+        /// (Este método já existia no seu arquivo)
         /// </summary>
         public async Task<List<StatusReportViewModel>> GetContagemPorStatusAsync()
         {
             _logger.LogInformation("Gerando relatório de contagem de chamados por status.");
             try
             {
-                // Usamos o DbContext para acessar a tabela Chamados
                 var contagemPorStatus = await _context.Chamados
-                    .GroupBy(c => c.Status) // Agrupa todos os chamados pelo campo "Status"
-                    .Select(g => new StatusReportViewModel // Cria um novo ViewModel para cada grupo
+                    .GroupBy(c => c.Status)
+                    .Select(g => new StatusReportViewModel
                     {
-                        Status = g.Key ?? "Sem Status", // g.Key é o valor pelo qual agrupamos (o Status)
-                        Contagem = g.Count() // Conta quantos itens há em cada grupo
+                        Status = g.Key ?? "Sem Status",
+                        Contagem = g.Count()
                     })
-                    .OrderByDescending(r => r.Contagem) // Ordena do mais comum para o menos comum
-                    .ToListAsync(); // Executa a consulta no banco
+                    .OrderByDescending(r => r.Contagem)
+                    .ToListAsync();
 
                 return contagemPorStatus;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro ao gerar relatório de contagem por status.");
-                return new List<StatusReportViewModel>(); // Retorna lista vazia em caso de erro
+                return new List<StatusReportViewModel>();
             }
         }
+
+
+        // --- INÍCIO: IMPLEMENTAÇÃO DOS NOVOS MÉTODOS ---
+
+        /// <summary>
+        /// Relatório 1: Retorna o número total de chamados abertos.
+        /// </summary>
+        public async Task<int> GetTotalChamadosAbertosAsync()
+        {
+            _logger.LogInformation("Buscando contagem total de chamados abertos.");
+            try
+            {
+                // Conta todos os chamados cujo status NÃO ESTÁ na lista de statusFechados
+                return await _context.Chamados
+                    .CountAsync(c => !statusFechados.Contains(c.Status));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao buscar contagem total de chamados abertos.");
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Relatório 2: Retorna a contagem de chamados abertos agrupados por prioridade.
+        /// </summary>
+        public async Task<Dictionary<string, int>> GetChamadosAbertosPorPrioridadeAsync()
+        {
+            _logger.LogInformation("Buscando contagem de chamados por prioridade.");
+            try
+            {
+                return await _context.Chamados
+                    .Where(c => !statusFechados.Contains(c.Status) && c.Prioridade != null) // Filtra apenas abertos
+                    .GroupBy(c => c.Prioridade) // Agrupa por Prioridade
+                    .Select(g => new { Prioridade = g.Key, Total = g.Count() })
+                    .ToDictionaryAsync(k => k.Prioridade, v => v.Total); // Converte para Dicionário
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao buscar contagem por prioridade.");
+                return new Dictionary<string, int>(); // Retorna dicionário vazio em caso de erro
+            }
+        }
+
+        /// <summary>
+        /// Relatório 3: Retorna uma lista de chamados abertos recentemente.
+        /// </summary>
+        public async Task<List<Chamado>> GetChamadosAbertosRecentementeAsync(int diasRecentes = 7)
+        {
+            _logger.LogInformation("Buscando chamados abertos nos últimos {diasRecentes} dias.", diasRecentes);
+            try
+            {
+                // Define a data de corte (hoje - X dias)
+                var dataLimite = DateTime.UtcNow.AddDays(-diasRecentes);
+
+                return await _context.Chamados
+                    .Where(c => !statusFechados.Contains(c.Status) && c.DataAbertura >= dataLimite) // Filtra abertos E recentes
+                    .OrderByDescending(c => c.DataAbertura) // Mais novos primeiro
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao buscar chamados recentes.");
+                return new List<Chamado>(); // Retorna lista vazia em caso de erro
+            }
+        }
+
+        // --- FIM: IMPLEMENTAÇÃO DOS NOVOS MÉTODOS ---
     }
 }
