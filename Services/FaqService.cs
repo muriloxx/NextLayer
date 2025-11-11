@@ -1,119 +1,111 @@
-﻿// --- ARQUIVO: Services/FaqService.cs (COMPLETO E ATUALIZADO) ---
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
 using NextLayer.Data;
 using NextLayer.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace NextLayer.Services
 {
+    // Esta classe implementa a IFaqService
     public class FaqService : IFaqService
     {
         private readonly AppDbContext _context;
-        private readonly ILogger<FaqService> _logger;
-        // --- INJETAR A INTERFACE DA IA COM O NOME CORRETO ---
-        private readonly IIaService _iaService;
 
-        // --- CONSTRUTOR ATUALIZADO ---
-        public FaqService(AppDbContext context,
-                          ILogger<FaqService> logger,
-                          IIaService iaService) // <-- Adicionado IIaService
+        public FaqService(AppDbContext context)
         {
             _context = context;
-            _logger = logger;
-            _iaService = iaService; // <-- Adicionado
         }
 
         /// <summary>
-        /// Obtém todos os itens de FAQ ordenados por ID.
+        /// Implementação de: Obtém todos os itens de FAQ do banco de dados.
         /// </summary>
         public async Task<List<FaqItem>> GetAllFaqsAsync()
         {
-            _logger.LogInformation("Buscando todos os itens de FAQ.");
-            try
-            {
-                return await _context.FaqItems.OrderBy(f => f.Id).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Erro ao buscar todos os itens de FAQ.");
-                return new List<FaqItem>();
-            }
+            // ==========================================================
+            // CORREÇÃO: Usando "FaqItens" (com 'e')
+            // ==========================================================
+            return await _context.FaqItens.AsNoTracking().ToListAsync();
         }
 
-        // --- MÉTODO ATUALIZADO PARA USAR A IA ---
         /// <summary>
-        /// Sugere FAQs usando a IA para comparar o problema com a base de conhecimento.
+        /// Implementação de: Sugere itens de FAQ relevantes.
         /// </summary>
         public async Task<List<FaqItem>> GetFaqSugestoesAsync(string titulo, string descricao)
         {
-            _logger.LogInformation("Buscando sugestões de FAQ (via IA) para: {Titulo}", titulo);
+            var palavrasChaveDescricao = descricao.Split(' ')
+                                                  .Select(p => p.ToLower())
+                                                  .Where(p => p.Length > 3);
 
-            if (string.IsNullOrWhiteSpace(titulo) && string.IsNullOrWhiteSpace(descricao))
-            {
-                return new List<FaqItem>();
-            }
+            var palavrasChaveTitulo = titulo.Split(' ')
+                                            .Select(p => p.ToLower())
+                                            .Where(p => p.Length > 3);
 
-            try
-            {
-                // 1. Busca todas as FAQs do banco (para a IA analisar)
-                var todasFaqs = await GetAllFaqsAsync();
-                if (!todasFaqs.Any())
-                {
-                    _logger.LogWarning("Nenhum FAQ encontrado no banco para sugestão.");
-                    return new List<FaqItem>();
-                }
+            var palavrasChave = palavrasChaveDescricao.Union(palavrasChaveTitulo);
 
-                // 2. Chama a IA (usando a interface IIaService)
-                var idsSugeridos = await _iaService.SugerirFaqsRelevantesAsync(titulo, descricao, todasFaqs);
+            // ==========================================================
+            // CORREÇÃO: Usando "FaqItens" (com 'e')
+            // ==========================================================
+            var todosFaqs = await _context.FaqItens.AsNoTracking().ToListAsync();
 
-                if (!idsSugeridos.Any())
-                {
-                    _logger.LogInformation("IA não sugeriu FAQs relevantes.");
-                    return new List<FaqItem>();
-                }
+            var sugestoes = todosFaqs
+                .Where(faq => palavrasChave.Any(p => faq.Pergunta.ToLower().Contains(p) ||
+                                                     faq.Resposta.ToLower().Contains(p)))
+                .Take(3) // Limita a 3 sugestões
+                .ToList();
 
-                // 3. Filtra a lista original para retornar apenas os itens sugeridos
-                var sugestoes = todasFaqs
-                    .Where(f => idsSugeridos.Contains(f.Id))
-                    .ToList();
-
-                _logger.LogInformation("Encontradas {Count} sugestões de FAQ via IA.", sugestoes.Count);
-                return sugestoes;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Erro ao buscar sugestões de FAQ (IA) para: {Titulo}", titulo);
-                return new List<FaqItem>();
-            }
+            return sugestoes;
         }
-        // --- FIM DA ATUALIZAÇÃO ---
-
 
         /// <summary>
-        /// Adiciona os exemplos de FAQ iniciais ao banco de dados, se ele estiver vazio.
+        /// Implementação de: Adiciona FAQs iniciais ao banco de dados.
         /// </summary>
         public async Task SeedInitialFaqsAsync()
         {
-            if (!await _context.FaqItems.AnyAsync())
+            // ==========================================================
+            // CORREÇÃO: Usando "FaqItens" (com 'e')
+            // ==========================================================
+            if (await _context.FaqItens.AnyAsync())
             {
-                _logger.LogInformation("Populando tabela FaqItens com dados iniciais...");
-                var faqsIniciais = new List<FaqItem>
-                {
-                    new FaqItem { Pergunta = "Como resetar minha senha de rede/sistema?", Resposta = "Para resetar sua senha, acesse o portal interno em [link_do_portal] e clique em \"Esqueci minha senha\". Siga as instruções enviadas para o seu e-mail de recuperação. Se não tiver acesso ao e-mail, abra um chamado detalhando o problema.", DataCriacao = DateTime.UtcNow },
-                    new FaqItem { Pergunta = "A impressora não está funcionando. O que fazer?", Resposta = "Verifique se a impressora está ligada e conectada à rede (cabo ou Wi-Fi). Certifique-se de que há papel na bandeja e que não há mensagens de erro no painel. Tente reiniciar a impressora e seu computador. Se o problema persistir, anote o modelo da impressora e o código de erro (se houver) e abra um chamado.", DataCriacao = DateTime.UtcNow },
-                    new FaqItem { Pergunta = "Não consigo acessar a pasta compartilhada da rede.", Resposta = "Verifique sua conexão de rede (cabo ou Wi-Fi). Tente acessar outras pastas ou recursos da rede para confirmar a conexão. Se você consegue acessar outros recursos, pode ser um problema de permissão. Anote o caminho completo da pasta (ex: \\\\servidor\\departamento) e abra um chamado solicitando a verificação de acesso.", DataCriacao = DateTime.UtcNow },
-                    new FaqItem { Pergunta = "Meu computador está muito lento.", Resposta = "Feche todos os programas que não estiver utilizando. Reinicie o computador. Verifique se há atualizações pendentes do Windows ou de outros softwares. Execute uma verificação de vírus com o antivírus corporativo. Se a lentidão continuar, abra um chamado informando desde quando o problema ocorre e quais programas parecem ser mais afetados.", DataCriacao = DateTime.UtcNow },
-                    new FaqItem { Pergunta = "Como configurar o e-mail no meu celular?", Resposta = "Siga o guia passo-a-passo disponível na Intranet em [link_do_guia_email_mobile]. Você precisará do seu e-mail corporativo, senha e, possivelmente, das configurações do servidor (IMAP/SMTP) descritas no guia. Se encontrar dificuldades, abra um chamado informando o modelo do seu celular e o passo onde ocorreu o erro.", DataCriacao = DateTime.UtcNow }
-                };
-                await _context.FaqItems.AddRangeAsync(faqsIniciais);
-                await _context.SaveChangesAsync();
-                _logger.LogInformation("Tabela FaqItens populada com {Count} itens.", faqsIniciais.Count);
+                // Se o banco já tiver FAQs, não faz nada.
+                return;
             }
-            else { _logger.LogInformation("Tabela FaqItens já contém dados. Seed não executado."); }
+
+            var listaFaqs = new List<FaqItem>
+            {
+                new FaqItem
+                {
+                    Pergunta = "Como redefinir minha senha?",
+                    Resposta = "Para redefinir sua senha, vá até a tela de login e clique em 'Esqueci minha senha'. Siga as instruções enviadas para o seu e-mail.",
+                    DataCriacao = DateTime.UtcNow
+                },
+                new FaqItem
+                {
+                    Pergunta = "Não consigo acessar o sistema, o que fazer?",
+                    Resposta = "Verifique se seu usuário e senha estão corretos. Se o problema persistir, tente redefinir sua senha ou entre em contato com o administrador.",
+                    DataCriacao = DateTime.UtcNow
+                },
+                new FaqItem
+                {
+                    Pergunta = "Como abrir um novo chamado?",
+                    Resposta = "Na sua tela principal (Dashboard), clique no botão 'Novo Chamado'. Preencha o formulário com o máximo de detalhes possível, incluindo título, descrição e categoria.",
+                    DataCriacao = DateTime.UtcNow
+                }
+            };
+
+            // Adiciona os FAQs iniciais ao contexto
+            await _context.FaqItens.AddRangeAsync(listaFaqs);
+
+            // Salva as mudanças no banco de dados
+            await _context.SaveChangesAsync();
         }
+
+        // ====================================================================
+        // NOTA:
+        // Os métodos que causaram os erros de "Categoria" (como CriarFaqAsync,
+        // AtualizarFaqAsync, etc.) não estão definidos na sua IFaqService.cs.
+        // Por isso, eles foram removidos para que o código compile.
+        // Se você precisar deles, eles devem ser adicionados primeiro à IFaqService.cs.
+        // ====================================================================
     }
 }
