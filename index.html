@@ -232,7 +232,7 @@
 
         .ticket-grid-container {
             max-height: 400px;
-            overflow-y: auto;
+            overflow: auto; /* <-- ALTERAÇÃO RESPONSIVIDADE */
             margin-top: 1rem;
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -742,6 +742,102 @@
                 color: #dc3545;
             }
 
+        /* --- NOVO: Media Queries para Responsividade --- */
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem 0; /* Menos padding no body */
+                -webkit-text-size-adjust: 100%; /* Previne zoom do iOS */
+            }
+
+            .container {
+                padding: 1rem; /* Menos padding no container */
+                width: 98%; /* Usar mais da tela */
+                margin-top: 0.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            h2, .header h2 {
+                font-size: 1.25rem;
+                margin-bottom: 1rem;
+            }
+
+            /* Ajusta cabeçalhos do Dashboard e Chat */
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.5rem;
+            }
+
+                .header h2 {
+                    text-align: center;
+                }
+
+                .header .btn-logout, .header .btn-action, .header .btn-back {
+                    width: 100%;
+                    margin: 0.2rem 0;
+                    text-align: center;
+                    padding: 0.75rem; /* Botões maiores para toque */
+                }
+
+            /* Abas de navegação */
+            .tab-nav {
+                flex-wrap: wrap; /* Quebra os botões da aba se não couberem */
+            }
+
+            .tab-link {
+                font-size: 0.9rem;
+                padding: 0.75rem 0.75rem; /* Facilita o toque */
+                flex-grow: 1; /* Faz as abas ocuparem o espaço */
+                text-align: center;
+            }
+
+            /* Layouts Flex (Stats, Cards de Relatório) */
+            .stats-layout, .db-card-container {
+                flex-direction: column; /* Empilha verticalmente */
+            }
+
+            .stats-grafico {
+                max-width: 95%; /* Permitir o gráfico crescer */
+                margin-top: 1rem;
+            }
+
+            /* Formulário de Chat */
+            .chat-input-form {
+                flex-direction: column; /* Empilha input e botão */
+            }
+
+                .chat-input-form input {
+                    border-radius: 0;
+                    font-size: 1rem; /* Garante que o zoom não seja aplicado */
+                }
+
+                .chat-input-form button {
+                    width: 100%;
+                    border-radius: 0 0 4px 4px;
+                    padding: 0.85rem;
+                }
+
+            /* Controles do Analista */
+            .analyst-controls-grid {
+                flex-direction: column;
+                gap: 0;
+            }
+
+                .analyst-controls-grid .form-group {
+                    margin-bottom: 0.5rem; /* Reduz margem */
+                }
+
+            /* Mensagens de Chat */
+            .chat-messages {
+                height: 350px; /* Ajusta altura */
+            }
+
+            .chat-message {
+                max-width: 95%; /* Mensagens podem ser mais largas */
+            }
+        }
+        /* --- FIM DAS MEDIA QUERIES --- */
+
         /* --- FIM DO CSS --- */
     </style>
 </head>
@@ -954,13 +1050,87 @@
             // --- NOVO: Cache para a lista de funcionários (para edição) ---
             let employeeListCache = [];
 
+            // --- NOVO: Variável para o Polling ---
+            let chatPollingInterval = null;
+
             // --- FUNÇÕES AUXILIARES (Sem alterações) ---
             function showScreen(screenId) { try { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); const sS = document.getElementById(screenId); if (sS) { sS.classList.add('active'); if (screenId.includes('dashboard-screen')) { mainContainer.classList.add('dashboard-active'); } else { mainContainer.classList.remove('dashboard-active'); } } else { console.error("Tela Inválida:", screenId); document.getElementById('login-screen').classList.add('active'); mainContainer.classList.remove('dashboard-active'); } showMessage('', false); window.scrollTo(0, 0); } catch (e) { console.error("Erro em showScreen:", e); } }
             function showMessage(message, isError = false) { if (!messageArea) return; try { if (messageArea.timerId) clearTimeout(messageArea.timerId); messageArea.textContent = message; messageArea.className = message ? (isError ? 'error' : 'success') : ''; const t = isError ? 8000 : 5000; if (message) { messageArea.timerId = setTimeout(() => { showMessage(''); }, t); } } catch (e) { console.error("Erro em showMessage:", e); } }
             function formatISODate(iso) { if (!iso) return '-'; try { return new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch (e) { console.error("Erro formatar data:", iso, e); return iso; } }
             function formatISODateRecente(iso) { if (!iso) return '-'; try { return new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }); } catch (e) { return iso; } }
             function disableForm(formId, disable = true) { try { const f = document.getElementById(formId); if (!f) { console.warn("Elemento não encontrado:", formId); return; } const els = f.querySelectorAll('input, select, textarea, button'); els.forEach(el => { if (el) el.disabled = disable; }); let btn; if (formId === 'analyst-controls') { btn = document.getElementById('btn-save-analyst-changes'); } else if (f.tagName === 'FORM') { btn = f.querySelector('button[type="submit"]'); } else { return; } if (btn) { const oTxt = btn.dataset.originalText || btn.textContent; if (disable && !btn.dataset.originalText) { btn.dataset.originalText = oTxt; } let wTxt = 'Aguarde...'; if (formId === 'analyst-controls' || formId.startsWith('mudar-senha-form') || formId === 'admin-reset-password-form') { wTxt = 'Salvando...'; } if (formId === 'admin-register-form') { wTxt = 'Cadastrando...'; } if (formId === 'client-ticket-form') { wTxt = 'Enviando...'; } btn.textContent = disable ? wTxt : oTxt; if (!disable) delete btn.dataset.originalText; } } catch (e) { console.error("Erro em disableForm:", e, formId); } }
-            function logout() { currentUserType = null; currentChamadoId = null; listaAnalistasCache = null; currentUserIsAdmin = false; localStorage.removeItem('jwtToken'); localStorage.removeItem('userName'); localStorage.removeItem('isAdmin'); try { document.getElementById('analyst-ticket-grid-body').innerHTML = ''; } catch (e) { } try { document.getElementById('my-assigned-grid-body').innerHTML = ''; } catch (e) { } try { document.getElementById('client-ticket-grid-body').innerHTML = ''; } catch (e) { } try { if (statsChartInstance) { statsChartInstance.destroy(); statsChartInstance = null; } const sC = document.getElementById('dashboard-stats-container'); if (sC) { sC.innerHTML = '<p id="stats-loading-message" style="color: #666;">Carregando...</p>'; } } catch (e) { } try { document.getElementById('report-total-abertos').innerHTML = '<div class="db-stat-number db-loading">...</div>'; } catch (e) { } try { document.getElementById('report-por-prioridade').innerHTML = '<li class="db-loading">Carregando...</li>'; } catch (e) { } try { document.getElementById('report-recentes-body').innerHTML = '<tr><td colspan="4" class="db-loading" style="text-align: center;">Carregando...</td></tr>'; } catch (e) { } try { document.getElementById('employee-list-body').innerHTML = ''; } catch (e) { } ['login-form', 'client-register-form', 'client-ticket-form', 'chat-message-form', 'analyst-controls', 'admin-register-form', 'mudar-senha-form-client', 'mudar-senha-form-employee', 'admin-reset-password-form'].forEach(id => { const el = document.getElementById(id); if (el) { if (el.tagName === 'FORM') el.reset(); else { try { el.querySelectorAll('select').forEach(s => s.selectedIndex = 0); el.querySelectorAll('input:not([type=hidden])').forEach(i => i.value = ''); } catch (e) { } } } }); try { document.getElementById('client-dashboard-title').textContent = "Portal do Cliente"; } catch (e) { } try { document.getElementById('employee-dashboard-title').textContent = "Painel do Analista"; } catch (e) { } try { document.getElementById('tab-link-admin').style.display = 'none'; } catch (e) { } showScreen('login-screen'); }
+
+            function logout() {
+                // --- NOVO: Para polling ---
+                stopChatPolling();
+                // --- FIM NOVO ---
+                currentUserType = null; currentChamadoId = null; listaAnalistasCache = null; currentUserIsAdmin = false; localStorage.removeItem('jwtToken'); localStorage.removeItem('userName'); localStorage.removeItem('isAdmin'); try { document.getElementById('analyst-ticket-grid-body').innerHTML = ''; } catch (e) { } try { document.getElementById('my-assigned-grid-body').innerHTML = ''; } catch (e) { } try { document.getElementById('client-ticket-grid-body').innerHTML = ''; } catch (e) { } try { if (statsChartInstance) { statsChartInstance.destroy(); statsChartInstance = null; } const sC = document.getElementById('dashboard-stats-container'); if (sC) { sC.innerHTML = '<p id="stats-loading-message" style="color: #666;">Carregando...</p>'; } } catch (e) { } try { document.getElementById('report-total-abertos').innerHTML = '<div class="db-stat-number db-loading">...</div>'; } catch (e) { } try { document.getElementById('report-por-prioridade').innerHTML = '<li class="db-loading">Carregando...</li>'; } catch (e) { } try { document.getElementById('report-recentes-body').innerHTML = '<tr><td colspan="4" class="db-loading" style="text-align: center;">Carregando...</td></tr>'; } catch (e) { } try { document.getElementById('employee-list-body').innerHTML = ''; } catch (e) { } ['login-form', 'client-register-form', 'client-ticket-form', 'chat-message-form', 'analyst-controls', 'admin-register-form', 'mudar-senha-form-client', 'mudar-senha-form-employee', 'admin-reset-password-form'].forEach(id => { const el = document.getElementById(id); if (el) { if (el.tagName === 'FORM') el.reset(); else { try { el.querySelectorAll('select').forEach(s => s.selectedIndex = 0); el.querySelectorAll('input:not([type=hidden])').forEach(i => i.value = ''); } catch (e) { } } } }); try { document.getElementById('client-dashboard-title').textContent = "Portal do Cliente"; } catch (e) { } try { document.getElementById('employee-dashboard-title').textContent = "Painel do Analista"; } catch (e) { } try { document.getElementById('tab-link-admin').style.display = 'none'; } catch (e) { } showScreen('login-screen');
+            }
+
+            // --- NOVO: Funções de Polling do Chat ---
+
+            // Para o polling quando saímos do chat
+            function stopChatPolling() {
+                if (chatPollingInterval) {
+                    clearInterval(chatPollingInterval);
+                    chatPollingInterval = null;
+                    console.log("Polling do chat interrompido.");
+                }
+            }
+
+            // Função que será chamada a cada 5 segundos
+            async function pollChatMessages() {
+                // Para se o ID mudou ou se a tela do chat não está ativa
+                if (!currentChamadoId || document.getElementById('chat-screen').classList.contains('active') === false) {
+                    stopChatPolling();
+                    return;
+                }
+
+                console.log("Polling: Verificando novas mensagens...");
+                try {
+                    // Re-buscamos os detalhes completos.
+                    // A API GET /api/Chamado/{id} já retorna as mensagens.
+                    const r = await fetchAutenticado(`${API_URL}/api/Chamado/${currentChamadoId}`);
+                    if (!r.ok) {
+                        console.warn("Erro no polling, pulando ciclo.");
+                        return; // Não para o polling, só pula este ciclo.
+                    }
+
+                    const data = await r.json();
+                    currentChamadoDetails = data; // Atualiza os detalhes (status, etc.)
+
+                    // --- Otimização ---
+                    // Conta as mensagens atuais na tela e as que vieram da API
+                    const novasMensagens = data.mensagens || [];
+                    const msgCountApi = novasMensagens.length;
+                    const msgCountTela = document.getElementById('chat-messages-area').querySelectorAll('.chat-message').length;
+
+                    // Só renderiza de novo se a contagem de mensagens for diferente
+                    if (msgCountApi !== msgCountTela) {
+                        console.log("Novas mensagens detectadas, renderizando!");
+
+                        const chatArea = document.getElementById('chat-messages-area');
+                        // Verifica se o usuário estava no final do chat antes de renderizar
+                        const isScrolledToBottom = chatArea.scrollHeight - chatArea.clientHeight <= chatArea.scrollTop + 15; // 15px de margem
+
+                        renderizarMensagens(novasMensagens); // Re-renderiza
+
+                        // Se estava no final, força o scroll para o final de novo
+                        if (isScrolledToBottom) {
+                            chatArea.scrollTop = chatArea.scrollHeight;
+                        }
+                    }
+
+                    // Atualiza o status no header do chat (pode ter mudado)
+                    document.getElementById('chat-numero').textContent = `${data.numeroChamado || 'N/A'} (${data.status || 'N/A'})`;
+
+                } catch (e) {
+                    console.error("Erro durante o polling do chat:", e);
+                    // Não paramos o polling por erro de rede, ele tentará novamente.
+                }
+            }
+            // --- FIM NOVAS FUNÇÕES ---
+
             async function fetchAutenticado(url, options = {}) { const t = localStorage.getItem('jwtToken'); const h = new Headers(options.headers || {}); if (t) { h.append('Authorization', `Bearer ${t}`); } if (options.body && !(options.body instanceof FormData) && !h.has('Content-Type')) { h.append('Content-Type', 'application/json'); } options.headers = h; const r = await fetch(url, options); if (r.status === 401) { console.warn("401. Forçando logout."); showMessage("Sessão expirada. Faça login.", true); logout(); throw new Error("Sessão expirada."); } if (r.status === 403) { console.warn("403. Proibido."); try { const e = await r.json(); throw new Error(e.message || "Acesso negado."); } catch (e) { throw new Error("Acesso negado."); } } return r; }
 
             // --- LÓGICA DE CARREGAMENTO DOS PAINÉIS (Sem alterações) ---
@@ -974,7 +1144,35 @@
             async function loadClientDashboard() { try { const u = localStorage.getItem('userName') || 'Cliente'; document.getElementById('client-dashboard-title').innerHTML = `Portal <span class="user-name">(${u})</span>`; } catch (e) { console.error("Erro nome cliente:", e); } showClientTab('client-novo'); const gB = document.getElementById('client-ticket-grid-body'); if (!gB) return; gB.innerHTML = `<tr><td colspan="4">Carregando...</td></tr>`; try { const r = await fetchAutenticado(`${API_URL}/api/Chamado/meuschamados`); if (!r.ok) throw new Error(`Erro ${r.status}.`); const c = await r.json(); gB.innerHTML = ''; if (!c || c.length === 0) { gB.innerHTML = `<tr><td colspan="4">Nenhum chamado.</td></tr>`; return; } c.forEach(ch => { gB.innerHTML += `<tr data-id="${ch.id}"><td data-action="abrirChat" class="grid-clickable-cell">${ch.numeroChamado || '-'}</td><td data-action="abrirChat" class="grid-clickable-cell">${ch.titulo || '-'}</td><td>${formatISODate(ch.dataAbertura)}</td><td>${ch.status || '-'}</td></tr>`; }); } catch (e) { console.error('Erro load cliente:', e); if (e.message !== "Sessão expirada.") gB.innerHTML = `<tr><td colspan="4" style="color:red;">${e.message || 'Erro.'}</td></tr>`; } }
             async function carregarAnalistasDropdown(selId, selAId = null) { const s = document.getElementById(selId); if (!s) { console.error("Dropdown não encontrado:", selId); return; } s.options.length = 1; try { if (!listaAnalistasCache) { console.log("Buscando analistas..."); const r = await fetchAutenticado(`${API_URL}/api/Employee/analistas`); if (!r.ok) throw new Error(`Erro ${r.status}`); listaAnalistasCache = await r.json(); } if (listaAnalistasCache && listaAnalistasCache.length > 0) { listaAnalistasCache.forEach(a => { const o = document.createElement('option'); o.value = a.id; o.textContent = `${a.nome} (${a.funcao || 'N/A'})`; if (selAId && a.id === selAId) { o.selected = true; } s.appendChild(o); }); } } catch (e) { console.error("Erro carregar analistas:", e); const o = document.createElement('option'); o.value = ""; o.textContent = "Erro"; o.disabled = true; s.appendChild(o); } }
             async function handleStatusChange(sel) { const id = sel.dataset.id; const s = sel.value; if (!id || !s) return; sel.disabled = true; showMessage(`Salvando...`, false); let oS = ''; try { const rG = await fetchAutenticado(`${API_URL}/api/Chamado/${id}`); if (!rG.ok) throw new Error(`Erro ${rG.status}.`); const cA = await rG.json(); oS = cA.status || ''; if (!cA) throw new Error("Dados atuais não carregados."); const d = { Status: s, Prioridade: cA.prioridade || 'Média', AnalistaId: cA.analistaId || null }; const rP = await fetchAutenticado(`${API_URL}/api/Chamado/${id}/atualizar`, { method: 'PUT', body: JSON.stringify(d) }); if (!rP.ok) { const ed = await rP.json(); throw new Error(ed.message || `Erro ${rP.status}.`); } showMessage('Status atualizado!', false); loadEmployeeGrids(); } catch (e) { console.error('Erro status grid:', e); if (e.message !== "Sessão expirada.") showMessage(`Erro: ${e.message}`, true); try { sel.value = oS; } catch (rE) { } } finally { sel.disabled = false; } }
-            async function abrirChat(chamadoId) { if (!chamadoId) return; currentChamadoId = chamadoId; showScreen('chat-screen'); const ctl = document.getElementById('analyst-controls'); const cI = document.getElementById('chat-message-input'); const tit = document.getElementById('chat-titulo'); const num = document.getElementById('chat-numero'); const aC = document.getElementById('chat-anexos-container'); const aL = document.getElementById('chat-anexos-list'); const mA = document.getElementById('chat-messages-area'); tit.textContent = 'Carregando...'; num.textContent = '...'; if (aL) aL.innerHTML = ''; if (aC) aC.style.display = 'none'; if (mA) mA.innerHTML = '<p style="text-align:center; color:#999;">Carregando...</p>'; disableForm('chat-message-form', true); disableForm('analyst-controls', true); if (ctl) ctl.style.display = 'none'; currentChamadoDetails = null; try { const r = await fetchAutenticado(`${API_URL}/api/Chamado/${chamadoId}`); if (!r.ok) throw new Error(`Erro ${r.status}.`); currentChamadoDetails = await r.json(); const c = currentChamadoDetails; console.log("Dados chat:", c); if (!c) throw new Error("Resposta inválida (null)."); tit.textContent = c.titulo || 'S/ Título'; num.textContent = `${c.numeroChamado || 'N/A'} (${c.status || 'N/A'})`; if (c.anexos && c.anexos.length > 0) { let h = ''; c.anexos.forEach(a => { if (a.urlArquivo && a.nomeArquivo) { const s = a.nomeArquivo.replace(/</g, "&lt;").replace(/>/g, "&gt;"); h += `<li><a href="${a.urlArquivo}" target="_blank">${s}</a></li>`; } }); if (h) { aL.innerHTML = h; aC.style.display = 'block'; } } renderizarMensagens(c.mensagens || []); if (currentUserType === 'Employee') { ctl.style.display = 'block'; try { document.getElementById('analyst-select-status').value = c.status || ''; } catch (e) { console.warn(e); } try { document.getElementById('analyst-select-priority').value = c.prioridade || 'Média'; } catch (e) { console.warn(e); } await carregarAnalistasDropdown('analyst-select-assignee', c.analistaId); disableForm('analyst-controls', false); } let iB = false; if (c.status === 'Encerrado' || c.status === 'Cancelado') { iB = true; } else if (c.status === 'Concluído' && c.dataConclusao) { try { const dC = new Date(c.dataConclusao); const ag = new Date(); const dH = (ag - dC) / 36e5; if (dH > 72) iB = true; } catch (e) { console.error(e); } } if (iB && currentUserType === 'Client') { cI.placeholder = "Este chamado está encerrado."; showMessage("Este chamado está encerrado.", true); disableForm('chat-message-form', true); } else { cI.placeholder = "Digite sua mensagem..."; disableForm('chat-message-form', false); } } catch (e) { console.error('Erro abrir chat:', e); if (e.message !== "Sessão expirada.") showMessage(`Erro chat: ${e.message}`, true); mA.innerHTML = `<p style="color:red;">Falha ao carregar dados.</p>`; } }
+
+            async function abrirChat(chamadoId) {
+                if (!chamadoId) return;
+
+                // --- NOVO: Para qualquer polling antigo ---
+                stopChatPolling();
+                // --- FIM NOVO ---
+
+                currentChamadoId = chamadoId;
+                showScreen('chat-screen');
+                const ctl = document.getElementById('analyst-controls');
+                const cI = document.getElementById('chat-message-input');
+                const tit = document.getElementById('chat-titulo');
+                const num = document.getElementById('chat-numero');
+                const aC = document.getElementById('chat-anexos-container');
+                const aL = document.getElementById('chat-anexos-list');
+                const mA = document.getElementById('chat-messages-area');
+                tit.textContent = 'Carregando...'; num.textContent = '...'; if (aL) aL.innerHTML = ''; if (aC) aC.style.display = 'none'; if (mA) mA.innerHTML = '<p style="text-align:center; color:#999;">Carregando...</p>'; disableForm('chat-message-form', true); disableForm('analyst-controls', true); if (ctl) ctl.style.display = 'none'; currentChamadoDetails = null;
+                try {
+                    const r = await fetchAutenticado(`${API_URL}/api/Chamado/${chamadoId}`); if (!r.ok) throw new Error(`Erro ${r.status}.`); currentChamadoDetails = await r.json(); const c = currentChamadoDetails; console.log("Dados chat:", c); if (!c) throw new Error("Resposta inválida (null)."); tit.textContent = c.titulo || 'S/ Título'; num.textContent = `${c.numeroChamado || 'N/A'} (${c.status || 'N/A'})`; if (c.anexos && c.anexos.length > 0) { let h = ''; c.anexos.forEach(a => { if (a.urlArquivo && a.nomeArquivo) { const s = a.nomeArquivo.replace(/</g, "&lt;").replace(/>/g, "&gt;"); h += `<li><a href="${a.urlArquivo}" target="_blank">${s}</a></li>`; } }); if (h) { aL.innerHTML = h; aC.style.display = 'block'; } } renderizarMensagens(c.mensagens || []); if (currentUserType === 'Employee') { ctl.style.display = 'block'; try { document.getElementById('analyst-select-status').value = c.status || ''; } catch (e) { console.warn(e); } try { document.getElementById('analyst-select-priority').value = c.prioridade || 'Média'; } catch (e) { console.warn(e); } await carregarAnalistasDropdown('analyst-select-assignee', c.analistaId); disableForm('analyst-controls', false); } let iB = false; if (c.status === 'Encerrado' || c.status === 'Cancelado') { iB = true; } else if (c.status === 'Concluído' && c.dataConclusao) { try { const dC = new Date(c.dataConclusao); const ag = new Date(); const dH = (ag - dC) / 36e5; if (dH > 72) iB = true; } catch (e) { console.error(e); } } if (iB && currentUserType === 'Client') { cI.placeholder = "Este chamado está encerrado."; showMessage("Este chamado está encerrado.", true); disableForm('chat-message-form', true); } else { cI.placeholder = "Digite sua mensagem..."; disableForm('chat-message-form', false); }
+
+                    // --- NOVO: Inicia o polling após carregar o chat ---
+                    stopChatPolling(); // Garante que parou (de novo)
+                    chatPollingInterval = setInterval(pollChatMessages, 5000); // Verifica a cada 5 segundos
+                    // --- FIM NOVO ---
+
+                } catch (e) { console.error('Erro abrir chat:', e); if (e.message !== "Sessão expirada.") showMessage(`Erro chat: ${e.message}`, true); mA.innerHTML = `<p style="color:red;">Falha ao carregar dados.</p>`; }
+            }
+
             function renderizarMensagens(msgs) { const a = document.getElementById('chat-messages-area'); if (!a) return; a.innerHTML = ''; if (!msgs || msgs.length === 0) { a.innerHTML = `<p style="text-align:center; color:#999;">Sem mensagens.</p>`; return; } try { msgs.forEach(m => { if (!m) { console.warn("Msg inválida:", m); return; } const d = formatISODate(m.dataEnvio); let rc = '', ac = ''; const t = m.tipoRemetente || 'IA'; const u = currentUserType || 'Client'; if (t === 'Client') rc = 'client'; else if (t === 'Employee') rc = 'analyst'; else rc = 'ia'; if ((t === 'Client' && u === 'Client') || (t === 'Employee' && u === 'Employee')) { ac = 'viewer'; } else { ac = 'other'; } const sC = (m.conteudo || '').replace(/</g, "&lt;").replace(/>/g, "&gt;"); const sS = (m.remetenteNome || 'Desc.').replace(/</g, "&lt;").replace(/>/g, "&gt;"); a.innerHTML += `<div class="chat-message ${ac} ${rc}"><span class="sender">${sS}<span class="timestamp">${d}</span></span><div class="content">${sC}</div></div>`; }); setTimeout(() => { a.scrollTop = a.scrollHeight; }, 50); } catch (err) { console.error("Erro renderizar:", err, msgs); a.innerHTML = `<p style="color:red;">Erro exibir msgs.</p>`; } }
             function showAnalystTab(tabName) { try { document.querySelectorAll('#employee-dashboard-screen .tab-content').forEach(c => c.classList.remove('active')); document.querySelectorAll('#employee-dashboard-screen .tab-link').forEach(l => l.classList.remove('active')); document.getElementById(`tab-content-${tabName}`).classList.add('active'); document.getElementById(`tab-link-${tabName}`).classList.add('active'); } catch (e) { console.error("Erro aba Analista:", e, tabName); } }
             function showClientTab(tabName) { try { document.querySelectorAll('#client-dashboard-screen .tab-content').forEach(c => c.classList.remove('active')); document.querySelectorAll('#client-dashboard-screen .tab-link').forEach(l => l.classList.remove('active')); document.getElementById(`tab-content-${tabName}`).classList.add('active'); document.getElementById(`tab-link-${tabName}`).classList.add('active'); } catch (e) { console.error("Erro aba Cliente:", e, tabName); } }
@@ -992,7 +1190,14 @@
             document.getElementById('logout-client').addEventListener('click', logout);
             document.getElementById('logout-employee').addEventListener('click', logout);
             document.getElementById('logout-chat').addEventListener('click', logout);
-            document.getElementById('chat-btn-back').addEventListener('click', () => { currentChamadoId = null; const s = currentUserType === "Client" ? 'client-dashboard-screen' : 'employee-dashboard-screen'; showScreen(s); if (currentUserType === "Client") loadClientDashboard(); else loadEmployeeDashboard(); });
+
+            document.getElementById('chat-btn-back').addEventListener('click', () => {
+                // --- NOVO ---
+                stopChatPolling();
+                // --- FIM NOVO ---
+                currentChamadoId = null; const s = currentUserType === "Client" ? 'client-dashboard-screen' : 'employee-dashboard-screen'; showScreen(s); if (currentUserType === "Client") loadClientDashboard(); else loadEmployeeDashboard();
+            });
+
             document.getElementById('chat-btn-refresh').addEventListener('click', () => { if (currentChamadoId) { showMessage('Atualizando...', false); abrirChat(currentChamadoId); } });
             function handleGridClick(event) { if (event.target && event.target.classList.contains('grid-clickable-cell')) { const chamadoId = event.target.closest('tr').dataset.id; if (chamadoId) abrirChat(chamadoId); } }
             document.getElementById('my-assigned-grid-body').addEventListener('click', handleGridClick);
@@ -1088,15 +1293,15 @@
                     employees.forEach(emp => {
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
-                                <td>${emp.name}</td>
-                                <td>${emp.email}</td>
-                                <td>${emp.role}</td>
-                                <td>${emp.isAdmin ? 'Sim' : 'Não'}</td>
-                                <td>
-                                    <button class="btn-grid-edit" data-id="${emp.id}">Editar</button>
-                                    <button class="btn-grid-delete" data-id="${emp.id}">Excluir</button>
-                                </td>
-                            `;
+                                    <td>${emp.name}</td>
+                                    <td>${emp.email}</td>
+                                    <td>${emp.role}</td>
+                                    <td>${emp.isAdmin ? 'Sim' : 'Não'}</td>
+                                    <td>
+                                        <button class="btn-grid-edit" data-id="${emp.id}">Editar</button>
+                                        <button class="btn-grid-delete" data-id="${emp.id}">Excluir</button>
+                                    </td>
+                                `;
                         listBody.appendChild(tr);
                     });
                 } catch (e) {
