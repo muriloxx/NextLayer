@@ -74,6 +74,9 @@ builder.Services.AddControllers();
 builder.Services.AddRazorPages(); // Mantém as páginas padrão (Welcome, Error)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 
 // --- FIM DO REGISTRO DE SERVIÇOS ---
 
