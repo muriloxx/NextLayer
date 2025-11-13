@@ -25,7 +25,6 @@ namespace NextLayer.Data
         public DbSet<MensagemChat> MensagensChat { get; set; }
         public DbSet<Anexo> Anexos { get; set; }
         public DbSet<FaqItem> FaqItens { get; set; }
-
         // DbSet para a  tabela de Auditoria
         public DbSet<AuditLog> AuditLogs { get; set; }
 

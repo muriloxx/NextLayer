@@ -10,6 +10,7 @@ C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\obj\Debug\net8.0-windows\NextL
 C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\obj\Debug\net8.0-windows\NextLayer.AdminDesktop.AssemblyInfoInputs.cache
 C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\obj\Debug\net8.0-windows\NextLayer.AdminDesktop.AssemblyInfo.cs
 C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\obj\Debug\net8.0-windows\NextLayer.AdminDesktop.csproj.CoreCompileInputs.cache
+C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\obj\Debug\net8.0-windows\NextLayer.AdminDesktop.sourcelink.json
 C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\obj\Debug\net8.0-windows\NextLayer.AdminDesktop.dll
 C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\obj\Debug\net8.0-windows\refint\NextLayer.AdminDesktop.dll
 C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\obj\Debug\net8.0-windows\NextLayer.AdminDesktop.pdb
