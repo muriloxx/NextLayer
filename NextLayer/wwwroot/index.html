@@ -1064,7 +1064,52 @@
                 // --- NOVO: Para polling ---
                 stopChatPolling();
                 // --- FIM NOVO ---
-                currentUserType = null; currentChamadoId = null; listaAnalistasCache = null; currentUserIsAdmin = false; localStorage.removeItem('jwtToken'); localStorage.removeItem('userName'); localStorage.removeItem('isAdmin'); try { document.getElementById('analyst-ticket-grid-body').innerHTML = ''; } catch (e) { } try { document.getElementById('my-assigned-grid-body').innerHTML = ''; } catch (e) { } try { document.getElementById('client-ticket-grid-body').innerHTML = ''; } catch (e) { } try { if (statsChartInstance) { statsChartInstance.destroy(); statsChartInstance = null; } const sC = document.getElementById('dashboard-stats-container'); if (sC) { sC.innerHTML = '<p id="stats-loading-message" style="color: #666;">Carregando...</p>'; } } catch (e) { } try { document.getElementById('report-total-abertos').innerHTML = '<div class="db-stat-number db-loading">...</div>'; } catch (e) { } try { document.getElementById('report-por-prioridade').innerHTML = '<li class="db-loading">Carregando...</li>'; } catch (e) { } try { document.getElementById('report-recentes-body').innerHTML = '<tr><td colspan="4" class="db-loading" style="text-align: center;">Carregando...</td></tr>'; } catch (e) { } try { document.getElementById('employee-list-body').innerHTML = ''; } catch (e) { } ['login-form', 'client-register-form', 'client-ticket-form', 'chat-message-form', 'analyst-controls', 'admin-register-form', 'mudar-senha-form-client', 'mudar-senha-form-employee', 'admin-reset-password-form'].forEach(id => { const el = document.getElementById(id); if (el) { if (el.tagName === 'FORM') el.reset(); else { try { el.querySelectorAll('select').forEach(s => s.selectedIndex = 0); el.querySelectorAll('input:not([type=hidden])').forEach(i => i.value = ''); } catch (e) { } } } }); try { document.getElementById('client-dashboard-title').textContent = "Portal do Cliente"; } catch (e) { } try { document.getElementById('employee-dashboard-title').textContent = "Painel do Analista"; } catch (e) { } try { document.getElementById('tab-link-admin').style.display = 'none'; } catch (e) { } showScreen('login-screen');
+                currentUserType = null; currentChamadoId = null; listaAnalistasCache = null; currentUserIsAdmin = false;
+                localStorage.removeItem('jwtToken');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('isAdmin');
+                localStorage.removeItem('userType'); // <-- ALTERAÇÃO: Limpa o tipo de usuário
+                try { document.getElementById('analyst-ticket-grid-body').innerHTML = ''; } catch (e) { }
+                try { document.getElementById('my-assigned-grid-body').innerHTML = ''; } catch (e) { }
+                try { document.getElementById('client-ticket-grid-body').innerHTML = ''; } catch (e) { }
+                try { if (statsChartInstance) { statsChartInstance.destroy(); statsChartInstance = null; } const sC = document.getElementById('dashboard-stats-container'); if (sC) { sC.innerHTML = '<p id="stats-loading-message" style="color: #666;">Carregando...</p>'; } } catch (e) { }
+                try { document.getElementById('report-total-abertos').innerHTML = '<div class="db-stat-number db-loading">...</div>'; } catch (e) { }
+                try { document.getElementById('report-por-prioridade').innerHTML = '<li class="db-loading">Carregando...</li>'; } catch (e) { }
+                try { document.getElementById('report-recentes-body').innerHTML = '<tr><td colspan="4" class="db-loading" style="text-align: center;">Carregando...</td></tr>'; } catch (e) { }
+                try { document.getElementById('employee-list-body').innerHTML = ''; } catch (e) { }
+                ['login-form', 'client-register-form', 'client-ticket-form', 'chat-message-form', 'analyst-controls', 'admin-register-form', 'mudar-senha-form-client', 'mudar-senha-form-employee', 'admin-reset-password-form'].forEach(id => { const el = document.getElementById(id); if (el) { if (el.tagName === 'FORM') el.reset(); else { try { el.querySelectorAll('select').forEach(s => s.selectedIndex = 0); el.querySelectorAll('input:not([type=hidden])').forEach(i => i.value = ''); } catch (e) { } } } });
+                try { document.getElementById('client-dashboard-title').textContent = "Portal do Cliente"; } catch (e) { }
+                try { document.getElementById('employee-dashboard-title').textContent = "Painel do Analista"; } catch (e) { }
+                try { document.getElementById('tab-link-admin').style.display = 'none'; } catch (e) { }
+                showScreen('login-screen');
+            }
+
+            // --- NOVO: Função para verificar sessão existente ---
+            function checkExistingSession() {
+                const token = localStorage.getItem('jwtToken');
+                const userName = localStorage.getItem('userName');
+                const userType = localStorage.getItem('userType'); // <-- O novo item
+                const isAdmin = localStorage.getItem('isAdmin') === 'true'; // Converte string para booleano
+
+                if (token && userName && userType) {
+                    console.log("Sessão existente encontrada:", userType);
+
+                    // 1. Popula as variáveis globais (igual no login)
+                    currentUserType = userType;
+                    currentUserIsAdmin = isAdmin;
+
+                    // 2. Mostra o dashboard correto, pulando o login
+                    if (userType === "Client") {
+                        showScreen('client-dashboard-screen');
+                        loadClientDashboard();
+                    } else if (userType === "Employee") {
+                        showScreen('employee-dashboard-screen');
+                        loadEmployeeDashboard();
+                    }
+                } else {
+                    console.log("Nenhuma sessão ativa. Exibindo login.");
+                    // Não faz nada, pois o HTML padrão (screen active) já mostra a tela de login.
+                }
             }
 
             // --- NOVO: Funções de Polling do Chat ---
@@ -1216,7 +1261,12 @@
                 event.preventDefault(); showMessage('', false); disableForm('login-form', true); const d = { email: document.getElementById('login-email').value, password: document.getElementById('login-password').value };
                 try {
                     const r = await fetch(`${API_URL}/api/Auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) }); const res = await r.json(); if (!r.ok) { throw new Error(res.message || `Erro ${r.status}.`); } if (!res.token || !res.userName) throw new Error("Resposta de login incompleta.");
-                    localStorage.setItem('jwtToken', res.token); localStorage.setItem('userName', res.userName); localStorage.setItem('isAdmin', res.isAdmin); currentUserType = res.userType; currentUserIsAdmin = res.isAdmin;
+                    localStorage.setItem('jwtToken', res.token);
+                    localStorage.setItem('userName', res.userName);
+                    localStorage.setItem('isAdmin', res.isAdmin);
+                    localStorage.setItem('userType', res.userType); // <-- ALTERAÇÃO: Salva o tipo de usuário
+                    currentUserType = res.userType;
+                    currentUserIsAdmin = res.isAdmin;
                     document.getElementById('login-form').reset();
                     if (currentUserType === "Client") { showScreen('client-dashboard-screen'); loadClientDashboard(); }
                     else if (currentUserType === "Employee") { showScreen('employee-dashboard-screen'); loadEmployeeDashboard(); }
@@ -1293,15 +1343,15 @@
                     employees.forEach(emp => {
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
-                                    <td>${emp.name}</td>
-                                    <td>${emp.email}</td>
-                                    <td>${emp.role}</td>
-                                    <td>${emp.isAdmin ? 'Sim' : 'Não'}</td>
-                                    <td>
-                                        <button class="btn-grid-edit" data-id="${emp.id}">Editar</button>
-                                        <button class="btn-grid-delete" data-id="${emp.id}">Excluir</button>
-                                    </td>
-                                `;
+                                        <td>${emp.name}</td>
+                                        <td>${emp.email}</td>
+                                        <td>${emp.role}</td>
+                                        <td>${emp.isAdmin ? 'Sim' : 'Não'}</td>
+                                        <td>
+                                            <button class="btn-grid-edit" data-id="${emp.id}">Editar</button>
+                                            <button class="btn-grid-delete" data-id="${emp.id}">Excluir</button>
+                                        </td>
+                                    `;
                         listBody.appendChild(tr);
                     });
                 } catch (e) {
@@ -1521,6 +1571,8 @@
             document.getElementById('ticket-descricao').addEventListener('input', debounceBuscarSugestoes);
 
             console.log("Portal NextLayer (com CRUD de Admin) inicializado.");
+
+            checkExistingSession(); // <-- ALTERAÇÃO: Verifica se já existe uma sessão ao carregar a página
 
         }); // --- FIM DO DOMContentLoaded ---
         /* --- FIM DO JAVASCRIPT --- */
