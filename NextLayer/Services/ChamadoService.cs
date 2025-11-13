@@ -31,6 +31,46 @@ namespace NextLayer.Services
             _logger = logger;
         }
 
+        public async Task<List<ChamadoGridViewModel>> GetAllChamadosAdminAsync(string? status, string? prioridade)
+        {
+            // Começa com uma query que pega todos os chamados
+            // ---  Adicionámos .Include() para forçar o carregamento ---
+            var query = _context.Chamados
+                                .Include(c => c.Cliente) // <-- Força o carregamento do Cliente
+                                .Include(c => c.Analista) // <-- Força o carregamento do Analista
+                                .AsQueryable();
+
+            // Aplica o filtro de status, se ele foi fornecido
+            if (!string.IsNullOrEmpty(status))
+            {
+                query = query.Where(c => c.Status == status);
+            }
+
+            // Aplica o filtro de prioridade, se ele foi fornecido
+            if (!string.IsNullOrEmpty(prioridade))
+            {
+                query = query.Where(c => c.Prioridade == prioridade);
+            }
+
+            // Projeta o resultado para o ViewModel
+            var chamados = await query
+                .OrderByDescending(c => c.DataAbertura)
+                .Select(c => new ChamadoGridViewModel
+                {
+                    Id = c.Id,
+                    NumeroChamado = c.NumeroChamado,
+                    Titulo = c.Titulo,
+                    Status = c.Status,
+                    Prioridade = c.Prioridade,
+                    DataAbertura = c.DataAbertura,
+                    NomeCliente = c.Cliente.Name, // Esta linha agora DEVE funcionar
+                    NomeAnalista = c.Analista != null ? c.Analista.Name : null
+                })
+                .ToListAsync();
+
+            return chamados;
+        }
+
         public async Task<DetalheChamadoViewModel> CriarNovoChamado(CriarChamadoViewModel model, int clienteId)
         {
             var cliente = await _context.Clients.FindAsync(clienteId);

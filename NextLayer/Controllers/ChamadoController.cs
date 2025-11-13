@@ -1,6 +1,4 @@
-﻿// --- ARQUIVO: Controllers/ChamadoController.cs (COMPLETO E CORRIGIDO) ---
-
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NextLayer.Services;
@@ -10,6 +8,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization; // Para futura autenticação
 using System.Security.Claims; // Para futura autenticação
+using Microsoft.EntityFrameworkCore;
 
 namespace NextLayer.Controllers
 {
@@ -33,7 +32,25 @@ namespace NextLayer.Controllers
             _logger = logger;
         }
 
-        // --- NOVO MÉTODO HELPER (Usado internamente) ---
+        // ---  MÉTODO PARA O DASHBOARD ADMIN ---
+        [HttpGet("todos-admin")]
+        [Authorize(Policy = "AdminOnly")] // Apenas Admins podem ver tudo
+        public async Task<IActionResult> GetAllChamadosParaAdmin([FromQuery] string? status, [FromQuery] string? prioridade)
+        {
+            try
+            {
+                // Agora chama o Service, que tem a lógica correta
+                var chamados = await _chamadoService.GetAllChamadosAdminAsync(status, prioridade);
+                return Ok(chamados);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Erro interno ao buscar chamados.", error = ex.Message });
+            }
+        }
+        // --- FIM DO  MÉTODO ---
+
+        // ---  MÉTODO HELPER (Usado internamente) ---
         /// <summary>
         /// Obtém o ID e o Tipo (Role) do usuário logado a partir do token JWT.
         /// </summary>

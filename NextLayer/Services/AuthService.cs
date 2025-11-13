@@ -65,18 +65,38 @@ namespace NextLayer.Services
 
         public async Task<Employee> RegisterEmployeeAsync(EmployeeRegisterViewModel model)
         {
-            if (await _context.Employees.AnyAsync(e => e.Email == model.Email))
+            
+
+            // 1. Converte o e-mail de entrada para minúsculas ANTES de checar
+            var emailLower = model.Email.ToLower();
+
+            // 2. Verifica na tabela Employees (ignorando maiúsculas/minúsculas)
+            var employeeExists = await _context.Employees.AnyAsync(e => e.Email.ToLower() == emailLower);
+            if (employeeExists)
             {
-                throw new InvalidOperationException("Este e-mail já está em uso.");
+                // Usa o e-mail original (model.Email) na mensagem de erro
+                throw new InvalidOperationException($"Email '{model.Email}' já está em uso.");
             }
+
+            // 3. ADIÇÃO CRÍTICA: Verifica também na tabela de Clientes
+            var clientExists = await _context.Clients.AnyAsync(c => c.Email.ToLower() == emailLower);
+            if (clientExists)
+            {
+                // Lança o mesmo erro para o usuário não saber que foi em outra tabela
+                throw new InvalidOperationException($"Email '{model.Email}' já está em uso.");
+            }
+
+
+            // O resto do seu código estava correto:
             var employee = new Employee
             {
                 Name = model.Name,
-                Email = model.Email,
+                Email = model.Email, // Salva o e-mail original no banco
                 Role = model.Role,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
                 IsAdmin = model.IsAdmin
             };
+
             _context.Employees.Add(employee);
             await _context.SaveChangesAsync();
             return employee;
