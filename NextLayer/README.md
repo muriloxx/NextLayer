@@ -46,7 +46,7 @@ Esta API fornece endpoints para todas as operações do sistema, incluindo:
 ### Pré-requisitos
 * [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 * Um servidor [PostgreSQL](https://www.postgresql.org/download/) em execução.
-* (Opcional) Uma chave de API do Google Gemini (ou Groq, etc.) para a IA funcionar.
+* (Opcional) Uma chave de API do  Grok (ou Groq, etc.) para a IA funcionar.
 
 ### 1. Configurar o `appsettings.Development.json`
 Antes de executar, configure as suas "secrets". O ficheiro deve ter a seguinte estrutura:
@@ -62,6 +62,6 @@ Antes de executar, configure as suas "secrets". O ficheiro deve ter a seguinte e
     "Audience": "NextLayerApp"
   },
   "AiService": {
-    "ApiKey": "SUA_CHAVE_DE_API_DO_GEMINI_AQUI"
+    "ApiKey": "SUA_CHAVE_DE_API_DO_Grok_AQUI"
   }
 }
