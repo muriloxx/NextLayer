@@ -20,12 +20,6 @@ namespace NextLayer.Controllers
         private readonly IChamadoService _chamadoService;
         private readonly ILogger<ChamadoController> _logger;
 
-        // --- ÁREA DE SIMULAÇÃO DE LOGIN ---
-        // (Será removida quando implementarmos o front-end com JWT)
-        private const int SIMULATED_CLIENT_ID = 1;
-        private const int SIMULATED_ANALYST_ID = 1; // Mude para 2 para testar o Analista 2
-        // --- FIM DA ÁREA DE SIMULAÇÃO ---
-
         public ChamadoController(IChamadoService chamadoService, ILogger<ChamadoController> logger)
         {
             _chamadoService = chamadoService;

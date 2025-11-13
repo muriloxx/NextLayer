@@ -19,7 +19,6 @@ namespace NextLayer.Services
             _context = context;
         }
 
-        // --- Métodos que já existiam (sem alterações) ---
         public async Task<(object user, string userType)> AuthenticateAsync(LoginViewModel model)
         {
             var client = await _context.Clients.FirstOrDefaultAsync(c => c.Email == model.Email);
@@ -140,10 +139,9 @@ namespace NextLayer.Services
             await _context.SaveChangesAsync();
         }
 
-        // --- FIM DOS MÉTODOS QUE JÁ EXISTIAM ---
 
 
-        // --- INÍCIO DO NOVO MÉTODO ADICIONADO ---
+        // --- INÍCIO DO  MÉTODO  ---
 
         /// <summary>
         /// Força a redefinição da senha de um usuário (Cliente ou Funcionário)
@@ -183,6 +181,6 @@ namespace NextLayer.Services
             await _context.SaveChangesAsync();
         }
 
-        // --- FIM DO NOVO MÉTODO ADICIONADO ---
+        // --- FIM DO  MÉTODO  ---
     }
 }

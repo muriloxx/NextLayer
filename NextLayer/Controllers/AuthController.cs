@@ -1,6 +1,4 @@
-﻿// --- ARQUIVO: Controllers/AuthController.cs (COM NOVO ENDPOINT DE RESET) ---
-
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NextLayer.Services;
 using NextLayer.ViewModels;
 using System;
@@ -105,7 +103,7 @@ namespace NextLayer.Controllers
         }
 
 
-        // --- INÍCIO DO NOVO MÉTODO ADICIONADO ---
+        // --- INÍCIO DO MÉTODO  ---
 
         /// <summary>
         /// (Admin) Força a redefinição da senha de qualquer usuário.
@@ -143,10 +141,10 @@ namespace NextLayer.Controllers
             }
         }
 
-        // --- FIM DO NOVO MÉTODO ADICIONADO ---
+        // --- FIM DO  MÉTODO  ---
 
 
-        // --- MÉTODO GERAR TOKEN (sem alterações) ---
+        // --- MÉTODO GERAR TOKEN ---
         private string GerarTokenJwt(object userObject, string userType, bool isAdmin)
         {
             var jwtKey = _configuration["Jwt:Key"] ?? throw new ArgumentNullException("Jwt:Key não encontrada");

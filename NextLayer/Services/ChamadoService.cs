@@ -1,6 +1,4 @@
-﻿// --- ARQUIVO: Services/ChamadoService.cs (COMPLETO E CORRIGIDO) ---
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NextLayer.Data;
 using NextLayer.Models;
@@ -34,7 +32,6 @@ namespace NextLayer.Services
         public async Task<List<ChamadoGridViewModel>> GetAllChamadosAdminAsync(string? status, string? prioridade)
         {
             // Começa com uma query que pega todos os chamados
-            // ---  Adicionámos .Include() para forçar o carregamento ---
             var query = _context.Chamados
                                 .Include(c => c.Cliente) // <-- Força o carregamento do Cliente
                                 .Include(c => c.Analista) // <-- Força o carregamento do Analista

@@ -1,6 +1,4 @@
-﻿// --- ARQUIVO: Controllers/EmployeeController.cs (COMPLETO E ATUALIZADO) ---
-
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NextLayer.Data; // 1. ADICIONADO: Para usar o AppDbContext
 using NextLayer.Models; // 2. ADICIONADO: Para usar o Employee
 using NextLayer.Services;
@@ -21,7 +19,7 @@ namespace NextLayer.Controllers
     {
         private readonly AppDbContext _context; // 7. ADICIONADO: Injeção do DbContext
 
-        // 8. ATUALIZADO: Construtor agora recebe o AppDbContext
+        // 8.  Construtor agora recebe o AppDbContext
         public EmployeeController(AppDbContext context)
         {
             _context = context;
@@ -56,7 +54,7 @@ namespace NextLayer.Controllers
         }
 
 
-        // --- INÍCIO: NOVOS MÉTODOS DE ADMIN ADICIONADOS ---
+        // --- INÍCIO:  MÉTODOS DE ADMIN  ---
 
         /// <summary>
         /// (Admin) Retorna a lista de TODOS os funcionários (Analistas e Admins).
@@ -172,6 +170,6 @@ namespace NextLayer.Controllers
             }
         }
 
-        // --- FIM: NOVOS MÉTODOS DE ADMIN ADICIONADOS ---
+        // --- FIM:  MÉTODOS DE ADMIN  ---
     }
 }
