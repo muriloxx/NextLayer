@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-// Adicionamos a referência ao Modelo 'Chamado'
 using NextLayer.Models;
 
 namespace NextLayer.Services
@@ -58,7 +57,7 @@ namespace NextLayer.Services
         }
 
 
-        // --- INÍCIO: IMPLEMENTAÇÃO DOS NOVOS MÉTODOS ---
+        // --- INÍCIO: IMPLEMENTAÇÃO DOS MÉTODOS ---
 
         /// <summary>
         /// Relatório 1: Retorna o número total de chamados abertos.
@@ -123,6 +122,6 @@ namespace NextLayer.Services
             }
         }
 
-        // --- FIM: IMPLEMENTAÇÃO DOS NOVOS MÉTODOS ---
+        // --- FIM: IMPLEMENTAÇÃO DOS MÉTODOS ---
     }
 }

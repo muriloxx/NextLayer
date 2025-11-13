@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-// A linha 'using Microsoft.AspNetCore.Identity.EntityFrameworkCore;' foi REMOVIDA
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking; // Necessário para o ChangeTracker
 using NextLayer.Models;
@@ -19,7 +18,7 @@ namespace NextLayer.Data
             _httpContextAccessor = httpContextAccessor;
         }
 
-        // Seus DbSets existentes
+        //  DbSets existentes
         public DbSet<Client> Clients { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Chamado> Chamados { get; set; }
@@ -27,7 +26,7 @@ namespace NextLayer.Data
         public DbSet<Anexo> Anexos { get; set; }
         public DbSet<FaqItem> FaqItens { get; set; }
 
-        // DbSet para a nova tabela de Auditoria
+        // DbSet para a  tabela de Auditoria
         public DbSet<AuditLog> AuditLogs { get; set; }
 
         // Identity DbSets (como no seu arquivo original)

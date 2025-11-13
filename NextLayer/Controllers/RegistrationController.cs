@@ -1,6 +1,4 @@
-﻿// --- ARQUIVO: Controllers/RegistrationController.cs (FINALMENTE CORRETO) ---
-
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NextLayer.Services;
 using NextLayer.ViewModels;
 using System.Threading.Tasks;

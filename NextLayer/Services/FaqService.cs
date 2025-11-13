@@ -22,9 +22,7 @@ namespace NextLayer.Services
         /// </summary>
         public async Task<List<FaqItem>> GetAllFaqsAsync()
         {
-            // ==========================================================
-            // CORREÇÃO: Usando "FaqItens" (com 'e')
-            // ==========================================================
+
             return await _context.FaqItens.AsNoTracking().ToListAsync();
         }
 
@@ -43,9 +41,7 @@ namespace NextLayer.Services
 
             var palavrasChave = palavrasChaveDescricao.Union(palavrasChaveTitulo);
 
-            // ==========================================================
-            // CORREÇÃO: Usando "FaqItens" (com 'e')
-            // ==========================================================
+
             var todosFaqs = await _context.FaqItens.AsNoTracking().ToListAsync();
 
             var sugestoes = todosFaqs
@@ -62,9 +58,7 @@ namespace NextLayer.Services
         /// </summary>
         public async Task SeedInitialFaqsAsync()
         {
-            // ==========================================================
-            // CORREÇÃO: Usando "FaqItens" (com 'e')
-            // ==========================================================
+
             if (await _context.FaqItens.AnyAsync())
             {
                 // Se o banco já tiver FAQs, não faz nada.
@@ -100,12 +94,6 @@ namespace NextLayer.Services
             await _context.SaveChangesAsync();
         }
 
-        // ====================================================================
-        // NOTA:
-        // Os métodos que causaram os erros de "Categoria" (como CriarFaqAsync,
-        // AtualizarFaqAsync, etc.) não estão definidos na sua IFaqService.cs.
-        // Por isso, eles foram removidos para que o código compile.
-        // Se você precisar deles, eles devem ser adicionados primeiro à IFaqService.cs.
-        // ====================================================================
+
     }
 }

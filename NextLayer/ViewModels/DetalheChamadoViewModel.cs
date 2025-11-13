@@ -30,7 +30,7 @@ namespace NextLayer.ViewModels
         public string Status { get; set; }
         public string NomeCliente { get; set; }
 
-        // --- NOVAS PROPRIEDADES PARA O FRONT-END ---
+        // ---  PROPRIEDADES PARA O FRONT-END ---
         /// <summary>
         /// Prioridade atual do chamado (Baixa, Média, Alta).
         /// </summary>

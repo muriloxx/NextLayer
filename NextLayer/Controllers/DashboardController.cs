@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using NextLayer.Services;
 using System;
 using System.Threading.Tasks;
-// Adicionamos os 'usings' necessários para os novos retornos
 using NextLayer.Models;
 using System.Collections.Generic;
 
@@ -45,7 +44,7 @@ namespace NextLayer.Controllers
         }
 
 
-        // --- INÍCIO: NOVOS ENDPOINTS ADICIONADOS ---
+        // --- INÍCIO: ENDPOINTS  ---
 
         /// <summary>
         /// Relatório 1: Retorna o número total de chamados abertos.
@@ -101,6 +100,6 @@ namespace NextLayer.Controllers
             }
         }
 
-        // --- FIM: NOVOS ENDPOINTS ADICIONADOS ---
+        // --- FIM: ENDPOINTS  ---
     }
 }
