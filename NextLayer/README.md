@@ -24,7 +24,7 @@ Esta API fornece endpoints para todas as operações do sistema, incluindo:
     * Cadastro de Clientes (com validação de CPF).
     * Cadastro de Funcionários (com validação de e-mail institucional).
     * Edição, listagem e exclusão de funcionários por administradores.
-* **Integração com IA (Gemini):**
+* **Integração com IA (Grok):**
     * **Respostas Iniciais:** A IA fornece a primeira resposta automática ao cliente quando um chamado é criado.
     * **Sugestões de FAQ:** A IA sugere artigos de FAQ relevantes enquanto o cliente digita o seu problema.
 * **Dashboard de Relatórios:** Endpoints que fornecem estatísticas para painéis de BI (ex: total de chamados abertos, chamados por status, chamados por prioridade).
