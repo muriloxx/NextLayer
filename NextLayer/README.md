@@ -38,7 +38,7 @@ Esta API fornece endpoints para todas as operações do sistema, incluindo:
 * **PostgreSQL** (Banco de Dados)
 * **Autenticação JWT** (JSON Web Tokens)
 * **BCrypt.Net-Next** (para Hashing de senhas)
-* **API do Google Gemini** (para as funcionalidades de IA)
+* **API do Grok** (para as funcionalidades de IA)
 * **Arquitetura de Serviços** (Services) para desacoplar a lógica de negócio dos Controllers.
 
 ## ⚙️ Como Executar
