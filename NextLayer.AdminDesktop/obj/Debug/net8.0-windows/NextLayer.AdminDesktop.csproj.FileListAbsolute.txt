@@ -1,0 +1,17 @@
+C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\bin\Debug\net8.0-windows\NextLayer.AdminDesktop.exe
+C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\bin\Debug\net8.0-windows\NextLayer.AdminDesktop.deps.json
+C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\bin\Debug\net8.0-windows\NextLayer.AdminDesktop.runtimeconfig.json
+C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\bin\Debug\net8.0-windows\NextLayer.AdminDesktop.dll
+C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\bin\Debug\net8.0-windows\NextLayer.AdminDesktop.pdb
+C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\obj\Debug\net8.0-windows\NextLayer.AdminDesktop.frmDashboard.resources
+C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\obj\Debug\net8.0-windows\NextLayer.AdminDesktop.frmLogin.resources
+C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\obj\Debug\net8.0-windows\NextLayer.AdminDesktop.csproj.GenerateResource.cache
+C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\obj\Debug\net8.0-windows\NextLayer.AdminDesktop.GeneratedMSBuildEditorConfig.editorconfig
+C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\obj\Debug\net8.0-windows\NextLayer.AdminDesktop.AssemblyInfoInputs.cache
+C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\obj\Debug\net8.0-windows\NextLayer.AdminDesktop.AssemblyInfo.cs
+C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\obj\Debug\net8.0-windows\NextLayer.AdminDesktop.csproj.CoreCompileInputs.cache
+C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\obj\Debug\net8.0-windows\NextLayer.AdminDesktop.dll
+C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\obj\Debug\net8.0-windows\refint\NextLayer.AdminDesktop.dll
+C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\obj\Debug\net8.0-windows\NextLayer.AdminDesktop.pdb
+C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\obj\Debug\net8.0-windows\NextLayer.AdminDesktop.genruntimeconfig.cache
+C:\NextLayerProj\NextLayer\NextLayer.AdminDesktop\obj\Debug\net8.0-windows\ref\NextLayer.AdminDesktop.dll

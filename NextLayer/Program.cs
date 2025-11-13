@@ -67,8 +67,12 @@ builder.Services.AddAuthentication(options =>
             ?? throw new ArgumentNullException("Jwt:Key não encontrada")))
     };
 });
-builder.Services.AddAuthorization();
-
+builder.Services.AddAuthorization(options =>
+{
+    // Esta política verifica se o token tem a claim "isAdmin" com o valor "True"
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireClaim("isAdmin", "True"));
+});
 // 6. Serviços Padrão do ASP.NET
 builder.Services.AddControllers();
 builder.Services.AddRazorPages(); // Mantém as páginas padrão (Welcome, Error)
